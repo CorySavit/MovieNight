@@ -1,0 +1,11 @@
+# MovieNight API
+
+The MovieNight API provides the necessary endpoints for the MovieNight Android Application. Currently, the API utilizes the [TMS Data Delivery API](http://developer.tmsapi.com/TMS_Data_Delivery_APIs) for relevant movie information. The API can be accessed at [labs.amoscato.com/movienight-api](http://labs.amoscato.com/movienight-api/).
+
+## Methods
+
+Below are a list of methods supported by the API.
+
+### /movies
+
+Returns a list of all movies currently playing in local theatres, with showtimes.
