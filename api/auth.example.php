@@ -1,4 +1,7 @@
 <?php
 
 // http://developer.tmsapi.com
-$ONCONNECT_KEY = '###';
+define("ONCONNECT_KEY", "###");
+
+// http://www.themoviedb.org/documentation/api
+define("THEMOVIEDB_KEY", "###");

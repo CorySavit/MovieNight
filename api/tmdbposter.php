@@ -1,4 +1,5 @@
 <?php
+require_once 'auth.php';
 
 class TMDBposter{
 	const _API_URL_ = "http://api.themoviedb.org/3/";
@@ -7,7 +8,7 @@ class TMDBposter{
 	private $_imgUrl;
 
 		public function  __construct() {
-			$this->setApikey('#######APIKEY#######');
+			$this->setApikey(THEMOVIEDB_KEY);
 			$this->setLang('en');
 			$conf = $this->getConfig();
 			if (empty($conf)){echo "Unable to read configuration, verify that the API key is valid";exit;}
