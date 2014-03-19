@@ -18,6 +18,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        
         <activity
             android:name="edu.pitt.cs1635.movienight.MainActivity"
             android:label="@string/app_name" >
@@ -27,6 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity
+            android:name="edu.pitt.cs1635.movienight.MovieDetailsActivity"
+            android:label="Movie" >
+        </activity>
+        
     </application>
 
 </manifest>

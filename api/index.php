@@ -3,6 +3,8 @@ require_once 'auth.php';
 require_once 'tmdbposter.php';
 
 class Movie {
+  public $id;
+  public $tmsid;
   public $title;
   public $description;
   public $genres;
@@ -42,6 +44,8 @@ if ($request[0] == "movies") {
   $movies = array();
   foreach ($result as $data) {
     $movie = new Movie();
+    $movie->id = $data->tmsId; // this will probably be our database's ID
+    $movie->tmsid = $data->tmsId;
     $movie->title = $data->title;
     $movie->description = $data->longDescription;
     $movie->rating = $data->ratings[0]->code;

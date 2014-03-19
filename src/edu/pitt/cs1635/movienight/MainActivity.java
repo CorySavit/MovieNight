@@ -7,11 +7,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import org.json.*;
 
@@ -24,6 +30,7 @@ public class MainActivity extends Activity {
 	private ArrayList<HashMap<String, String>> movieList;
 	
 	// define JSON keys
+	static final String TAG_ID = "id";
 	static final String TAG_TITLE = "title";
 	static final String TAG_POSTER = "poster";
 
@@ -41,6 +48,24 @@ public class MainActivity extends Activity {
 		
 		// find grid view
 		posterGrid = (GridView) this.findViewById(R.id.posterGrid);
+		
+		// listen for clicks on the grid view and delegate to each cell
+		posterGrid.setOnItemClickListener(new OnItemClickListener() {
+			
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
+				// getting values from selected movie
+				String name = ((TextView) view.findViewById(R.id.title)).getText().toString();
+
+				// start single contact activity
+				Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
+				intent.putExtra(TAG_ID, (String)view.getTag());
+				intent.putExtra(TAG_TITLE, name);
+				startActivity(intent);
+			}
+			
+		});
 
 		// fetch our movies
 		new GetMovies().execute();

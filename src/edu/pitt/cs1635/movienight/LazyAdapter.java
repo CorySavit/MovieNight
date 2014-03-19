@@ -64,9 +64,12 @@ public class LazyAdapter extends BaseAdapter {
         HashMap<String, String> movie = new HashMap<String, String>();
         movie = data.get(position);
  
-        // setting all values in view
+        // set all values in view
         title.setText(movie.get(MainActivity.TAG_TITLE));
         imageLoader.displayImage(movie.get(MainActivity.TAG_POSTER), poster);
+        
+        // set this view's tag to the unique movie id
+        view.setTag(movie.get(MainActivity.TAG_ID));
         
         return view;
     }
