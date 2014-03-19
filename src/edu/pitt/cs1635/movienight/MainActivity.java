@@ -20,12 +20,8 @@ import com.nostra13.universalimageloader.core.*;
 public class MainActivity extends Activity {
 
 	private ProgressDialog pDialog;
-	
 	private GridView posterGrid;
-
 	private ArrayList<HashMap<String, String>> movieList;
-	
-	static final String API_BASE_URL = "http://labs.amoscato.com/movienight-api/";
 	
 	// define JSON keys
 	static final String TAG_TITLE = "title";
@@ -77,10 +73,7 @@ public class MainActivity extends Activity {
 		protected Void doInBackground(Void... arg0) {
 			
 			// make call to API
-			ServiceHandler sh = new ServiceHandler();
-			String str = sh.makeServiceCall(API_BASE_URL + "movies", ServiceHandler.GET);
-
-			//Log.d("Response: ", "> " + str);
+			String str = API.getInstance().get("movies");
 
 			if (str != null) {
 				try {

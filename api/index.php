@@ -37,8 +37,7 @@ if ($request[0] == "movies") {
   print file_get_contents('mock/movies-showings');
   exit(1);
 
-  //$result = file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY);
-  $result = json_decode(file_get_contents('mock/movies-showings'));
+  $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
 
   $movies = array();
   foreach ($result as $data) {
