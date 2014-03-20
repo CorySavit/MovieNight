@@ -1,7 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -16,9 +15,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.ListAdapter;
-import android.widget.SimpleAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.json.*;
 
@@ -54,8 +50,12 @@ public class MainActivity extends Activity {
 				// start movie details activity
 				Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
 				Movie movie = (Movie) view.getTag();
-				intent.putExtra(Movie.ID, movie.id);
-				intent.putExtra(Movie.TITLE, movie.title);
+				
+				// pass our serialized movie object to the activity
+				// note that we should probably implement Parcelable instead
+				// see http://www.developerphil.com/parcelable-vs-serializable/
+				intent.putExtra("data", movie);
+				
 				startActivity(intent);
 			}
 			

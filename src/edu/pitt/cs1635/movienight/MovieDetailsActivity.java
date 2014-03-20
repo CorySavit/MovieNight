@@ -3,6 +3,7 @@ package edu.pitt.cs1635.movienight;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MovieDetailsActivity extends Activity {
@@ -14,16 +15,13 @@ public class MovieDetailsActivity extends Activity {
         
         // getting intent data
         Intent intent = getIntent();
+        Movie movie = (Movie) intent.getSerializableExtra("data");
         
-        // get JSON values from previous intent
-        String id = intent.getStringExtra(Movie.ID);
-        String title = intent.getStringExtra(Movie.TITLE);
-        
-        // @todo use id to make an API call to get additional data
+        // @todo use id to make an API call to get additional data?
         
         // set all values in view
         TextView titleView = (TextView) findViewById(R.id.title);
-        titleView.setText(title);
+        titleView.setText(movie.title);
     }
 
 }

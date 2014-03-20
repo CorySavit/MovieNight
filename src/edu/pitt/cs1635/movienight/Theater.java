@@ -1,5 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Theater {
+public class Theater implements Serializable {
 	
 	// JSON keys
 	static final String NAME = "name";

@@ -1,5 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -9,7 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class Movie {
+public class Movie implements Serializable {
 	
 	// JSON keys
 	static final String ID = "id";
