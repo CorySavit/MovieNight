@@ -16,8 +16,8 @@ public class MovieDetailsActivity extends Activity {
         Intent intent = getIntent();
         
         // get JSON values from previous intent
-        String id = intent.getStringExtra(MainActivity.TAG_ID);
-        String title = intent.getStringExtra(MainActivity.TAG_TITLE);
+        String id = intent.getStringExtra(Movie.ID);
+        String title = intent.getStringExtra(Movie.TITLE);
         
         // @todo use id to make an API call to get additional data
         

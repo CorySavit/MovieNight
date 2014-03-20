@@ -11,26 +11,27 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 
-public class LazyAdapter extends BaseAdapter {
+public class MainActivityAdapter extends BaseAdapter {
 	
 	private Activity activity;
-    private ArrayList<HashMap<String, String>> data;
+    private List<Movie> movies;
     private static LayoutInflater inflater = null;
     public ImageLoader imageLoader; 
  
-    public LazyAdapter(Activity a, ArrayList<HashMap<String, String>> d) {
+    public MainActivityAdapter(Activity a, List<Movie> d) {
         activity = a;
-        data = d;
+        movies = d;
         inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         imageLoader = ImageLoader.getInstance();
     }
     
     @Override
 	public int getCount() {
-		return data.size();
+		return movies.size();
 	}
 
 	@Override
@@ -61,15 +62,14 @@ public class LazyAdapter extends BaseAdapter {
         ImageView poster = (ImageView) view.findViewById(R.id.poster);
         
         // get appropriate movie data
-        HashMap<String, String> movie = new HashMap<String, String>();
-        movie = data.get(position);
+        Movie movie = movies.get(position);
  
         // set all values in view
-        title.setText(movie.get(MainActivity.TAG_TITLE));
-        imageLoader.displayImage(movie.get(MainActivity.TAG_POSTER), poster);
+        title.setText(movie.title);
+        imageLoader.displayImage(movie.poster, poster);
         
-        // set this view's tag to the unique movie id
-        view.setTag(movie.get(MainActivity.TAG_ID));
+        // set this view's tag to the entire data object
+        view.setTag(movie);
         
         return view;
     }

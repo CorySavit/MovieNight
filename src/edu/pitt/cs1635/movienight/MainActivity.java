@@ -2,6 +2,7 @@ package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,12 +28,7 @@ public class MainActivity extends Activity {
 
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
-	private ArrayList<HashMap<String, String>> movieList;
-	
-	// define JSON keys
-	static final String TAG_ID = "id";
-	static final String TAG_TITLE = "title";
-	static final String TAG_POSTER = "poster";
+	private List<Movie> movieList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +40,7 @@ public class MainActivity extends Activity {
         ImageLoader.getInstance().init(config);
 		
         // create data structure
-		movieList = new ArrayList<HashMap<String, String>>();
+		movieList = new ArrayList<Movie>();
 		
 		// find grid view
 		posterGrid = (GridView) this.findViewById(R.id.posterGrid);
@@ -55,13 +51,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				
-				// getting values from selected movie
-				String name = ((TextView) view.findViewById(R.id.title)).getText().toString();
-
-				// start single contact activity
+				// start movie details activity
 				Intent intent = new Intent(getApplicationContext(), MovieDetailsActivity.class);
-				intent.putExtra(TAG_ID, (String)view.getTag());
-				intent.putExtra(TAG_TITLE, name);
+				Movie movie = (Movie) view.getTag();
+				intent.putExtra(Movie.ID, movie.id);
+				intent.putExtra(Movie.TITLE, movie.title);
 				startActivity(intent);
 			}
 			
@@ -107,18 +101,10 @@ public class MainActivity extends Activity {
 
 					// loop through movies
 					for (int i = 0; i < movies.length(); i++) {
-						
-						// get JSON movie object
-						JSONObject c = movies.getJSONObject(i);
-						
-						// store its properties in a HashMap
-						HashMap<String, String> movie = new HashMap<String, String>();
-						movie.put(TAG_TITLE, c.getString(TAG_TITLE));
-						movie.put(TAG_POSTER, c.getString(TAG_POSTER));
-						
-						// add this HashMap to the movie list
-						movieList.add(movie);
+						// create movie object from JSON data and add to list
+						movieList.add(new Movie(movies.getJSONObject(i)));
 					}
+					
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -139,7 +125,7 @@ public class MainActivity extends Activity {
 			}
 			
 			// update the grid view with via our LazyAdapter
-			ListAdapter adapter = new LazyAdapter(MainActivity.this, movieList);
+			ListAdapter adapter = new MainActivityAdapter(MainActivity.this, movieList);
 			posterGrid.setAdapter(adapter);
 		}
 
