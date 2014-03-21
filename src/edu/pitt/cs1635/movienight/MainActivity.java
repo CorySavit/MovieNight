@@ -19,6 +19,7 @@ import android.widget.ListAdapter;
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
+import com.nostra13.universalimageloader.core.assist.PauseOnScrollListener;
 
 public class MainActivity extends Activity {
 

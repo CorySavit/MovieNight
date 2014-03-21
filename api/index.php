@@ -36,7 +36,7 @@ if ($request[0] == "movies") {
   // default zip code
   $zip = 15213;
 
-  print file_get_contents('mock/movies-showings');
+  print file_get_contents('mock/movies');
   exit(1);
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
@@ -72,7 +72,10 @@ if ($request[0] == "movies") {
     // add poster via the movie database
     $tmdb = new TMDBposter();
     $tmdb_results = $tmdb->searchMovie($movie->title,'en');
-    $movie->poster = 'http://image.tmdb.org/t/p/w342'.$tmdb_results['results'][0]['poster_path'];
+    $movie->poster = '';
+    if ($tmdb_results['results'][0]['poster_path']) {
+      $movie->poster = 'http://image.tmdb.org/t/p/w500'.$tmdb_results['results'][0]['poster_path'];
+    }
     
     array_push($movies, $movie);
   }
