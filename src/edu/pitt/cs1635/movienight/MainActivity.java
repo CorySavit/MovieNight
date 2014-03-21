@@ -1,6 +1,7 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.os.AsyncTask;
@@ -97,13 +98,18 @@ public class MainActivity extends Activity {
 
 			if (str != null) {
 				try {
-					// parse result to a JSON Array
-					JSONArray movies = new JSONArray(str);
+					// parse result to a JSON Object
+					JSONObject movies = new JSONObject(str);
 
 					// loop through movies
-					for (int i = 0; i < movies.length(); i++) {
+					Iterator<?> keys = movies.keys();
+					while (keys.hasNext()) {
+						String key = (String) keys.next();
+						
 						// create movie object from JSON data and add to list
-						movieList.add(new Movie(movies.getJSONObject(i)));
+						if (movies.get(key) instanceof JSONObject) {
+							movieList.add(new Movie(movies.getJSONObject(key)));
+						}
 					}
 					
 				} catch (JSONException e) {

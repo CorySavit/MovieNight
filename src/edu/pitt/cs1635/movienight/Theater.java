@@ -16,28 +16,29 @@ public class Theater implements Serializable {
 	// JSON keys
 	static final String NAME = "name";
 	static final String SHOWTIMES = "showtimes";
+	static final String TICKET_URL = "ticketurl";
 	
 	// object variables
 	String name;
-	List<Date> showtimes;
+	List<Showtime> showtimes;
+	String ticketurl;
 	
 	private SimpleDateFormat inputFormat;
 	
 	public Theater(JSONObject data) {
 		try {
 			name = data.getString(NAME);
+			ticketurl = data.getString(TICKET_URL);
 			
 			// add showtimes
 			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-			showtimes = new ArrayList<Date>();
+			showtimes = new ArrayList<Showtime>();
 			JSONArray myShowtimes = data.getJSONArray(SHOWTIMES);
 			for (int i = 0; i < myShowtimes.length(); i++) {
-				showtimes.add(inputFormat.parse(myShowtimes.getString(i)));
+				showtimes.add(new Showtime(myShowtimes.getJSONObject(i)));
 			}
 			
 		} catch (JSONException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}
