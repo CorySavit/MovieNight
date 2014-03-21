@@ -1,5 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,7 +8,7 @@ import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Showtime {
+public class Showtime implements Serializable {
 
 	// JSON keys
 	static final String TIME = "time";
