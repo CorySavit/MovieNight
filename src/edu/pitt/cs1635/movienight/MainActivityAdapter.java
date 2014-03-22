@@ -75,8 +75,7 @@ public class MainActivityAdapter extends BaseAdapter {
         // get appropriate movie data
         Movie movie = movies.get(position);
  
-        // set all values in view
-        title.setText(movie.title);
+        // set poster image
         imageLoader.displayImage(movie.poster, poster, imageOptions);
         
         // set this view's tag to the entire data object

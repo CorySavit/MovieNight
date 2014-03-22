@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Showtime implements Serializable {
@@ -28,18 +27,14 @@ public class Showtime implements Serializable {
 		try {
 			// parse time
 			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
-			time = inputFormat.parse(data.getString(TIME));
+			time = inputFormat.parse(JSON.getString(data, TIME));
 			
 			// convert flag
-			flag = data.getInt(FLAG);
+			flag = JSON.getInt(data, FLAG);
 
-		} catch (JSONException e) {
-			e.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 	}
-
-	// @todo should probably add get methods
 
 }
