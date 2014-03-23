@@ -24,3 +24,6 @@ proguard/
 
 # API keys
 api/auth.php
+
+# Project Properties
+project.properties
