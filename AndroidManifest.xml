@@ -46,6 +46,11 @@
             android:label="Movie" >
         </activity>
         
+        <activity
+            android:name="edu.pitt.cs1635.movienight.MapActivity"
+            android:label="Map" >
+        </activity>
+        
         <!-- Meta Data for google play services and google maps -->
          <meta-data
             android:name="com.google.android.gms.version"

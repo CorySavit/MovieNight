@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
+
 
 public class MainActivity extends Activity {
 
@@ -69,6 +71,21 @@ public class MainActivity extends Activity {
 
 		// fetch our movies
 		new GetMovies().execute();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			return true;
+		case R.id.action_map:
+			Intent mapView = new Intent(this, MapActivity.class);
+			startActivity(mapView);
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
