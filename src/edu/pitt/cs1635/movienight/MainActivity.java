@@ -8,18 +8,25 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 public class MainActivity extends Activity {
 
@@ -130,11 +137,85 @@ public class MainActivity extends Activity {
 				pDialog.dismiss();
 			}
 			
-			// update the grid view with via our LazyAdapter
-			ListAdapter adapter = new MainActivityAdapter(MainActivity.this, movieList);
+			// update the grid view with via our PosterAdapter
+			ListAdapter adapter = new PosterAdapter(MainActivity.this, movieList);
 			posterGrid.setAdapter(adapter);
 		}
 
+	}
+	
+	/*
+	 * Used to populate the GridView of movie posters
+	 */
+	private class PosterAdapter extends BaseAdapter {
+		
+		private Activity activity;
+	    private List<Movie> movies;
+	    private LayoutInflater inflater = null;
+	    private ImageLoader imageLoader;
+	    private DisplayImageOptions imageOptions;
+	 
+	    private PosterAdapter(Activity a, List<Movie> d) {
+	        activity = a;
+	        movies = d;
+	        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        imageLoader = ImageLoader.getInstance();
+	        imageOptions = new DisplayImageOptions.Builder()
+	        	.showImageOnLoading(R.drawable.blank_poster)
+	        	.showImageForEmptyUri(R.drawable.blank_poster)
+	        	.showImageOnFail(R.drawable.blank_poster)
+	        	.cacheInMemory(true)
+	        	.cacheOnDisc(false)
+	        	.build();
+	    }
+	    
+	    @Override
+		public int getCount() {
+			return movies.size();
+		}
+
+		@Override
+		// we have to implement this
+		public Object getItem(int position) {
+			return movies.get(position);
+		}
+
+		@Override
+		// again, we have have to implement this
+		public long getItemId(int position) {
+			return position;
+		}
+	 
+	    // see http://developer.android.com/reference/android/widget/Adapter.html#getView(int, android.view.View, android.view.ViewGroup)
+	    // this method is called for every grid in the gridview
+	    public View getView(int position, View convertView, ViewGroup parent) {
+	        
+	    	// create a new view if old view does not exist
+	    	View view = convertView;
+	        if (convertView == null) {
+	        	view = inflater.inflate(R.layout.movie_poster, null);
+	        }
+	        
+	        // get appropriate movie data
+	        Movie movie = movies.get(position);
+	        
+	        // set title
+	        // @todo figure out how to hide this if poster exists
+	        //TextView title = (TextView) view.findViewById(R.id.title);
+	        //title.setText(movie.title);
+	 
+	        // set poster image
+	        // this ImageAware wrapper is supposed to solve the image re-load issue on scroll
+	        // see https://github.com/nostra13/Android-Universal-Image-Loader/issues/406
+	        ImageAware poster = new ImageViewAware((ImageView) view.findViewById(R.id.poster), false);
+	        imageLoader.displayImage(movie.poster, poster, imageOptions);
+	        
+	        // set this view's tag to the entire data object
+	        view.setTag(movie);
+	        
+	        return view;
+	    }
+	    
 	}
 
 }

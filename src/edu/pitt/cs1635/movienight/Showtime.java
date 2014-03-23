@@ -36,5 +36,22 @@ public class Showtime implements Serializable {
 			e.printStackTrace();
 		}
 	}
+	
+	public String toString() {
+		SimpleDateFormat fmt = new SimpleDateFormat("h:mm a");
+		String result = fmt.format(time);
+		switch(flag) {
+			case FLAG_3D:
+				result += " (3D)";
+				break;
+			case FLAG_IMAX:
+				result += " (IMAX)";
+				break;
+			default:
+				// do nothing
+				break;
+		}
+		return result;
+	}
 
 }
