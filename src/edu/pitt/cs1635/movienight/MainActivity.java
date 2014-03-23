@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +28,7 @@ import org.json.*;
 import com.nostra13.universalimageloader.core.*;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
+
 
 public class MainActivity extends Activity {
 
@@ -71,6 +73,21 @@ public class MainActivity extends Activity {
 
 		// fetch our movies
 		new GetMovies().execute();
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			return true;
+		case R.id.action_map:
+			Intent mapView = new Intent(this, MapActivity.class);
+			startActivity(mapView);
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
