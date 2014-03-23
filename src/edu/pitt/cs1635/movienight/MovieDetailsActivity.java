@@ -136,9 +136,10 @@ public class MovieDetailsActivity extends Activity {
 			int size = theater.showtimes.size();
 			// @todo check to see whether or not showtimes.getChildCount() is a hack...
 			for (int i = 0; i < size && showtimes.getChildCount() < size; i++) {
-				TextView tv = (TextView) View.inflate(MovieDetailsActivity.this, R.layout.showtime_button, null);
+				LinearLayout layout = (LinearLayout) View.inflate(MovieDetailsActivity.this, R.layout.showtime_button, null);
+				TextView tv = (TextView) layout.findViewById(R.id.time);
 				tv.setText(theater.showtimes.get(i).toString());
-				showtimes.addView(tv);
+				showtimes.addView(layout);
 			}
 
 			return view;

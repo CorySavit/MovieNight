@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:layout_margin="20dp"
-    android:background="@color/gold"
-    android:textSize="20sp" >
-    
-</TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:paddingRight="10dp" >
+	
+	<TextView
+	    android:id="@+id/time"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:paddingTop="10dp"
+	    android:paddingRight="15dp"
+	    android:paddingBottom="10dp"
+	    android:paddingLeft="15dp"
+	    android:background="@color/gold"
+	    android:textSize="20sp" >
+	    
+	</TextView>
+	
+</LinearLayout>
