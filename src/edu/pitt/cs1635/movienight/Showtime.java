@@ -37,6 +37,11 @@ public class Showtime implements Serializable {
 		}
 	}
 	
+	public String getDate() {
+		SimpleDateFormat fmt = new SimpleDateFormat("EEEE, MMMM d");
+		return fmt.format(time);
+	}
+	
 	public String toString() {
 		SimpleDateFormat fmt = new SimpleDateFormat("h:mm a");
 		String result = fmt.format(time);

@@ -19,12 +19,14 @@ class Movie {
 }
 
 class Theater {
+  public $id;
   public $name;
   public $ticketurl;
   public $showtimes;
 
-  public function __construct($name) {
-    if (!is_null($name)) {
+  public function __construct($id, $name) {
+    if (!is_null($id) && !is_null($name)) {
+      $this->id = $id;
       $this->name = $name;
     }
     $this->showtimes = array();
@@ -54,6 +56,7 @@ if ($request[0] == "movies") {
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
+  //exit(1);
 
   $movies = array();
   foreach ($result as $data) {
@@ -89,7 +92,7 @@ if ($request[0] == "movies") {
 
       // add new theater if it does not already exist
       if (!array_key_exists($id, $movie->theaters)) {
-        $theater = new Theater($showtime->theatre->name);
+        $theater = new Theater($id, $showtime->theatre->name);
         if (isset($showtime->ticketURI)) {
           $theater->ticketurl = $showtime->ticketURI;
         }

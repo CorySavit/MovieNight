@@ -11,11 +11,13 @@ import org.json.JSONObject;
 public class Theater implements Serializable {
 
 	// JSON keys
+	static final String ID = "id";
 	static final String NAME = "name";
 	static final String SHOWTIMES = "showtimes";
 	static final String TICKET_URL = "ticketurl";
 
 	// object variables
+	int id;
 	String name;
 	List<Showtime> showtimes;
 	String ticketurl;
@@ -23,7 +25,8 @@ public class Theater implements Serializable {
 	private SimpleDateFormat inputFormat;
 
 	public Theater(JSONObject data) {
-
+		
+		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
 		ticketurl = JSON.getString(data, TICKET_URL);
 

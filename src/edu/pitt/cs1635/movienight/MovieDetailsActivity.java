@@ -7,13 +7,18 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,6 +29,10 @@ public class MovieDetailsActivity extends Activity {
 
 	private ImageLoader imageLoader;
 	private DisplayImageOptions imageOptions;
+	private AlertDialog.Builder confirmBuilder;
+	private Movie movie;
+	private Theater myTheater;
+	private Showtime myShowtime;
 
 	public String join(List<String> list, String del) {
 		String result = "";
@@ -40,13 +49,41 @@ public class MovieDetailsActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.movie_details);
+		setContentView(R.layout.activity_movie_details);
 
 		imageLoader = ImageLoader.getInstance();
+		
+		// create alert dialog
+		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
+			.setTitle(R.string.event_summary)
+			.setNegativeButton(R.string.cancel, null)
+			.setPositiveButton(R.string.create_event, new DialogInterface.OnClickListener() {
+
+				@Override
+				// called when user select 'Create Event'
+				public void onClick(DialogInterface dialog, int which) {
+					
+					Intent intent = new Intent(getApplicationContext(), InviteFriendsActivity.class);
+					
+					// keep track of what the user has selected
+					// @todo this should be turned into an event object
+					intent.putExtra("movie", movie);
+					intent.putExtra("theater", myTheater);
+					intent.putExtra("showtime", myShowtime);
+					
+					// start invite friends activity
+					startActivity(intent);
+				}
+				
+			});
 
 		// getting intent data
 		Intent intent = getIntent();
-		Movie movie = (Movie) intent.getSerializableExtra("data");
+		movie = (Movie) intent.getSerializableExtra("data");
+		
+		// these will be set when user makes a choice
+		myTheater = null;
+		myShowtime = null;
 
 		// set title
 		TextView titleView = (TextView) findViewById(R.id.title);
@@ -126,6 +163,9 @@ public class MovieDetailsActivity extends Activity {
 
 			// get appropriate theater data
 			Theater theater = theaters.get(position);
+			
+			// set tag (id)
+			view.setTag(theater);
 
 			// set name
 			TextView name = (TextView) view.findViewById(R.id.name);
@@ -138,8 +178,24 @@ public class MovieDetailsActivity extends Activity {
 			for (int i = 0; i < size && showtimes.getChildCount() < size; i++) {
 				LinearLayout layout = (LinearLayout) View.inflate(MovieDetailsActivity.this, R.layout.showtime_button, null);
 				TextView tv = (TextView) layout.findViewById(R.id.time);
-				tv.setText(theater.showtimes.get(i).toString());
+				Showtime time = theater.showtimes.get(i); 
+				tv.setText(time.toString());
+				tv.setTag(time);
 				showtimes.addView(layout);
+				
+				// @todo check to see if we should not be doing this for each textview
+				tv.setOnClickListener(new OnClickListener() {
+
+					@Override
+					public void onClick(View v) {
+						// @todo this is most likely not how you do this
+						myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag());
+						myShowtime = (Showtime) v.getTag();
+						Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
+						confirmBuilder.setMessage(message).create().show();
+					}
+					
+				});
 			}
 
 			return view;
