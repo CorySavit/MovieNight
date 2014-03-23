@@ -15,6 +15,7 @@ public class API {
 	public static API getInstance() {
 		if (instance == null) {
 			instance = new API();
+			
 		}
 		return instance;
 	}
