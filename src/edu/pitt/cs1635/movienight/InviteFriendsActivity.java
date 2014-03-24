@@ -1,7 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,31 +11,44 @@ import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 public class InviteFriendsActivity extends Activity {
 	
 	private Event event;
-	private List<User> friendList;
+	private ArrayList<User> originalFriendList;
+	private ArrayList<User> workingFriendList;
 	
 	private ListView friendView;
+	private EditText search;
+	private FriendAdapter friendAdapter;
+	
+	// update friendList based on queried filter 
+	private void filter(String query) {
+		String q = query.toLowerCase();
+		workingFriendList.clear();
+		for (User friend : originalFriendList) {
+			if (query.length() == 0 || friend.name.toLowerCase().contains(q)) {
+				workingFriendList.add(friend);
+			}
+		}
+	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,7 +60,30 @@ public class InviteFriendsActivity extends Activity {
 		
 		// set listview
 		friendView = (ListView) findViewById(R.id.users);
-		friendList = new ArrayList<User>();
+		originalFriendList = new ArrayList<User>();
+		workingFriendList = new ArrayList<User>();
+		
+		// list to search EditText changes
+		search = (EditText) findViewById(R.id.search);
+		search.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				filter(s.toString());
+				friendAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+			}
+			
+		});
 		
 		// get our friends from the server
 		new GetFriends().execute();
@@ -77,7 +112,7 @@ public class InviteFriendsActivity extends Activity {
 
 					// loop through friends
 					for (int i = 0; i < friends.length(); i++) {
-						friendList.add(new User(friends.getJSONObject(i)));
+						workingFriendList.add(new User(friends.getJSONObject(i)));
 					}
 					
 				} catch (JSONException e) {
@@ -94,9 +129,9 @@ public class InviteFriendsActivity extends Activity {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			// update the grid view with via our PosterAdapter
-			ListAdapter adapter = new FriendAdapter(InviteFriendsActivity.this, friendList);
-			friendView.setAdapter(adapter);
+			originalFriendList = (ArrayList<User>) workingFriendList.clone();
+			friendAdapter = new FriendAdapter(InviteFriendsActivity.this, R.id.users, workingFriendList);
+			friendView.setAdapter(friendAdapter);
 		}
 		
 	}
@@ -104,19 +139,18 @@ public class InviteFriendsActivity extends Activity {
 	/*
 	 * Used to populate the ListView of friends
 	 */
-	private class FriendAdapter extends BaseAdapter {
+	private class FriendAdapter extends ArrayAdapter<User> {
 		
-		private Activity activity;
-	    private List<User> friends;
+		private ArrayList<User> friends;
 	    private LayoutInflater inflater = null;
 	    private ImageLoader imageLoader;
 	    private DisplayImageOptions imageOptions;
-	 
-	    private FriendAdapter(Activity a, List<User> d) {
-	        activity = a;
-	        friends = d;
-	        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-	        imageLoader = ImageLoader.getInstance();
+	    
+	    public FriendAdapter(Context context, int textViewResourceId, ArrayList<User> friends) {
+			super(context, textViewResourceId, friends);
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			this.friends = friends;
+			imageLoader = ImageLoader.getInstance();
 	        imageOptions = new DisplayImageOptions.Builder()
 	        	.showImageOnLoading(R.drawable.blank_profile)
 	        	.showImageForEmptyUri(R.drawable.blank_profile)
@@ -124,23 +158,6 @@ public class InviteFriendsActivity extends Activity {
 	        	.cacheInMemory(true)
 	        	.cacheOnDisc(false)
 	        	.build();
-	    }
-	    
-	    @Override
-		public int getCount() {
-			return friends.size();
-		}
-
-		@Override
-		// we have to implement this
-		public Object getItem(int position) {
-			return friends.get(position);
-		}
-
-		@Override
-		// again, we have have to implement this
-		public long getItemId(int position) {
-			return position;
 		}
 	 
 	    // this method is called for every item in the listview
@@ -152,7 +169,6 @@ public class InviteFriendsActivity extends Activity {
 	        	view = inflater.inflate(R.layout.user_item, null);
 	        }
 	        
-	        // get appropriate movie data
 	        User friend = friends.get(position);
 	        
 	        // set title
