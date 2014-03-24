@@ -9,8 +9,8 @@ if ($request[0] == "movies") {
   // default zip code
   $zip = 15213;
 
-  //print file_get_contents('mock/movies');
-  //exit(1);
+  print file_get_contents('mock/movies');
+  exit(1);
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
@@ -69,9 +69,9 @@ if ($request[0] == "movies") {
       // check if showtime is 3D or IMAX experience
       if (isset($showtime->quals)) {
         if (strpos($showtime->quals, '3D')) {
-          $time->flag = 1;
+          $time->flag = FLAG_3D;
         } else if (strpos($showtime->quals, 'IMAX')) {
-          $time->flag = 2;
+          $time->flag = FLAG_IMAX;
         }
       }
 
@@ -86,25 +86,17 @@ if ($request[0] == "movies") {
   //print_r($movies);
   print json_encode($movies);
 
-} else if ($request[0] == "user") {
-
-  // not returning anything at the moment
-
-  if (sizeof($request) > 1) {
-
-    if ($request[1] == "friends") {
+} else if ($request[0] == "friends") {
       
-      $friends = array();
-      $data = explode("\n", file_get_contents('mock/data/users.dat'));
-      foreach ($data as $line) {
-        $line = explode("\t", $line);
-        $friend = new User($line[0], $line[1]);
-        $friend->photo = $line[2];
-        array_push($friends, $friend);
-      }
-      
-      print json_encode($friends);
-    }
-
+  $friends = array();
+  $data = explode("\n", file_get_contents('mock/data/users.dat'));
+  foreach ($data as $line) {
+    $line = explode("\t", $line);
+    $friend = new User($line[0], $line[1]);
+    $friend->photo = $line[2];
+    array_push($friends, $friend);
   }
+  
+  print json_encode($friends);
+
 }

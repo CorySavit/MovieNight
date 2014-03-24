@@ -31,9 +31,12 @@ class Theater {
   }
 }
 
+define("FLAG_3D", 1);
+define("FLAG_IMAX", 2);
+
 class Showtime {
   public $time;
-  public $flag; // 0 = normal; 1 = 3D; 2 = IMAX
+  public $flag;
 
   public function __construct($time) {
     if (!is_null($time)) {
@@ -62,5 +65,21 @@ class User {
       $this->id = $id;
       $this->name = $name;
     }
+  }
+}
+
+define("STATUS_INVITED", 0);
+define("STATUS_ACCEPTED", 1);
+define("STATUS_DECLINED", -1);
+
+class Guest {
+  public $user;
+  public $status;
+
+  public function __construct($user) {
+    if (!is_null($user)) {
+      $this->user = $user;
+    }
+    $this->status = STATUS_INVITED;
   }
 }

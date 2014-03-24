@@ -1,9 +1,10 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 	
     <RelativeLayout
+        android:id="@+id/search_frame"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:background="@color/black"
@@ -28,6 +29,32 @@
     <ListView
         android:id="@+id/users"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_frame" />
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true"
+		android:background="@color/black"
+		android:paddingTop="10dp"
+		android:paddingRight="20dp"
+		android:paddingBottom="10dp"
+		android:paddingLeft="20dp" >
 
-</LinearLayout>
+        <Button
+            android:id="@+id/finish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/finish"
+            android:paddingTop="10dp"
+		    android:paddingRight="15dp"
+		    android:paddingBottom="10dp"
+		    android:paddingLeft="15dp"
+		    android:background="@color/gold"
+		    android:textSize="20sp" />
+        
+    </RelativeLayout>
+
+</RelativeLayout>

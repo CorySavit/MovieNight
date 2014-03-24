@@ -29,5 +29,13 @@
         android:layout_toRightOf="@id/photo_frame"
         android:textSize="18sp"
         android:paddingTop="9dp" />
+    
+    <ImageView
+        android:id="@+id/checkmark"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/checkmark"
+        android:visibility="invisible" />
 
 </RelativeLayout>

@@ -7,5 +7,6 @@
     <string name="cancel">Cancel</string>
     <string name="create_event">Create Event</string>
     <string name="invite_friends">Invite Friends</string>
+    <string name="finish">Finish</string>
 
 </resources>

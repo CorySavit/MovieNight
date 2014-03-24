@@ -17,12 +17,23 @@ public class User implements Serializable {
 	String name;
 	String email;
 	String photo;
+	boolean selected;
 
 	public User(JSONObject data) {
 		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
 		email = JSON.getString(data, EMAIL);
 		photo = JSON.getString(data, PHOTO);
+		selected = false;
+	}
+	
+	// toggle selected state
+	public void toggle() {
+		if (selected) {
+			selected = false;
+		} else {
+			selected = true;
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +23,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -58,12 +62,44 @@ public class InviteFriendsActivity extends Activity {
 		Intent intent = getIntent();
 		event = (Event) intent.getSerializableExtra("data");
 		
-		// set listview
+		// set listview and initialize data structures
 		friendView = (ListView) findViewById(R.id.users);
 		originalFriendList = new ArrayList<User>();
 		workingFriendList = new ArrayList<User>();
 		
-		// list to search EditText changes
+		// listen for list item clicks
+		friendView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				User selected = originalFriendList.get(position);
+				toggleUserItem(view, !selected.selected);
+				selected.toggle();
+			}
+			
+		});
+		
+		// listen for the finish button click
+		Button finish = (Button) findViewById(R.id.finish);
+		finish.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				for (User friend : originalFriendList) {
+					if (friend.selected) {
+						event.guests.add(new Guest(friend));
+					}
+				}
+				
+				Intent intent = new Intent(getApplicationContext(), MyEventsActivity.class);
+				intent.putExtra("data", event);
+				startActivity(intent);
+			}
+			
+		});
+		
+		
+		// listen to search EditText changes
 		search = (EditText) findViewById(R.id.search);
 		search.addTextChangedListener(new TextWatcher() {
 
@@ -103,7 +139,7 @@ public class InviteFriendsActivity extends Activity {
 		protected Void doInBackground(Void... arg0) {
 			
 			// make call to API
-			String str = API.getInstance().get("user/friends");
+			String str = API.getInstance().get("friends");
 
 			if (str != null) {
 				try {
@@ -112,7 +148,8 @@ public class InviteFriendsActivity extends Activity {
 
 					// loop through friends
 					for (int i = 0; i < friends.length(); i++) {
-						workingFriendList.add(new User(friends.getJSONObject(i)));
+						User user = new User(friends.getJSONObject(i));
+						workingFriendList.add(user);
 					}
 					
 				} catch (JSONException e) {
@@ -179,12 +216,29 @@ public class InviteFriendsActivity extends Activity {
 	        ImageAware photo = new ImageViewAware((ImageView) view.findViewById(R.id.photo), false);
 	        imageLoader.displayImage(friend.photo, photo, imageOptions);
 	        
+	        // check to see if this should be checked
+	        toggleUserItem(view, friend.selected);
+	        
 	        // set this view's tag to the entire data object
 	        view.setTag(friend);
 	        
 	        return view;
 	    }
 	    
+	}
+	
+	/*
+	 * Adds styling to user_item relative layout
+	 */
+	public void toggleUserItem(View view, boolean toggle) {
+		ImageView checked = (ImageView) view.findViewById(R.id.checkmark);
+		if (toggle) {
+			view.setBackgroundColor(getResources().getColor(R.color.green));
+	    	checked.setVisibility(View.VISIBLE);
+		} else {
+			view.setBackgroundColor(0x00000000);
+			checked.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	@Override
