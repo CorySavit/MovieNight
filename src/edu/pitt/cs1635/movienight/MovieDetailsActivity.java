@@ -34,18 +34,6 @@ public class MovieDetailsActivity extends Activity {
 	private Theater myTheater;
 	private Showtime myShowtime;
 
-	public String join(List<String> list, String del) {
-		String result = "";
-		int size = list.size();
-		for (int i = 0; i < size; i++) {
-			result += list.get(i);
-			if (i < size - 1) {
-				result += del;
-			}
-		}
-		return result;
-	}
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -66,10 +54,7 @@ public class MovieDetailsActivity extends Activity {
 					Intent intent = new Intent(getApplicationContext(), InviteFriendsActivity.class);
 					
 					// keep track of what the user has selected
-					// @todo this should be turned into an event object
-					intent.putExtra("movie", movie);
-					intent.putExtra("theater", myTheater);
-					intent.putExtra("showtime", myShowtime);
+					intent.putExtra("data", new Event(movie, myTheater, myShowtime));
 					
 					// start invite friends activity
 					startActivity(intent);
@@ -99,9 +84,9 @@ public class MovieDetailsActivity extends Activity {
 			subtitle.add(movie.runtime);
 		}
 		if (movie.genres != null && movie.genres.size() > 0) {
-			subtitle.add(join(movie.genres, ", "));
+			subtitle.add(Utility.join(movie.genres, ", "));
 		}
-		subtitleView.setText(join(subtitle, " \u2014 "));
+		subtitleView.setText(Utility.join(subtitle, " \u2014 "));
 
 		// set blurred poster behind title
 		ImageView poster = (ImageView) findViewById(R.id.poster);
@@ -152,8 +137,6 @@ public class MovieDetailsActivity extends Activity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			
-			//System.out.println(position);
 
 			// create a new view if old view does not exist
 			View view = convertView;

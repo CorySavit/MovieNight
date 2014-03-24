@@ -1,49 +1,7 @@
 <?php
 require_once 'auth.php';
 require_once 'tmdbposter.php';
-
-class Movie {
-  public $id;
-  public $tmsid;
-  public $title;
-  public $description;
-  public $genres;
-  public $poster;
-  public $rating;
-  public $runtime;
-  public $theaters;
-
-  public function __construct() {
-    $this->theaters = array();
-  }
-}
-
-class Theater {
-  public $id;
-  public $name;
-  public $ticketurl;
-  public $showtimes;
-
-  public function __construct($id, $name) {
-    if (!is_null($id) && !is_null($name)) {
-      $this->id = $id;
-      $this->name = $name;
-    }
-    $this->showtimes = array();
-  }
-}
-
-class Showtime {
-  public $time;
-  public $flag; // 0 = normal; 1 = 3D; 2 = IMAX
-
-  public function __construct($time) {
-    if (!is_null($time)) {
-      $this->time = $time;
-    }
-    $flag = 0;
-  }
-}
+require_once 'models.php';
 
 $request = explode('/', $_GET['request']);
 
@@ -51,8 +9,8 @@ if ($request[0] == "movies") {
   // default zip code
   $zip = 15213;
 
-  print file_get_contents('mock/movies');
-  exit(1);
+  //print file_get_contents('mock/movies');
+  //exit(1);
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
@@ -73,7 +31,13 @@ if ($request[0] == "movies") {
 
       // parse runtime "PT02H14M" --> "2 hr 14 min"
       preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
-      $movie->runtime = intval($runtime[1]).' hr '.intval($runtime[2]).' min';
+      $movie->runtime = '';
+      $hours = intval($runtime[1]);
+      if ($hours !== 0) {
+        // don't include hours if they are 0
+        $movie->runtime .= $hours.' hr ';
+      }
+      $movie->runtime .= intval($runtime[2]).' min';
 
       // add poster via the movie database
       $tmdb = new TMDBposter();
@@ -121,4 +85,26 @@ if ($request[0] == "movies") {
 
   //print_r($movies);
   print json_encode($movies);
+
+} else if ($request[0] == "user") {
+
+  // not returning anything at the moment
+
+  if (sizeof($request) > 1) {
+
+    if ($request[1] == "friends") {
+      
+      $friends = array();
+      $data = explode("\n", file_get_contents('mock/data/users.dat'));
+      foreach ($data as $line) {
+        $line = explode("\t", $line);
+        $friend = new User($line[0], $line[1]);
+        $friend->photo = $line[2];
+        array_push($friends, $friend);
+      }
+      
+      print json_encode($friends);
+    }
+
+  }
 }
