@@ -24,5 +24,11 @@
             android:textSize="13sp" />
         
     </LinearLayout>
+    
+    <ImageView
+        android:id="@+id/status"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

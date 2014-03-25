@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -136,6 +137,22 @@ public class MyEventsActivity extends Activity {
 	        TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
 	        int num = event.guests.size();
 	        subtitle.setText("with " + event.guests.size() + " friend" + (num == 1 ? "" : "s") + " on " + event.showtime.getDate() + " at " + event.showtime);
+	        
+	        // set status icon
+	        ImageView status = (ImageView) view.findViewById(R.id.status);
+	        switch(event.status) {
+	        	case Event.STATUS_DECLINED:
+	        		status.setImageResource(R.drawable.status_declined);
+	        		title.setTextColor(getResources().getColor(R.color.gray));
+	        		subtitle.setTextColor(getResources().getColor(R.color.gray));
+	        		break;
+	        	case Event.STATUS_INVITED:
+	        		status.setImageResource(R.drawable.status_invited);
+	        		break;
+	        	default:
+	        		status.setImageResource(R.drawable.status_accepted);
+	        		break;
+	        }
 	        
 	        // set this view's tag to the entire data object
 	        view.setTag(event);

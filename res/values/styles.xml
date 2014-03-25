@@ -21,6 +21,7 @@
     <color name="gold">#E9CE6B</color>
     <color name="black">#343434</color>
     <color name="green">#CADEAC</color>
+    <color name="gray">#a6a6a6</color>
     
     <style name="TextShadow">
 		<item name="android:shadowColor">#000000</item>
