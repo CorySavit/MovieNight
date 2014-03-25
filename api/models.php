@@ -11,7 +11,10 @@ class Movie {
   public $runtime;
   public $theaters;
 
-  public function __construct() {
+  public function __construct($title = null) {
+    if (!is_null($title)) {
+      $this->title = $title;
+    }
     $this->theaters = array();
   }
 }
@@ -22,7 +25,7 @@ class Theater {
   public $ticketurl;
   public $showtimes;
 
-  public function __construct($id, $name) {
+  public function __construct($id = null, $name = null) {
     if (!is_null($id) && !is_null($name)) {
       $this->id = $id;
       $this->name = $name;
@@ -38,7 +41,7 @@ class Showtime {
   public $time;
   public $flag;
 
-  public function __construct($time) {
+  public function __construct($time = null) {
     if (!is_null($time)) {
       $this->time = $time;
     }
@@ -46,12 +49,26 @@ class Showtime {
   }
 }
 
+define("STATUS_INVITED", 0);
+define("STATUS_ACCEPTED", 1);
+define("STATUS_DECLINED", -1);
+define("STATUS_ADMIN", 2);
+
 class Event {
   public $id;
   public $movie;
   public $showtime;
   public $theater;
   public $admin;
+  public $status;
+  public $guests;
+
+  public function __construct($id = null) {
+    if (!is_null($id)) {
+      $this->id = $id;
+    }
+    $this->guests = array();
+  }
 }
 
 class User {
@@ -60,7 +77,7 @@ class User {
   public $email;
   public $photo;
 
-  public function __construct($id, $name) {
+  public function __construct($id = null, $name = null) {
     if (!is_null($id) && !is_null($name)) {
       $this->id = $id;
       $this->name = $name;
@@ -68,15 +85,11 @@ class User {
   }
 }
 
-define("STATUS_INVITED", 0);
-define("STATUS_ACCEPTED", 1);
-define("STATUS_DECLINED", -1);
-
 class Guest {
   public $user;
   public $status;
 
-  public function __construct($user) {
+  public function __construct($user = null) {
     if (!is_null($user)) {
       $this->user = $user;
     }

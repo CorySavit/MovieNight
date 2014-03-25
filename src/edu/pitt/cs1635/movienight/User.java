@@ -20,6 +20,10 @@ public class User implements Serializable {
 	boolean selected;
 
 	public User(JSONObject data) {
+		
+		// @todo sanity check for mock data
+		if (data == null) {return;}
+		
 		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
 		email = JSON.getString(data, EMAIL);

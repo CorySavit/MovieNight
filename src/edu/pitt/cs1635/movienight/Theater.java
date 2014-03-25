@@ -26,6 +26,9 @@ public class Theater implements Serializable {
 
 	public Theater(JSONObject data) {
 		
+		// @todo sanity check for mock data
+		if (data == null) {return;}
+		
 		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
 		ticketurl = JSON.getString(data, TICKET_URL);

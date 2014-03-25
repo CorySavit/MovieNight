@@ -18,6 +18,7 @@ public class Guest implements Serializable {
 	static final int STATUS_INVITED = 0;
 	static final int STATUS_ACCEPTED = 1;
 	static final int STATUS_DECLINED = -1;
+	static final int STATUS_ADMIN = 2;
 
 	// object variables
 	User user;

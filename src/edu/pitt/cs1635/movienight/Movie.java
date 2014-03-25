@@ -34,6 +34,9 @@ public class Movie implements Serializable {
 
 	public Movie(JSONObject data) {
 
+		// @todo sanity check for mock data
+		if (data == null) {return;}
+		
 		id = JSON.getString(data, ID);
 		tmsid = JSON.getString(data, TMS_ID);
 		title = JSON.getString(data, TITLE);

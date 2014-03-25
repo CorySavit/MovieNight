@@ -15,7 +15,14 @@ public class Event implements Serializable {
 	static final String SHOWTIME = "showtime";
 	static final String THEATER = "theater";
 	static final String ADMIN = "admin";
+	static final String STATUS = "status";
 	static final String GUESTS = "guests";
+	
+	// define status
+	static final int STATUS_INVITED = Guest.STATUS_INVITED;
+	static final int STATUS_ACCEPTED = Guest.STATUS_ACCEPTED;
+	static final int STATUS_DECLINED = Guest.STATUS_DECLINED;
+	static final int STATUS_ADMIN = Guest.STATUS_ADMIN;
 
 	// object variables
 	int id;
@@ -23,6 +30,7 @@ public class Event implements Serializable {
 	Showtime showtime;
 	Theater theater;
 	User admin;
+	int status;
 	List<Guest> guests;
 
 	public Event(JSONObject data) {
@@ -30,8 +38,8 @@ public class Event implements Serializable {
 		movie = new Movie(JSON.getJSONObject(data, MOVIE));
 		showtime = new Showtime(JSON.getJSONObject(data, SHOWTIME));
 		theater = new Theater(JSON.getJSONObject(data, THEATER));
-		showtime = new Showtime(JSON.getJSONObject(data, SHOWTIME));
 		admin = new User(JSON.getJSONObject(data, ADMIN));
+		status = JSON.getInt(data, STATUS);
 		
 		guests = new ArrayList<Guest>();
 		JSONArray myGuests = JSON.getJSONArray(data, GUESTS);
@@ -48,6 +56,7 @@ public class Event implements Serializable {
 		this.theater = theater;
 		this.showtime = showtime;
 		admin = null; // @todo pass in or get current user
+		status = STATUS_ADMIN; // @todo revisit this default value
 		this.guests = new ArrayList<Guest>();
 	}
 	

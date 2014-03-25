@@ -99,4 +99,21 @@ if ($request[0] == "movies") {
   
   print json_encode($friends);
 
+} else if ($request[0] == "events") {
+
+  $events = array();
+  $data = explode("\n", file_get_contents('mock/data/events.dat'));
+  foreach ($data as $line) {
+    $line = explode("\t", $line);
+    $event = new Event($line[0]);
+    $event->movie = new Movie($line[1]);
+    $event->showtime = new Showtime($line[2]);
+    $event->status = $line[3];
+    for ($i = 0; $i < $line[4]; $i++) {
+      array_push($event->guests, new Guest());
+    }
+    array_push($events, $event);
+  }
+
+  print json_encode($events);
 }
