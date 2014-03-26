@@ -47,6 +47,13 @@ class Showtime {
     }
     $flag = 0;
   }
+
+  public function cmp($a, $b) {
+    if ($a->time == $b->time) {
+      return 0;
+    }
+    return ($a->time < $b->time) ? -1 : 1;
+  }
 }
 
 define("STATUS_INVITED", 0);

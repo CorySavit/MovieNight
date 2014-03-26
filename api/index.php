@@ -83,6 +83,13 @@ if ($request[0] == "movies") {
     $movies[$data->rootId] = $movie;
   }
 
+  // go back and sort showtimes (despite that this is really inefficient)
+  foreach ($movies as $movie) {
+    foreach ($movie->theaters as $theater) {
+      usort($theater->showtimes, array('Showtime', 'cmp'));
+    }
+  }
+
   //print_r($movies);
   print json_encode($movies);
 
