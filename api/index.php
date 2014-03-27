@@ -44,7 +44,7 @@ if ($request[0] == "movies") {
       $tmdb_results = $tmdb->searchMovie($movie->title,'en');
       $movie->poster = '';
       if (isset($tmdb_results['results'][0]['poster_path'])) {
-        $movie->poster = 'http://image.tmdb.org/t/p/w500'.$tmdb_results['results'][0]['poster_path'];
+        $movie->poster = 'http://image.tmdb.org/t/p/w342'.$tmdb_results['results'][0]['poster_path'];
       }
     } else {
       $movie = $movies[$data->rootId];
@@ -76,7 +76,6 @@ if ($request[0] == "movies") {
       }
 
       // add showtime to appropriate theater object
-      // @todo make sure these are sorted chronologically
       array_push($movie->theaters[$id]->showtimes, $time);
     }
     
