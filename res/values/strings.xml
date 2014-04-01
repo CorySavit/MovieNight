@@ -9,5 +9,8 @@
     <string name="invite_friends">Invite Friends</string>
     <string name="finish">Finish</string>
     <string name="my_events">My Events</string>
+    <string name="zip">Zip Code</string>
+    <string name="zipSubmit">Click to use this zip code.</string>
+    <string name="profile">Profile</string>
 
 </resources>
