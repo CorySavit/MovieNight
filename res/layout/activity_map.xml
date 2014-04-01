@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
- <fragment xmlns:android="http://schemas.android.com/apk/res/android"
- 	xmlns:map="http://schemas.android.com/apk/res-auto"
- 	android:id="@+id/map"
- 	android:layout_width="match_parent"
-  	android:layout_height="match_parent"
-  	class="com.google.android.gms.maps.MapFragment"
-  	map:cameraBearing="112.5"
-  	map:cameraTargetLat="40.44176"
-  	map:cameraTargetLng="-79.956115"
-  	map:cameraTilt="30"
-  	map:cameraZoom="18"
-  	map:mapType="normal"
-  	map:uiCompass="false"
-  	map:uiRotateGestures="true"
-  	map:uiScrollGestures="true"
-  	map:uiTiltGestures="true"
-  	map:uiZoomControls="false"
-  	map:uiZoomGestures="true"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapActivity" >
+
+    <RelativeLayout
+        android:id="@+id/location_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <EditText
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:ems="10"
+            android:hint="@string/zip"
+            android:inputType="textPostalAddress|number"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="18sp" >
+
+        </EditText>
+
+        <ImageButton
+            android:id="@+id/location_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/zipSubmit"
+            android:src="@drawable/ic_action_forward" />
+
+    </RelativeLayout>
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/location_bar"
+        class="com.google.android.gms.maps.MapFragment" />
+
+</RelativeLayout>
