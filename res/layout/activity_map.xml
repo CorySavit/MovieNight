@@ -8,7 +8,8 @@
     <RelativeLayout
         android:id="@+id/location_bar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:background="@color/black" >
 
         <EditText
             android:id="@+id/location"
@@ -16,9 +17,10 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/location_submit"
             android:ems="10"
-            android:hint="@string/zip"
-            android:inputType="textPostalAddress|number"
+            android:hint="@string/enterLocation"
+            android:inputType="textPostalAddress"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="18sp" >

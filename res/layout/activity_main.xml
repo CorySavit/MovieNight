@@ -13,7 +13,7 @@
         android:id="@+id/posterGrid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/location_bar"
+        android:layout_above="@+id/curr_location_bar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:clipToPadding="false"
@@ -28,28 +28,21 @@
     </GridView>
 
     <RelativeLayout
-        android:id="@+id/location_bar"
+        android:id="@+id/curr_location_bar"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:background="@android:drawable/dark_header" >
 
-        <EditText
-            android:id="@+id/location"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:ems="10"
-            android:hint="@string/zip"
-            android:inputType="textPostalAddress|number"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="18sp" >
-
-        </EditText>
+            android:contentDescription="Location Icon"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_action_place" />
         
     </RelativeLayout>
 
