@@ -46,6 +46,10 @@ if ($request[0] == "movies") {
       if (isset($tmdb_results['results'][0]['poster_path'])) {
         $movie->poster = 'http://image.tmdb.org/t/p/w342'.$tmdb_results['results'][0]['poster_path'];
       }
+
+      // @todo this is just randomly generating stuff at the moment
+      $movie->mn_rating = rand(-1,1) * rand(1,10);
+
     } else {
       $movie = $movies[$data->rootId];
     }

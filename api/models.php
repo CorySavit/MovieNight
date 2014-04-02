@@ -10,6 +10,7 @@ class Movie {
   public $rating;
   public $runtime;
   public $theaters;
+  public $mn_rating;
 
   public function __construct($title = null) {
     if (!is_null($title)) {

@@ -22,6 +22,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
 import org.json.*;
 
@@ -215,17 +216,24 @@ public class MainActivity extends Activity {
 	        
 	        // get appropriate movie data
 	        Movie movie = movies.get(position);
-	        
-	        // set title
-	        // @todo figure out how to hide this if poster exists
-	        //TextView title = (TextView) view.findViewById(R.id.title);
-	        //title.setText(movie.title);
 	 
 	        // set poster image
 	        // this ImageAware wrapper is supposed to solve the image re-load issue on scroll
 	        // see https://github.com/nostra13/Android-Universal-Image-Loader/issues/406
 	        ImageAware poster = new ImageViewAware((ImageView) view.findViewById(R.id.poster), false);
 	        imageLoader.displayImage(movie.poster, poster, imageOptions);
+	        
+	        // movienight rating
+	        TextView ratingView = (TextView) view.findViewById(R.id.mn_rating);
+	        ratingView.setText(Integer.toString(movie.mnRating));
+	        ImageView ratingTag = (ImageView) view.findViewById(R.id.rating_tag);
+	        if (movie.mnRating < 0) {
+	        	ratingTag.setImageResource(R.drawable.negative_rating_tag);
+	        } else if (movie.mnRating > 0) {
+	        	ratingTag.setImageResource(R.drawable.positive_rating_tag);
+	        } else {
+	        	ratingTag.setImageResource(R.drawable.neutral_rating_tag);
+	        }
 	        
 	        // set this view's tag to the entire data object
 	        view.setTag(movie);

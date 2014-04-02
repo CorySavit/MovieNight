@@ -20,6 +20,7 @@ public class Movie implements Serializable {
 	static final String RATING = "rating";
 	static final String RUNTIME = "runtime";
 	static final String THEATERS = "theaters";
+	static final String MN_RATING = "mn_rating";
 
 	// object variables
 	String id; // @todo these ids should probably be ints
@@ -31,6 +32,7 @@ public class Movie implements Serializable {
 	String rating;
 	String runtime;
 	List<Theater> theaters;
+	int mnRating;
 
 	public Movie(JSONObject data) {
 
@@ -44,6 +46,7 @@ public class Movie implements Serializable {
 		poster = JSON.getString(data, POSTER);
 		rating = JSON.getString(data, RATING);
 		runtime = JSON.getString(data, RUNTIME);
+		mnRating = JSON.getInt(data, MN_RATING);
 
 		genres = new ArrayList<String>();
 		JSONArray myGenres = JSON.getJSONArray(data, GENRES);
