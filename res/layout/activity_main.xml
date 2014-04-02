@@ -37,12 +37,22 @@
         android:background="@android:drawable/dark_header" >
 
         <ImageView
-            android:id="@+id/imageView1"
+            android:id="@+id/curr_loc_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="Location Icon"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_action_place" />
+
+        <TextView
+            android:id="@+id/loc_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/curr_loc_icon"
+            android:text="Medium Text"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
         
     </RelativeLayout>
 

@@ -1,9 +1,15 @@
 package edu.pitt.cs1635.movienight;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -74,12 +80,44 @@ public class MainActivity extends Activity {
 
 		// fetch our movies
 		new GetMovies().execute();
+		
+		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE); 
+		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		double longitude = location.getLongitude();
+		double latitude = location.getLatitude();
+		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+
+		TextView text;
+		text = (TextView) findViewById(R.id.loc_display);
+		 try {
+		 List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+
+		 if(addresses != null) {
+		 Address returnedAddress = addresses.get(0);
+		 StringBuilder strReturnedAddress = new StringBuilder("Address:\n");
+		 for(int i=0; i<returnedAddress.getMaxAddressLineIndex(); i++) {
+		 strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+		  }
+		 text.setText(strReturnedAddress.toString());
+		 }
+		 else{
+		 text.setText("No Address returned!");
+		 }
+		} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		text.setText("Canont get Address!");
+		}
+		
 	}
+	
+
+		
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_settings:
+		case R.id.action_profile:
 			return true;
 		case R.id.action_map:
 			Intent mapView = new Intent(this, MapActivity.class);

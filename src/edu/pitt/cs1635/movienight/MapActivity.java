@@ -59,9 +59,7 @@ public class MapActivity extends FragmentActivity implements LocationListener{
 	        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 	                .getMap();
 	        // Check if we were successful in obtaining the map.
-	        if (mMap != null) {
-	            mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-	        }
+
 	    }
 	    mMap.setMyLocationEnabled(true);
 
@@ -217,8 +215,9 @@ public class MapActivity extends FragmentActivity implements LocationListener{
 		case R.id.action_settings:
 			return true;
 		case R.id.action_home:
-			Intent homeView = new Intent(this, MainActivity.class);
-			startActivity(homeView);
+			finish();
+			//Intent homeView = new Intent(this, MainActivity.class);
+			//startActivity(homeView);
 			return true;
 
 		default:
