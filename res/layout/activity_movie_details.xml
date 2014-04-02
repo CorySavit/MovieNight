@@ -20,35 +20,38 @@
 		        android:id="@+id/poster"
 		        android:layout_width="match_parent"
 		        android:layout_height="match_parent"
-		        android:scaleType = "centerCrop"
-		        android:alpha="0.75" />
+		        android:scaleType="centerCrop"
+		        android:alpha="0.75"
+		        android:contentDescription="@string/movie_poster" />
 	        
 	    </FrameLayout>
 	    
-	    <TextView
-	        android:id="@+id/subtitle"
-	        android:layout_width="wrap_content"
+	    <LinearLayout
+	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:layout_margin="20dp"
-	        android:layout_alignLeft="@+id/poster_frame"
 	        android:layout_alignBottom="@+id/poster_frame"
-	        android:textColor="#ffffff"
-	        android:typeface="sans"
-	        android:textSize="13sp"
-	        style="@style/TextShadow" />
-	    
-	    <TextView
-	        android:id="@+id/title"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_margin="20dp"
-	        android:layout_alignLeft="@+id/poster_frame"
-	        android:layout_alignBottom="@+id/subtitle"
-	        android:textColor="#ffffff"
-	        android:typeface="sans"
-	        android:textSize="20sp"
-	        android:textStyle="bold"
-	        style="@style/TextShadow" />
+	        android:layout_margin="@dimen/global_padding"
+	        android:orientation="vertical" >
+		    
+		    <TextView
+		        android:id="@+id/title"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        style="@style/MovieTitle" />
+		    
+		    <TextView
+		        android:id="@+id/subtitle1"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        style="@style/MovieSubtitle" />
+		    
+		    <TextView
+		        android:id="@+id/subtitle2"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        style="@style/MovieSubtitle" />
+		    
+		</LinearLayout>
 	    
     </RelativeLayout>
     

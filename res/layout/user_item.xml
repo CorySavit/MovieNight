@@ -2,10 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="10sp"
-    android:paddingRight="20sp"
-    android:paddingBottom="10sp"
-    android:paddingLeft="20sp" >
+    android:padding="@dimen/global_padding_small" >
     
     <FrameLayout
         android:id="@+id/photo_frame"
@@ -18,7 +15,8 @@
 	        android:id="@+id/photo"
 	        android:layout_width="match_parent"
 	        android:layout_height="match_parent"
-	        android:scaleType = "centerCrop" />
+	        android:scaleType="centerCrop"
+	        android:contentDescription="@string/profile_image" />
         
     </FrameLayout>
     
@@ -27,8 +25,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/photo_frame"
-        android:textSize="18sp"
-        android:paddingTop="9dp" />
+        android:textSize="16sp"
+        android:paddingTop="8dp" />
     
     <ImageView
         android:id="@+id/checkmark"
@@ -36,6 +34,7 @@
         android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:src="@drawable/checkmark"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:contentDescription="@string/selected" />
 
 </RelativeLayout>

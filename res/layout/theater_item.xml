@@ -3,16 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="20dp"
-    android:paddingBottom="20dp" >
+    android:paddingTop="@dimen/global_padding"
+    android:paddingBottom="@dimen/global_padding" >
     
     <TextView
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="@dimen/global_padding"
+        style="@style/Heading"
         android:layout_marginBottom="10dp" />
     
     <HorizontalScrollView
@@ -25,8 +24,8 @@
             android:layout_width="wrap_content"
         	android:layout_height="wrap_content"
         	android:orientation="horizontal"
-        	android:paddingLeft="20dp"
-        	android:paddingRight="10dp" />
+        	android:paddingLeft="@dimen/global_padding"
+        	android:paddingRight="7dp" />
         
     </HorizontalScrollView>
 

@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dip" >
+    android:padding="4dp" >
     
     <edu.pitt.cs1635.movienight.PosterImageView
         android:id="@+id/poster"
@@ -19,7 +19,8 @@
         <ImageView
             android:id="@+id/rating_tag"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:contentDescription="@string/rating_tag" />
         
         <TextView
 			android:id="@+id/mn_rating"

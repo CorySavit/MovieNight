@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -28,6 +28,33 @@
 		<item name="android:shadowDx">1</item>
 		<item name="android:shadowDy">1</item>
 		<item name="android:shadowRadius">1</item>
+    </style>
+    
+    <style name="MovieHeading" parent="TextShadow">
+        <item name="android:textColor">#fff</item>
+    </style>
+    
+    <style name="MovieTitle" parent="MovieHeading">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="MovieSubtitle" parent="MovieHeading">
+        <item name="android:textSize">13sp</item>
+    </style>
+    
+    <style name="Heading">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="YellowButton">
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingRight">13dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingLeft">13dp</item>
+        <item name="android:background">@color/gold</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>

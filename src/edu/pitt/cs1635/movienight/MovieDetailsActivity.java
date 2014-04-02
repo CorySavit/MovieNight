@@ -74,8 +74,8 @@ public class MovieDetailsActivity extends Activity {
 		TextView titleView = (TextView) findViewById(R.id.title);
 		titleView.setText(movie.title);
 
-		// set subtitle
-		TextView subtitleView = (TextView) findViewById(R.id.subtitle);
+		// set subtitle 1
+		TextView subtitle1View = (TextView) findViewById(R.id.subtitle1);
 		List<String> subtitle = new ArrayList<String>();
 		if (movie.rating != null) {
 			subtitle.add(movie.rating);
@@ -83,10 +83,14 @@ public class MovieDetailsActivity extends Activity {
 		if (movie.runtime != null) {
 			subtitle.add(movie.runtime);
 		}
+		subtitle1View.setText(Utility.join(subtitle, " \u2014 "));
+		
+		// set subtitle 2
+		TextView subtitle2View = (TextView) findViewById(R.id.subtitle2);
 		if (movie.genres != null && movie.genres.size() > 0) {
-			subtitle.add(Utility.join(movie.genres, ", "));
+			subtitle2View.setText(Utility.join(movie.genres, ", "));
 		}
-		subtitleView.setText(Utility.join(subtitle, " \u2014 "));
+		
 
 		// set blurred poster behind title
 		ImageView poster = (ImageView) findViewById(R.id.poster);

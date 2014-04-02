@@ -13,5 +13,10 @@
     <string name="zipSubmit">Click to use this zip code.</string>
     <string name="profile">Profile</string>
     <string name="enterLocation">Enter Location</string>
+    <string name="rating_tag">Rating Tag</string>
+    <string name="profile_image">Profile Image</string>
+    <string name="selected">Selected</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="event_status">Event Status</string>
 
 </resources>
