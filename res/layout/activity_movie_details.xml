@@ -7,9 +7,50 @@
  	
     <include layout="@layout/movie_heading" />
     
-    <ListView
-        android:id="@+id/theaters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+    <TabHost
+		android:id="@android:id/tabhost"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+		
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
+			
+			<TabWidget
+				android:id="@android:id/tabs"
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" />
+				
+			<FrameLayout
+				android:id="@android:id/tabcontent"
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent">
+				
+				<TextView
+					android:text="Hallo1"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+				
+				<ListView
+			        android:id="@+id/theaters"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content" />
+				
+				<TextView
+					android:text="Hallo3"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+				
+				<TextView
+					android:text="Hallo4"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+				
+			</FrameLayout>
+			
+		</LinearLayout>
+		
+	</TabHost>
  
 </LinearLayout>

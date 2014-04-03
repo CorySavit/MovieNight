@@ -20,9 +20,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
+import android.widget.TabHost.TabContentFactory;
+import android.widget.TabWidget;
 import android.widget.TextView;
 
 public class MovieDetailsActivity extends Activity {
@@ -40,35 +45,39 @@ public class MovieDetailsActivity extends Activity {
 		setContentView(R.layout.activity_movie_details);
 
 		imageLoader = ImageLoader.getInstance();
-		
+
 		// create alert dialog
 		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
 			.setTitle(R.string.event_summary)
 			.setNegativeButton(R.string.cancel, null)
 			.setPositiveButton(R.string.create_event, new DialogInterface.OnClickListener() {
-
+	
 				@Override
 				// called when user select 'Create Event'
 				public void onClick(DialogInterface dialog, int which) {
-					
+	
 					Intent intent = new Intent(getApplicationContext(), InviteFriendsActivity.class);
-					
+	
 					// keep track of what the user has selected
 					intent.putExtra("data", new Event(movie, myTheater, myShowtime));
-					
+	
 					// start invite friends activity
 					startActivity(intent);
 				}
-				
+	
 			});
 
 		// getting intent data
 		Intent intent = getIntent();
 		movie = (Movie) intent.getSerializableExtra("data");
-		
+
 		// these will be set when user makes a choice
 		myTheater = null;
 		myShowtime = null;
+
+		/*
+		 * Set header data 
+		 */
 
 		// set title
 		TextView titleView = (TextView) findViewById(R.id.title);
@@ -84,12 +93,11 @@ public class MovieDetailsActivity extends Activity {
 			subtitle.add(movie.runtime);
 		}
 		String subtitleText = (Utility.join(subtitle, " \u2014 "));
-		
+
 		if (movie.genres != null && movie.genres.size() > 0) {
 			subtitleText += "\n" + Utility.join(movie.genres, ", ");
 		}
 		subtitle1View.setText(subtitleText);
-		
 
 		// set blurred poster behind title
 		ImageView poster = (ImageView) findViewById(R.id.poster);
@@ -103,9 +111,39 @@ public class MovieDetailsActivity extends Activity {
 		bmp = StackBlur.blur(bmp, 10);
 		poster.setImageBitmap(bmp);
 
+		/*
+		 * Setup tabs and content
+		 */
+
+		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+		tabHost.setup();
+		
+		final FrameLayout tabContent = tabHost.getTabContentView();
+		
+		// create tabs
+		final String[] tabs = {"events", "theaters", "details", "ratings"};
+		for (int i = 0; i < tabs.length; i++) {
+			final View tabContentView = tabContent.getChildAt(i);
+			TabSpec tabSpec = tabHost.newTabSpec(tabs[i]);
+			tabSpec.setContent(new TabContentFactory() {
+				@Override
+				public View createTabContent(String tag) {
+					return tabContentView;
+				}
+			});
+			tabSpec.setIndicator(getString(getResources().getIdentifier(tabs[i], "string", "edu.pitt.cs1635.movienight")));
+			tabHost.addTab(tabSpec);
+		}
+
+		// ensure that all tab content children are not visible at startup
+		for (int index = 0; index < tabContent.getChildCount(); index++) {
+			tabContent.getChildAt(index).setVisibility(View.GONE);
+		}
+		
 		// populate theater listview
 		ListView theaters = (ListView) findViewById(R.id.theaters);
 		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, movie.theaters));
+		
 	}
 
 	/*
@@ -149,7 +187,7 @@ public class MovieDetailsActivity extends Activity {
 
 			// get appropriate theater data
 			Theater theater = theaters.get(position);
-			
+
 			// set tag (id)
 			view.setTag(theater);
 
@@ -168,7 +206,7 @@ public class MovieDetailsActivity extends Activity {
 				tv.setText(time.toString());
 				tv.setTag(time);
 				showtimes.addView(layout);
-				
+
 				// @todo check to see if we should not be doing this for each textview
 				tv.setOnClickListener(new OnClickListener() {
 
@@ -180,7 +218,7 @@ public class MovieDetailsActivity extends Activity {
 						Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
 						confirmBuilder.setMessage(message).create().show();
 					}
-					
+
 				});
 			}
 
