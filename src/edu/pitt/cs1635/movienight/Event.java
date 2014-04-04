@@ -8,7 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Event implements Serializable {
-
+	private static final long serialVersionUID = 1L;
+	
 	// JSON keys
 	static final String ID = "id";
 	static final String MOVIE = "movie";

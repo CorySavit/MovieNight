@@ -193,7 +193,7 @@ public class InviteFriendsActivity extends Activity {
 	        	.showImageForEmptyUri(R.drawable.blank_profile)
 	        	.showImageOnFail(R.drawable.blank_profile)
 	        	.cacheInMemory(true)
-	        	.cacheOnDisc(false)
+	        	.cacheOnDisc(true)
 	        	.build();
 		}
 	 

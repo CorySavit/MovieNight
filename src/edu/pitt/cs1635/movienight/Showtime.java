@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.json.JSONObject;
 
 public class Showtime implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	// JSON keys
 	static final String TIME = "time";
@@ -26,7 +28,7 @@ public class Showtime implements Serializable {
 	public Showtime(JSONObject data) {
 		try {
 			// parse time
-			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
 			time = inputFormat.parse(JSON.getString(data, TIME));
 			
 			// convert flag
@@ -38,12 +40,12 @@ public class Showtime implements Serializable {
 	}
 	
 	public String getDate() {
-		SimpleDateFormat fmt = new SimpleDateFormat("EEEE, MMMM d");
+		SimpleDateFormat fmt = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
 		return fmt.format(time);
 	}
 	
 	public String toString() {
-		SimpleDateFormat fmt = new SimpleDateFormat("h:mm a");
+		SimpleDateFormat fmt = new SimpleDateFormat("h:mm a", Locale.US);
 		String result = fmt.format(time);
 		switch(flag) {
 			case FLAG_3D:

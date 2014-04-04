@@ -1,7 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.json.JSONObject;
 
@@ -9,6 +8,7 @@ import org.json.JSONObject;
  * Just a simple wrapper around User that keeps track of their status
  */
 public class Guest implements Serializable {
+	private static final long serialVersionUID = 1L;
 	
 	// JSON keys
 	static final String USER = "user";

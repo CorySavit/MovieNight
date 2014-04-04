@@ -81,6 +81,7 @@ public class MainActivity extends Activity {
 		// fetch our movies
 		new GetMovies().execute();
 		
+		/*
 		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE); 
 		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		double longitude = location.getLongitude();
@@ -108,6 +109,7 @@ public class MainActivity extends Activity {
 		e.printStackTrace();
 		text.setText("Canont get Address!");
 		}
+		*/
 		
 	}
 	
@@ -221,7 +223,7 @@ public class MainActivity extends Activity {
 	        	.showImageForEmptyUri(R.drawable.blank_poster)
 	        	.showImageOnFail(R.drawable.blank_poster)
 	        	.cacheInMemory(true)
-	        	.cacheOnDisc(false)
+	        	.cacheOnDisc(true)
 	        	.build();
 	    }
 	    
