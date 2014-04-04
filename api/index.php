@@ -50,6 +50,9 @@ if ($request[0] == "movies") {
       // @todo this is just randomly generating stuff at the moment
       $movie->mn_rating = rand(-1,1) * rand(1,10);
 
+      // @todo all movies have the same events for now
+      $movie->events = getEvents();
+
     } else {
       $movie = $movies[$data->rootId];
     }
@@ -97,21 +100,36 @@ if ($request[0] == "movies") {
   print json_encode($movies);
 
 } else if ($request[0] == "friends") {
-      
+
+  print json_encode(getUsers());
+
+} else if ($request[0] == "events") {
+
+  print json_encode(getEvents());
+
+}
+
+function getUsers($guest = false) {
   $friends = array();
   $data = explode("\n", file_get_contents('mock/data/users.dat'));
   foreach ($data as $line) {
     $line = explode("\t", $line);
-    $friend = new User($line[0], $line[1]);
-    $friend->photo = $line[2];
+    if ($guest) {
+      $friend = new Guest(new User($line[0], $line[1]));
+      $friend->user->photo = $line[2];
+    } else {
+      $friend = new User($line[0], $line[1]);
+      $friend->photo = $line[2];
+    }
     array_push($friends, $friend);
   }
-  
-  print json_encode($friends);
+  return $friends;
+}
 
-} else if ($request[0] == "events") {
+function getEvents() {
 
   $events = array();
+  $friends = getUsers(true);
   $data = explode("\n", file_get_contents('mock/data/events.dat'));
   foreach ($data as $line) {
     $line = explode("\t", $line);
@@ -119,11 +137,14 @@ if ($request[0] == "movies") {
     $event->movie = new Movie($line[1]);
     $event->showtime = new Showtime($line[2]);
     $event->status = $line[3];
-    for ($i = 0; $i < $line[4]; $i++) {
-      array_push($event->guests, new Guest());
+    $event->theater = new Theater(0, $line[5]);
+
+    $friend_list = explode(",", $line[4]);
+    foreach ($friend_list as $i) {
+      array_push($event->guests, $friends[$i % sizeof($friends)]);
     }
     array_push($events, $event);
   }
+  return $events;
 
-  print json_encode($events);
 }

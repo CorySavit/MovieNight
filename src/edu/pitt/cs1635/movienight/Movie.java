@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Movie implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	// JSON keys
 	static final String ID = "id";
@@ -21,6 +22,7 @@ public class Movie implements Serializable {
 	static final String RUNTIME = "runtime";
 	static final String THEATERS = "theaters";
 	static final String MN_RATING = "mn_rating";
+	static final String EVENTS = "events";
 
 	// object variables
 	String id; // @todo these ids should probably be ints
@@ -33,6 +35,7 @@ public class Movie implements Serializable {
 	String runtime;
 	List<Theater> theaters;
 	int mnRating;
+	List<Event> events;
 
 	public Movie(JSONObject data) {
 
@@ -63,6 +66,14 @@ public class Movie implements Serializable {
 			while (keys.hasNext()) {
 				String key = (String) keys.next();
 				theaters.add(new Theater(JSON.getJSONObject(myTheaters, key)));
+			}
+		}
+		
+		events = new ArrayList<Event>();
+		JSONArray myEvents = JSON.getJSONArray(data, EVENTS);
+		if (myEvents != null) {
+			for (int i = 0; i < myEvents.length(); i++) {
+				events.add(new Event(JSON.getJSONObject(myEvents, i)));
 			}
 		}
 		

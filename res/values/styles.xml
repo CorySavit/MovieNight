@@ -44,7 +44,7 @@
     </style>
     
     <style name="Heading">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textStyle">bold</item>
     </style>
     

@@ -15,11 +15,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class MyEventsActivity extends Activity {
 	
@@ -100,6 +102,17 @@ public class MyEventsActivity extends Activity {
 			eventsView = (ListView) findViewById(R.id.events);
 			eventAdapter = new EventAdapter(MyEventsActivity.this, R.layout.event_item, events);
 			eventsView.setAdapter(eventAdapter);
+			
+			eventsView.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					//Intent intent = new Intent(view.getContext(), EventDetailsActivity.class);
+					//intent.putExtra("data", events.get(position));
+					//startActivity(intent);
+				}
+				
+			});
 		}
 		
 	}
@@ -115,6 +128,7 @@ public class MyEventsActivity extends Activity {
 	    public EventAdapter(Context context, int textViewResourceId, ArrayList<Event> list) {
 			super(context, textViewResourceId, list);
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			// @todo we could probably just use the class-scope events list
 			events = list;
 		}
 	 

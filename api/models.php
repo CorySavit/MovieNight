@@ -11,12 +11,14 @@ class Movie {
   public $runtime;
   public $theaters;
   public $mn_rating;
+  public $events;
 
   public function __construct($title = null) {
     if (!is_null($title)) {
       $this->title = $title;
     }
     $this->theaters = array();
+    $this->events = array();
   }
 }
 

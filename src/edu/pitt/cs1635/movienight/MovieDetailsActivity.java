@@ -5,9 +5,12 @@ import java.util.List;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -19,6 +22,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewManager;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -74,6 +79,15 @@ public class MovieDetailsActivity extends Activity {
 		// these will be set when user makes a choice
 		myTheater = null;
 		myShowtime = null;
+		
+		imageLoader = ImageLoader.getInstance();
+        imageOptions = new DisplayImageOptions.Builder()
+        	.showImageOnLoading(R.drawable.blank_profile)
+        	.showImageForEmptyUri(R.drawable.blank_profile)
+        	.showImageOnFail(R.drawable.blank_profile)
+        	.cacheInMemory(true)
+        	.cacheOnDisc(true)
+        	.build();
 
 		/*
 		 * Set header data 
@@ -112,7 +126,7 @@ public class MovieDetailsActivity extends Activity {
 		poster.setImageBitmap(bmp);
 
 		/*
-		 * Setup tabs and content
+		 * Setup tabs
 		 */
 
 		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
@@ -135,45 +149,37 @@ public class MovieDetailsActivity extends Activity {
 			tabHost.addTab(tabSpec);
 		}
 
-		// ensure that all tab content children are not visible at startup
-		for (int index = 0; index < tabContent.getChildCount(); index++) {
+		// ensure that all but the first tab content are invisible
+		for (int index = 1; index < tabContent.getChildCount(); index++) {
 			tabContent.getChildAt(index).setVisibility(View.GONE);
 		}
 		
+		/*
+		 * Populate tab content
+		 */
+		
+		// populate feature events listview
+		ListView events = (ListView) findViewById(R.id.events);
+		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, R.layout.event_item, movie.events, imageLoader, imageOptions));
+		
 		// populate theater listview
 		ListView theaters = (ListView) findViewById(R.id.theaters);
-		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, movie.theaters));
+		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, R.layout.theater_item, movie.theaters));
 		
 	}
 
 	/*
 	 * Used to populate the ListView of theaters (in a movie detail)
 	 */
-	private class TheatersAdapter extends BaseAdapter {
+	private class TheatersAdapter extends ArrayAdapter<Theater> {
 
-		private Activity activity;
 		private List<Theater> theaters;
 		private LayoutInflater inflater = null;
 
-		public TheatersAdapter(Activity a, List<Theater> d) {
-			activity = a;
-			theaters = d;
-			inflater = activity.getLayoutInflater();
-		}
-
-		@Override
-		public int getCount() {
-			return theaters.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return theaters.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
+		public TheatersAdapter(Context context, int layoutResourceId, List<Theater> data) {
+			super(context, layoutResourceId, data);
+			theaters = data;
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
 		@Override
@@ -220,6 +226,120 @@ public class MovieDetailsActivity extends Activity {
 					}
 
 				});
+			}
+
+			return view;
+		}
+
+	}
+	
+	/*
+	 * Used to populate the ListView of featured events
+	 */
+	private class EventsAdapter extends ArrayAdapter<Event> {
+		private ImageLoader imageLoader;
+		private DisplayImageOptions imageOptions;
+		private List<Event> events;
+		private LayoutInflater inflater;
+
+		public EventsAdapter(Context context, int layoutResourceId, List<Event> data, ImageLoader imageLoader, DisplayImageOptions imageOptions) {
+			super(context, layoutResourceId, data);
+			events = data;
+			this.imageLoader = imageLoader;
+			this.imageOptions = imageOptions;
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+
+			// create a new view if old view does not exist
+			View view = convertView;
+			if (convertView == null) {
+				view = inflater.inflate(R.layout.featured_event_item, parent, false);
+			}
+
+			// get appropriate event data
+			Event event = events.get(position);
+
+			// set tag (id)
+			view.setTag(event);
+
+			// set date
+			TextView title = (TextView) view.findViewById(R.id.title);
+			title.setText(event.showtime + " on " + event.showtime.getDate());
+			
+			// set subtitle
+			TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
+			int numGuest = event.guests.size();
+			subtitle.setText("at " + event.theater + " with " + numGuest + " people");
+			
+			// set profile images
+			// @todo too many profile photos seems to be added to the first event
+			LinearLayout guests = (LinearLayout) view.findViewById(R.id.guests);
+			int max = Math.min(numGuest, 6);
+			for (int i = 0; guests.getChildCount() < max; i++) {
+				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
+				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
+		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
+		        guests.addView(myFrame);
+			}
+
+			return view;
+		}
+
+	}
+	
+	/*
+	 * Used to populate the ListView of profile images for a given event
+	 */
+	private class ProfileImageAdapter extends ArrayAdapter<Event> {
+		private int layoutResourceId;
+		private ImageLoader imageLoader;
+		private DisplayImageOptions imageOptions;
+		private List<Event> events;
+		private LayoutInflater inflater;
+
+		public ProfileImageAdapter(Context context, int layoutResourceId, List<Event> data, ImageLoader imageLoader, DisplayImageOptions imageOptions) {
+			super(context, layoutResourceId, data);
+			events = data;
+			this.layoutResourceId = layoutResourceId;
+			this.imageLoader = imageLoader;
+			this.imageOptions = imageOptions;
+			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+
+			// create a new view if old view does not exist
+			View view = convertView;
+			if (convertView == null) {
+				view = inflater.inflate(layoutResourceId, parent, false);
+			}
+
+			// get appropriate event data
+			Event event = events.get(position);
+
+			// set tag (id)
+			view.setTag(event);
+
+			// set date
+			TextView title = (TextView) view.findViewById(R.id.title);
+			title.setText(event.showtime + " on " + event.showtime.getDate());
+			
+			// set subtitle
+			TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
+			int numGuest = event.guests.size();
+			subtitle.setText("at " + event.theater + " with " + numGuest + " people");
+			
+			// set profile images
+			LinearLayout guests = (LinearLayout) view.findViewById(R.id.guests);
+			for (int i = 0; guests.getChildCount() < numGuest; i++) {
+				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
+				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
+		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
+		        guests.addView(myFrame);
 			}
 
 			return view;
