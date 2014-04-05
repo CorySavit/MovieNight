@@ -38,7 +38,6 @@ import android.widget.TextView;
 public class MovieDetailsActivity extends Activity {
 
 	private ImageLoader imageLoader;
-	private DisplayImageOptions imageOptions;
 	private AlertDialog.Builder confirmBuilder;
 	private Movie movie;
 	private Theater myTheater;
@@ -48,8 +47,6 @@ public class MovieDetailsActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_movie_details);
-
-		imageLoader = ImageLoader.getInstance();
 
 		// create alert dialog
 		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
@@ -81,13 +78,6 @@ public class MovieDetailsActivity extends Activity {
 		myShowtime = null;
 		
 		imageLoader = ImageLoader.getInstance();
-        imageOptions = new DisplayImageOptions.Builder()
-        	.showImageOnLoading(R.drawable.blank_profile)
-        	.showImageForEmptyUri(R.drawable.blank_profile)
-        	.showImageOnFail(R.drawable.blank_profile)
-        	.cacheInMemory(true)
-        	.cacheOnDisc(true)
-        	.build();
 
 		/*
 		 * Set header data 
@@ -114,6 +104,13 @@ public class MovieDetailsActivity extends Activity {
 		subtitle1View.setText(subtitleText);
 
 		// set blurred poster behind title
+		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+			.showImageOnLoading(R.drawable.blank_poster)
+			.showImageForEmptyUri(R.drawable.blank_poster)
+			.showImageOnFail(R.drawable.blank_poster)
+			.cacheInMemory(true)
+			.cacheOnDisc(true)
+			.build();
 		ImageView poster = (ImageView) findViewById(R.id.poster);
 		Bitmap bmp = null;
 		if (movie.poster != null && movie.poster.length() > 0) {
@@ -136,6 +133,7 @@ public class MovieDetailsActivity extends Activity {
 		
 		// create tabs
 		final String[] tabs = {"events", "theaters", "details", "ratings"};
+		final int[] icons = {R.drawable.ic_action_android_calendar, R.drawable.ic_action_icon_ticket, R.drawable.ic_action_information, R.drawable.ic_action_icon_star};
 		for (int i = 0; i < tabs.length; i++) {
 			final View tabContentView = tabContent.getChildAt(i);
 			TabSpec tabSpec = tabHost.newTabSpec(tabs[i]);
@@ -145,7 +143,7 @@ public class MovieDetailsActivity extends Activity {
 					return tabContentView;
 				}
 			});
-			tabSpec.setIndicator(getString(getResources().getIdentifier(tabs[i], "string", "edu.pitt.cs1635.movienight")));
+			tabSpec.setIndicator(null, getResources().getDrawable(icons[i]));
 			tabHost.addTab(tabSpec);
 		}
 
@@ -160,7 +158,7 @@ public class MovieDetailsActivity extends Activity {
 		
 		// populate feature events listview
 		ListView events = (ListView) findViewById(R.id.events);
-		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, R.layout.event_item, movie.events, imageLoader, imageOptions));
+		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, R.layout.event_item, movie.events));
 		
 		// populate theater listview
 		ListView theaters = (ListView) findViewById(R.id.theaters);
@@ -237,16 +235,20 @@ public class MovieDetailsActivity extends Activity {
 	 * Used to populate the ListView of featured events
 	 */
 	private class EventsAdapter extends ArrayAdapter<Event> {
-		private ImageLoader imageLoader;
 		private DisplayImageOptions imageOptions;
 		private List<Event> events;
 		private LayoutInflater inflater;
 
-		public EventsAdapter(Context context, int layoutResourceId, List<Event> data, ImageLoader imageLoader, DisplayImageOptions imageOptions) {
+		public EventsAdapter(Context context, int layoutResourceId, List<Event> data) {
 			super(context, layoutResourceId, data);
 			events = data;
-			this.imageLoader = imageLoader;
-			this.imageOptions = imageOptions;
+			imageOptions = new DisplayImageOptions.Builder()
+				.showImageOnLoading(R.drawable.blank_profile)
+				.showImageForEmptyUri(R.drawable.blank_profile)
+				.showImageOnFail(R.drawable.blank_profile)
+				.cacheInMemory(true)
+				.cacheOnDisc(true)
+				.build();
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		}
 
@@ -278,10 +280,12 @@ public class MovieDetailsActivity extends Activity {
 			// @todo too many profile photos seems to be added to the first event
 			LinearLayout guests = (LinearLayout) view.findViewById(R.id.guests);
 			int max = Math.min(numGuest, 6);
-			for (int i = 0; guests.getChildCount() < max; i++) {
+			for (int i = 0; i < max && guests.getChildCount() < max; i++) {
 				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
 				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
 		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
+				//TextView tv = (TextView) myFrame.findViewById(R.id.photo);
+				//tv.setText(position + "--" + i);
 		        guests.addView(myFrame);
 			}
 
