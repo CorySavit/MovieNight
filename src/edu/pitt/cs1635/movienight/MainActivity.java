@@ -98,51 +98,45 @@ public class MainActivity extends Activity {
 			
 		});
 
-		
-		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE); 
+		// find location via GPS
+		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
 		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
-		
-		double longitude = location.getLongitude();
-		double latitude = location.getLatitude();
-		Log.d("Latitude", String.valueOf(latitude));
-		Log.d("Logitude", String.valueOf(longitude)); 
-		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+		if (location != null) {
+			double longitude = location.getLongitude();
+			double latitude = location.getLatitude();
+			Log.d("Latitude", String.valueOf(latitude));
+			Log.d("Logitude", String.valueOf(longitude)); 
+			Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+			
+			TextView text = (TextView) findViewById(R.id.loc_display);
+			try {
+				List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
-		
-		TextView text = (TextView) findViewById(R.id.loc_display);
-		 try {
-		 List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-
-		 if(addresses != null) {
-		 Address returnedAddress = addresses.get(0);
-		 String zip = returnedAddress.getPostalCode();
-		 /*StringBuilder strReturnedAddress = new StringBuilder();
-		 for(int i=0; i<returnedAddress.getMaxAddressLineIndex(); i++) {
-		 strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-		  }*/
-		 Log.d("Returned Zip", zip);
-		 text.setText(zip);
-		 prefs.edit().putString("zip", zip);
-		 Log.d("prefs in main: initial", prefs.getString("zip", "nothing there"));
-		 }
-		 else{
-		 text.setText("No Address returned!");
-		 }
-		} catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		text.setText("Canont get Address!");
+				if (addresses != null) {
+					Address returnedAddress = addresses.get(0);
+					String zip = returnedAddress.getPostalCode();
+					/*StringBuilder strReturnedAddress = new StringBuilder();
+					 for(int i=0; i<returnedAddress.getMaxAddressLineIndex(); i++) {
+					 strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+					  }*/
+					Log.d("Returned Zip", zip);
+					text.setText(zip);
+					prefs.edit().putString("zip", zip);
+					Log.d("prefs in main: initial", prefs.getString("zip", "nothing there"));
+				}
+				else{
+					text.setText("No Address returned!");
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				text.setText("Canont get Address!");
+			}
 		}
-		
 
 		// fetch our movies
 		new GetMovies().execute();
-		
-		
-		
-		
-		
 	}
 	
 	@Override
@@ -153,11 +147,6 @@ public class MainActivity extends Activity {
 		text.setText(prefs.getString("zip", "No Zip Exists"));
 		
 	}
-
-
-
-
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
