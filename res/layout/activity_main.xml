@@ -52,7 +52,8 @@
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/curr_loc_icon"
             android:text="Medium Text"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
         
     </RelativeLayout>
 

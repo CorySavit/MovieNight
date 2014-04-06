@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -28,6 +29,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.json.*;
@@ -77,29 +79,44 @@ public class MainActivity extends Activity {
 			}
 			
 		});
-
-		// fetch our movies
-		new GetMovies().execute();
 		
-		/*
+		View locationBar = this.findViewById(R.id.curr_location_bar);
+		locationBar.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
+				startActivity(mapIntent);
+				
+			}
+			
+		});
+		
 		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE); 
 		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		
+		
 		double longitude = location.getLongitude();
 		double latitude = location.getLatitude();
+		Log.d("Latitude", String.valueOf(latitude));
+		Log.d("Logitude", String.valueOf(longitude)); 
 		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
 
-		TextView text;
-		text = (TextView) findViewById(R.id.loc_display);
+		
+		TextView text = (TextView) findViewById(R.id.loc_display);
 		 try {
 		 List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
 		 if(addresses != null) {
 		 Address returnedAddress = addresses.get(0);
-		 StringBuilder strReturnedAddress = new StringBuilder("Address:\n");
+		 String zip = returnedAddress.getPostalCode();
+		 /*StringBuilder strReturnedAddress = new StringBuilder();
 		 for(int i=0; i<returnedAddress.getMaxAddressLineIndex(); i++) {
 		 strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-		  }
-		 text.setText(strReturnedAddress.toString());
+		  }*/
+		 Log.d("Returned Zip", zip);
+		 text.setText(zip);
 		 }
 		 else{
 		 text.setText("No Address returned!");
@@ -109,7 +126,13 @@ public class MainActivity extends Activity {
 		e.printStackTrace();
 		text.setText("Canont get Address!");
 		}
-		*/
+
+		// fetch our movies
+		new GetMovies().execute();
+		
+		
+		
+		
 		
 	}
 	
@@ -280,6 +303,8 @@ public class MainActivity extends Activity {
 	        
 	        return view;
 	    }
+	    
+	    
 	    
 	}
 
