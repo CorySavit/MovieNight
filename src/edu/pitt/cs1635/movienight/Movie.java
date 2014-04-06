@@ -8,6 +8,15 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
+import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 public class Movie implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -77,5 +86,49 @@ public class Movie implements Serializable {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Populates movie_heading.xml based on this movie's data
+	 */
+	public void setHeader(Activity activity) {
+		// set title
+		TextView titleView = (TextView) activity.findViewById(R.id.title);
+		titleView.setText(title);
+
+		// set subtitle
+		TextView subtitle1View = (TextView) activity.findViewById(R.id.subtitle);
+		List<String> subtitle = new ArrayList<String>();
+		if (rating != null) {
+			subtitle.add(rating);
+		}
+		if (runtime != null) {
+			subtitle.add(runtime);
+		}
+		String subtitleText = (Utility.join(subtitle, " \u2014 "));
+
+		if (genres != null && genres.size() > 0) {
+			subtitleText += "\n" + Utility.join(genres, ", ");
+		}
+		subtitle1View.setText(subtitleText);
+
+		// set blurred poster behind title
+		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+			.showImageOnLoading(R.drawable.blank_poster)
+			.showImageForEmptyUri(R.drawable.blank_poster)
+			.showImageOnFail(R.drawable.blank_poster)
+			.cacheInMemory(true)
+			.cacheOnDisc(true)
+			.build();
+		ImageView poster = (ImageView) activity.findViewById(R.id.poster);
+		Bitmap bmp = null;
+		if (this.poster != null && this.poster.length() > 0) {
+			bmp = ImageLoader.getInstance().loadImageSync(this.poster, imageOptions);
+
+		} else {
+			bmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.blank_poster);
+		}
+		bmp = StackBlur.blur(bmp, 10);
+		poster.setImageBitmap(bmp);
 	}
 }

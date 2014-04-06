@@ -18,10 +18,12 @@
     <string name="selected">Selected</string>
     <string name="movie_poster">Movie Poster</string>
     <string name="event_status">Event Status</string>
-    
     <string name="events">Events</string>
     <string name="theaters">Theaters</string>
     <string name="details">Details</string>
     <string name="ratings">Ratings</string>
+    <string name="guests">Guests</string>
+    <string name="title_activity_event_details">Event Details</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

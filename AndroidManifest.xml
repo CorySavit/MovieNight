@@ -28,10 +28,10 @@
     <!-- used for Google Geocaching -->
     <permission
         android:name="edu.pitt.cs1635.movienight.permission.MAPS_RECEIVE"
-        android:protectionLevel="signature"/>
-    
-    <uses-permission android:name="edu.pitt.cs1635.movienight.permission.MAPS_RECEIVE"/>
-    
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="edu.pitt.cs1635.movienight.permission.MAPS_RECEIVE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -71,7 +71,15 @@
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="@string/google_maps" />
-        
+
+        <activity
+            android:name="edu.pitt.cs1635.movienight.EventDetailsActivity"
+            android:label="@string/title_activity_event_details"
+            android:parentActivityName="edu.pitt.cs1635.movienight.MyEventsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.pitt.cs1635.movienight.MyEventsActivity" />
+        </activity>
     </application>
 
 </manifest>

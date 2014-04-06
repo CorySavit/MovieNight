@@ -1,6 +1,5 @@
 package edu.pitt.cs1635.movienight;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -13,8 +12,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
@@ -22,9 +19,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.ViewManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,8 +28,8 @@ import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
-import android.widget.TabWidget;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class MovieDetailsActivity extends Activity {
 
@@ -79,48 +75,8 @@ public class MovieDetailsActivity extends Activity {
 		
 		imageLoader = ImageLoader.getInstance();
 
-		/*
-		 * Set header data 
-		 */
-
-		// set title
-		TextView titleView = (TextView) findViewById(R.id.title);
-		titleView.setText(movie.title);
-
-		// set subtitle
-		TextView subtitle1View = (TextView) findViewById(R.id.subtitle);
-		List<String> subtitle = new ArrayList<String>();
-		if (movie.rating != null) {
-			subtitle.add(movie.rating);
-		}
-		if (movie.runtime != null) {
-			subtitle.add(movie.runtime);
-		}
-		String subtitleText = (Utility.join(subtitle, " \u2014 "));
-
-		if (movie.genres != null && movie.genres.size() > 0) {
-			subtitleText += "\n" + Utility.join(movie.genres, ", ");
-		}
-		subtitle1View.setText(subtitleText);
-
-		// set blurred poster behind title
-		DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
-			.showImageOnLoading(R.drawable.blank_poster)
-			.showImageForEmptyUri(R.drawable.blank_poster)
-			.showImageOnFail(R.drawable.blank_poster)
-			.cacheInMemory(true)
-			.cacheOnDisc(true)
-			.build();
-		ImageView poster = (ImageView) findViewById(R.id.poster);
-		Bitmap bmp = null;
-		if (movie.poster != null && movie.poster.length() > 0) {
-			bmp = imageLoader.loadImageSync(movie.poster, imageOptions);
-
-		} else {
-			bmp = BitmapFactory.decodeResource(getResources(), R.drawable.blank_poster);
-		}
-		bmp = StackBlur.blur(bmp, 10);
-		poster.setImageBitmap(bmp);
+		// set header content
+		movie.setHeader(this);
 
 		/*
 		 * Setup tabs
@@ -159,6 +115,18 @@ public class MovieDetailsActivity extends Activity {
 		// populate feature events listview
 		ListView events = (ListView) findViewById(R.id.events);
 		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, R.layout.event_item, movie.events));
+		events.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
+				Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
+				intent.putExtra("movie", movie);
+				intent.putExtra("event", movie.events.get(position));
+				startActivity(intent);
+			}
+			
+		});
 		
 		// populate theater listview
 		ListView theaters = (ListView) findViewById(R.id.theaters);
@@ -286,63 +254,6 @@ public class MovieDetailsActivity extends Activity {
 		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
 				//TextView tv = (TextView) myFrame.findViewById(R.id.photo);
 				//tv.setText(position + "--" + i);
-		        guests.addView(myFrame);
-			}
-
-			return view;
-		}
-
-	}
-	
-	/*
-	 * Used to populate the ListView of profile images for a given event
-	 */
-	private class ProfileImageAdapter extends ArrayAdapter<Event> {
-		private int layoutResourceId;
-		private ImageLoader imageLoader;
-		private DisplayImageOptions imageOptions;
-		private List<Event> events;
-		private LayoutInflater inflater;
-
-		public ProfileImageAdapter(Context context, int layoutResourceId, List<Event> data, ImageLoader imageLoader, DisplayImageOptions imageOptions) {
-			super(context, layoutResourceId, data);
-			events = data;
-			this.layoutResourceId = layoutResourceId;
-			this.imageLoader = imageLoader;
-			this.imageOptions = imageOptions;
-			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-
-			// create a new view if old view does not exist
-			View view = convertView;
-			if (convertView == null) {
-				view = inflater.inflate(layoutResourceId, parent, false);
-			}
-
-			// get appropriate event data
-			Event event = events.get(position);
-
-			// set tag (id)
-			view.setTag(event);
-
-			// set date
-			TextView title = (TextView) view.findViewById(R.id.title);
-			title.setText(event.showtime + " on " + event.showtime.getDate());
-			
-			// set subtitle
-			TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
-			int numGuest = event.guests.size();
-			subtitle.setText("at " + event.theater + " with " + numGuest + " people");
-			
-			// set profile images
-			LinearLayout guests = (LinearLayout) view.findViewById(R.id.guests);
-			for (int i = 0; guests.getChildCount() < numGuest; i++) {
-				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
-				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
-		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
 		        guests.addView(myFrame);
 			}
 
