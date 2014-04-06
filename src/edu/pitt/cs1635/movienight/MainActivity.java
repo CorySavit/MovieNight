@@ -12,7 +12,6 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -45,7 +44,10 @@ public class MainActivity extends Activity {
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
 	private List<Movie> movieList;
-	public SharedPreferences prefs; //store zip?
+	private String zipCode;
+	
+	public SharedPreferences settings;
+	public static final String ZIP_CODE = "zipCode";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		//get preferences
-		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		settings = getPreferences(MODE_PRIVATE);
 		
 		// create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
@@ -85,15 +87,14 @@ public class MainActivity extends Activity {
 			
 		});
 		
+		// set location bar onclick listener
 		View locationBar = this.findViewById(R.id.curr_location_bar);
 		locationBar.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
 				startActivity(mapIntent);
-				
 			}
 			
 		});
@@ -104,35 +105,35 @@ public class MainActivity extends Activity {
 		
 		if (location != null) {
 			double longitude = location.getLongitude();
-			double latitude = location.getLatitude();
-			Log.d("Latitude", String.valueOf(latitude));
-			Log.d("Logitude", String.valueOf(longitude)); 
+			double latitude = location.getLatitude(); 
 			Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
 			
-			TextView text = (TextView) findViewById(R.id.loc_display);
+			// get location every time the app opens
 			try {
 				List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
 				if (addresses != null) {
 					Address returnedAddress = addresses.get(0);
-					String zip = returnedAddress.getPostalCode();
-					/*StringBuilder strReturnedAddress = new StringBuilder();
-					 for(int i=0; i<returnedAddress.getMaxAddressLineIndex(); i++) {
-					 strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-					  }*/
-					Log.d("Returned Zip", zip);
-					text.setText(zip);
-					prefs.edit().putString("zip", zip);
-					Log.d("prefs in main: initial", prefs.getString("zip", "nothing there"));
+					zipCode = returnedAddress.getPostalCode();
+					/*
+						StringBuilder strReturnedAddress = new StringBuilder();
+						for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+							strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+						}
+					*/
 				}
 				else{
-					text.setText("No Address returned!");
+					// if we can't get address, try to get last saved address
+					zipCode = settings.getString(ZIP_CODE, getString(R.string.unknown_location));
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				text.setText("Canont get Address!");
+				// if we can't get address, try to get last saved address
+				zipCode = settings.getString(ZIP_CODE, getString(R.string.unknown_location));
 			}
+			TextView text = (TextView) findViewById(R.id.loc_display);
+			text.setText(zipCode);
+			
 		}
 
 		// fetch our movies
@@ -140,12 +141,13 @@ public class MainActivity extends Activity {
 	}
 	
 	@Override
-	protected void onRestart() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		TextView text = (TextView) findViewById(R.id.loc_display);
-		text.setText(prefs.getString("zip", "No Zip Exists"));
+	protected void onStop(){
+		super.onStop();
 		
+		// save location when the app stops
+		SharedPreferences.Editor editor = settings.edit();
+		editor.putString(ZIP_CODE, zipCode);
+		editor.commit();
 	}
 
 	@Override
