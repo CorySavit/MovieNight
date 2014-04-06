@@ -12,10 +12,12 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,11 +46,15 @@ public class MainActivity extends Activity {
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
 	private List<Movie> movieList;
+	public SharedPreferences prefs; //store zip?
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		//get preferences
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
 		// create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
@@ -92,6 +98,7 @@ public class MainActivity extends Activity {
 			}
 			
 		});
+
 		
 		LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE); 
 		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -117,6 +124,8 @@ public class MainActivity extends Activity {
 		  }*/
 		 Log.d("Returned Zip", zip);
 		 text.setText(zip);
+		 prefs.edit().putString("zip", zip);
+		 Log.d("prefs in main: initial", prefs.getString("zip", "nothing there"));
 		 }
 		 else{
 		 text.setText("No Address returned!");
@@ -126,6 +135,7 @@ public class MainActivity extends Activity {
 		e.printStackTrace();
 		text.setText("Canont get Address!");
 		}
+		
 
 		// fetch our movies
 		new GetMovies().execute();
@@ -136,9 +146,20 @@ public class MainActivity extends Activity {
 		
 	}
 	
-
+	@Override
+	protected void onRestart() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		TextView text = (TextView) findViewById(R.id.loc_display);
+		text.setText(prefs.getString("zip", "No Zip Exists"));
 		
-	
+	}
+
+
+
+
+
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

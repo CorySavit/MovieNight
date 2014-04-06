@@ -10,23 +10,29 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONObject;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -36,11 +42,12 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 
-public class MapActivity extends FragmentActivity implements LocationListener{
+public class MapActivity extends FragmentActivity implements LocationListener, OnMapLongClickListener{
 
 	 private ImageButton mBtnFind;
 	 EditText etPlace;
@@ -48,11 +55,13 @@ public class MapActivity extends FragmentActivity implements LocationListener{
 	 private LocationManager locationManager;
 	 private static final long MIN_TIME = 400;
 	 private static final float MIN_DISTANCE = 1000;
+	 private SharedPreferences prefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_map);
+	    
 
 	    if (mMap == null) {
 	        // Try to obtain the map from the SupportMapFragment.
@@ -62,6 +71,7 @@ public class MapActivity extends FragmentActivity implements LocationListener{
 
 	    }
 	    mMap.setMyLocationEnabled(true);
+	    mMap.setOnMapLongClickListener(this);
 
 	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); 
@@ -257,5 +267,25 @@ public class MapActivity extends FragmentActivity implements LocationListener{
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	    // TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onMapLongClick(LatLng point) {
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+		
+		List<Address> addresses;
+		try {
+			addresses = geocoder.getFromLocation(point.latitude, point.longitude, 1);
+			Address returnedAddress = addresses.get(0);
+			String zip = returnedAddress.getPostalCode();
+			prefs.edit().putString("zip", zip);
+			Log.d("prefs in map", prefs.getString("zip", "nothing there"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		finish();
 	}
 }
