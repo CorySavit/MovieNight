@@ -20,6 +20,13 @@ class Movie {
     $this->theaters = array();
     $this->events = array();
   }
+
+  public function cmp($a, $b) {
+    if ($a->mn_rating == $b->mn_rating) {
+      return 0;
+    }
+    return ($a->mn_rating < $b->mn_rating) ? 1 : -1;
+  }
 }
 
 class Theater {

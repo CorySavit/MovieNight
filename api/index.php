@@ -11,8 +11,8 @@ if ($request[0] == "movies") {
   // default zip code
   $zip = 15213;
 
-  //print file_get_contents('mock/movies');
-  //exit(1);
+  print file_get_contents('mock/movies');
+  exit(1);
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
@@ -94,6 +94,9 @@ if ($request[0] == "movies") {
       usort($theater->showtimes, array('Showtime', 'cmp'));
     }
   }
+
+  // sort movies by rating
+  usort($movies, array('Movie', 'cmp'));
 
   //print_r($movies);
   print json_encode($movies);
