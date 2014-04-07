@@ -197,16 +197,14 @@ public class MainActivity extends Activity {
 			if (str != null) {
 				try {
 					// parse result to a JSON Object
-					JSONObject movies = new JSONObject(str);
+					JSONArray movies = new JSONArray(str);
 
 					// loop through movies
-					Iterator<?> keys = movies.keys();
-					while (keys.hasNext()) {
-						String key = (String) keys.next();
+					for (int i = 0; i < movies.length(); i++) {
 						
 						// create movie object from JSON data and add to list
-						if (movies.get(key) instanceof JSONObject) {
-							movieList.add(new Movie(movies.getJSONObject(key)));
+						if (movies.get(i) instanceof JSONObject) {
+							movieList.add(new Movie(movies.getJSONObject(i)));
 						}
 					}
 					
