@@ -39,7 +39,8 @@ public class EventDetailsActivity extends Activity {
 		final FrameLayout tabContent = tabHost.getTabContentView();
 		
 		// create tabs
-		final String[] tabs = {"details", "guests"};
+		final String[] tabs = {"details", "guests", "messaging"};
+		final int[] icons = {R.drawable.ic_action_information, R.drawable.ic_action_guests, R.drawable.ic_action_message};
 		for (int i = 0; i < tabs.length; i++) {
 			final View tabContentView = tabContent.getChildAt(i);
 			TabSpec tabSpec = tabHost.newTabSpec(tabs[i]);
@@ -49,7 +50,7 @@ public class EventDetailsActivity extends Activity {
 					return tabContentView;
 				}
 			});
-			tabSpec.setIndicator(getString(getResources().getIdentifier(tabs[i], "string", "edu.pitt.cs1635.movienight")));
+			tabSpec.setIndicator(null, getResources().getDrawable(icons[i]));
 			tabHost.addTab(tabSpec);
 		}
 

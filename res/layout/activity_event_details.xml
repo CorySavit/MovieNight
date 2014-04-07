@@ -26,7 +26,8 @@
 			<FrameLayout
 				android:id="@android:id/tabcontent"
 				android:layout_width="fill_parent"
-				android:layout_height="fill_parent">
+				android:layout_height="fill_parent"
+				android:padding="@dimen/global_padding" >
 				
 				<TextView
 					android:text="Details"
@@ -34,7 +35,12 @@
 					android:layout_height="fill_parent" />
 				
 				<TextView
-					android:text="Friends"
+					android:text="Guests"
+					android:layout_width="fill_parent"
+					android:layout_height="fill_parent" />
+				
+				<TextView
+					android:text="Messaging"
 					android:layout_width="fill_parent"
 					android:layout_height="fill_parent" />
 				
