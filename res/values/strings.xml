@@ -25,5 +25,6 @@
     <string name="guests">Guests</string>
     <string name="title_activity_event_details">Event Details</string>
     <string name="unknown_location">Unknown Location</string>
+    <string name="location_icon">Location Icon</string>
 
 </resources>

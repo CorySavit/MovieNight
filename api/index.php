@@ -1,6 +1,8 @@
 <?php
+header('Content-type: application/json');
+
 require_once 'auth.php';
-require_once 'tmdbposter.php';
+require_once 'tmdb.php';
 require_once 'models.php';
 
 $request = explode('/', $_GET['request']);
@@ -9,8 +11,8 @@ if ($request[0] == "movies") {
   // default zip code
   $zip = 15213;
 
-  print file_get_contents('mock/movies');
-  exit(1);
+  //print file_get_contents('mock/movies');
+  //exit(1);
 
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
@@ -40,12 +42,9 @@ if ($request[0] == "movies") {
       $movie->runtime .= intval($runtime[2]).' min';
 
       // add poster via the movie database
-      $tmdb = new TMDBposter();
-      $tmdb_results = $tmdb->searchMovie($movie->title,'en');
-      $movie->poster = '';
-      if (isset($tmdb_results['results'][0]['poster_path'])) {
-        $movie->poster = 'http://image.tmdb.org/t/p/w342'.$tmdb_results['results'][0]['poster_path'];
-      }
+      $tmdb = new TMDB($movie->title, $data->releaseYear);
+      //print_r($tmdb);
+      $movie->poster = $tmdb->getPosterURL();
 
       // @todo this is just randomly generating stuff at the moment
       $movie->mn_rating = rand(-1,1) * rand(1,10);

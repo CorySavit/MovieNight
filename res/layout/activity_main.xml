@@ -40,7 +40,7 @@
             android:id="@+id/curr_loc_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="Location Icon"
+            android:contentDescription="@string/location_icon"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_action_place" />
 
@@ -51,7 +51,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_toRightOf="@+id/curr_loc_icon"
-            android:text="Medium Text"
+            android:text="@string/unknown_location"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/white" />
         
