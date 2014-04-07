@@ -3,14 +3,21 @@
 class Movie {
   public $id;
   public $tmsid;
+  public $tmdbid;
+  public $imdbid;
+
   public $title;
   public $description;
   public $genres;
-  public $poster;
   public $rating;
   public $runtime;
-  public $theaters;
+  public $poster;
+  public $backdrop;
+  public $cast;
   public $mn_rating;
+
+  // @todo could move to separate endpoint
+  public $theaters;
   public $events;
 
   public function __construct($title = null) {
@@ -111,5 +118,21 @@ class Guest {
       $this->user = $user;
     }
     $this->status = STATUS_INVITED;
+  }
+}
+
+class Genre {
+  public $id;
+  public $name;
+
+  public function __construct($param = null) {
+    if (gettype($param) === "array") {
+      $this->id = $param['id'];
+      $this->name = $param['name'];
+    } else {
+      // @todo look search for name in database and set existing id
+      $this->id = 1;
+      $this->name = $param;
+    }
   }
 }

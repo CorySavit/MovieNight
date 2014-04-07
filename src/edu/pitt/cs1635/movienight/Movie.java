@@ -23,27 +23,39 @@ public class Movie implements Serializable {
 	// JSON keys
 	static final String ID = "id";
 	static final String TMS_ID = "tmsid";
+	static final String TMDB_ID = "tmdbid";
+	static final String IMDB_ID = "imdbid";
+	
 	static final String TITLE = "title";
 	static final String DESCRIPTION = "description";
 	static final String GENRES = "genres";
-	static final String POSTER = "poster";
 	static final String RATING = "rating";
 	static final String RUNTIME = "runtime";
-	static final String THEATERS = "theaters";
+	static final String POSTER = "poster";
+	static final String BACKDROP = "backdrop";
+	static final String CAST = "cast";
 	static final String MN_RATING = "mn_rating";
+	
+	static final String THEATERS = "theaters";
 	static final String EVENTS = "events";
 
 	// object variables
 	String id; // @todo these ids should probably be ints
 	String tmsid;
+	int tmdbid;
+	String imdbid;
+	
 	String title;
 	String description;
-	List<String> genres;
-	String poster;
+	List<Genre> genres;
 	String rating;
 	String runtime;
-	List<Theater> theaters;
+	String poster;
+	String backdrop;
+	List<CastMember> cast;
 	int mnRating;
+	
+	List<Theater> theaters;
 	List<Event> events;
 
 	public Movie(JSONObject data) {
@@ -53,20 +65,34 @@ public class Movie implements Serializable {
 		
 		id = JSON.getString(data, ID);
 		tmsid = JSON.getString(data, TMS_ID);
+		tmdbid = JSON.getInt(data, TMDB_ID);
+		imdbid = JSON.getString(data, IMDB_ID);
+		
 		title = JSON.getString(data, TITLE);
 		description = JSON.getString(data, DESCRIPTION);
-		poster = JSON.getString(data, POSTER);
 		rating = JSON.getString(data, RATING);
 		runtime = JSON.getString(data, RUNTIME);
+		poster = JSON.getString(data, POSTER);
+		backdrop = JSON.getString(data, BACKDROP);
 		mnRating = JSON.getInt(data, MN_RATING);
 
-		genres = new ArrayList<String>();
+		genres = new ArrayList<Genre>();
 		JSONArray myGenres = JSON.getJSONArray(data, GENRES);
 		if (myGenres != null) {
 			for (int i = 0; i < myGenres.length(); i++) {
-				genres.add(JSON.getString(myGenres, i));
+				genres.add(new Genre(JSON.getJSONObject(myGenres, i)));
 			}
 		}
+		
+		/*
+		cast = new ArrayList<CastMember>();
+		JSONArray myCast = JSON.getJSONArray(data, CAST);
+		if (myCast != null) {
+			for (int i = 0; i < myCast.length(); i++) {
+				cast.add(new CastMember(JSON.getJSONObject(myCast, i)));
+			}
+		}
+		*/
 
 		theaters = new ArrayList<Theater>();
 		JSONObject myTheaters = JSON.getJSONObject(data, THEATERS);
@@ -122,9 +148,8 @@ public class Movie implements Serializable {
 			.build();
 		ImageView poster = (ImageView) activity.findViewById(R.id.poster);
 		Bitmap bmp = null;
-		if (this.poster != null && this.poster.length() > 0) {
+		if (this.poster != null && !this.poster.isEmpty()) {
 			bmp = ImageLoader.getInstance().loadImageSync(this.poster, imageOptions);
-
 		} else {
 			bmp = BitmapFactory.decodeResource(activity.getResources(), R.drawable.blank_poster);
 		}

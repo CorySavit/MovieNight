@@ -57,6 +57,14 @@ class TMDB {
 			return null;
 		}
 
+		public function getTMDBId() {
+			return $this->getMovie('id');
+		}
+
+		public function getIMDBId() {
+			return $this->getMovie('imdb_id');
+		}
+
 		private function getImagePath($size="w342") {
 			return $this->_config['images']['base_url'].$size;
 		}
@@ -71,10 +79,6 @@ class TMDB {
 
 		public function getGenres() {
 			return $this->getMovie('genres');
-		}
-
-		public function getIMDBID() {
-			return $this->getMovie('imdb_id');
 		}
 
 		public function getOverview() {

@@ -14,6 +14,7 @@ if ($request[0] == "movies") {
   print file_get_contents('mock/movies');
   exit(1);
 
+  // get our list of movies from TMS API
   $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
   //print_r($result);
   //exit(1);
@@ -23,13 +24,35 @@ if ($request[0] == "movies") {
     
     // group movies by rootID which will inevitable collapse 3D/IMAX experiences accordingly
     if (!array_key_exists($data->rootId, $movies)) {
+      // find movie in The Movie Database
+      $tmdb = new TMDB($data->title, $data->releaseYear);
       $movie = new Movie();
+
       $movie->id = $data->tmsId; // this will probably be our database's ID
       $movie->tmsid = $data->tmsId;
+      //$movie->tmdbid = $tmdb->getTMDBId();
+      //$movie->imdbid = $tmdb->getIMDBId();
+
       $movie->title = $data->title;
-      $movie->description = $data->longDescription;
+      $movie->description = is_null($tmdb->getOverview()) ? $data->description : $tmdb->getOverview();
       $movie->rating = $data->ratings[0]->code;
-      $movie->genres = $data->genres;
+      $movie->poster = $tmdb->getPosterURL();
+      $movie->backdrop = $tmdb->getBackdropURL();
+      $movie->cast = $tmdb->getCast();
+
+      // add genres; note that we try to use TMDB because unique IDs will become useful later (when doing recommendations)
+      $movie->genres = array();
+      if (!is_null($tmdb->getGenres())) {
+        // add genre from TMDB
+        $genres = $tmdb->getGenres();
+      } else {
+        // fallback to TMS
+        $genres = $data->genres;
+      }
+      foreach ($genres as $genre) {
+        // @todo if from TMS, search for existing genre in database and set id accordingly
+        array_push($movie->genres, new Genre($genre));
+      }
 
       // parse runtime "PT02H14M" --> "2 hr 14 min"
       preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
@@ -40,11 +63,6 @@ if ($request[0] == "movies") {
         $movie->runtime .= $hours.' hr ';
       }
       $movie->runtime .= intval($runtime[2]).' min';
-
-      // add poster via the movie database
-      $tmdb = new TMDB($movie->title, $data->releaseYear);
-      //print_r($tmdb);
-      $movie->poster = $tmdb->getPosterURL();
 
       // @todo this is just randomly generating stuff at the moment
       $movie->mn_rating = rand(-1,1) * rand(1,10);
@@ -136,7 +154,7 @@ function getEvents() {
   foreach ($data as $line) {
     $line = explode("\t", $line);
     $event = new Event($line[0]);
-    $event->movie = new Movie($line[1]);
+    $event->movie = stripObject(new Movie($line[1]));
     $event->showtime = new Showtime($line[2]);
     $event->status = $line[3];
     $event->theater = new Theater(0, $line[5]);
@@ -149,4 +167,9 @@ function getEvents() {
   }
   return $events;
 
+}
+
+// strips simple object of null properties
+function stripObject($obj) {
+  return (object) array_filter((array) $obj);
 }
