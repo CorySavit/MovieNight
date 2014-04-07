@@ -84,7 +84,6 @@ public class Movie implements Serializable {
 			}
 		}
 		
-		/*
 		cast = new ArrayList<CastMember>();
 		JSONArray myCast = JSON.getJSONArray(data, CAST);
 		if (myCast != null) {
@@ -92,7 +91,6 @@ public class Movie implements Serializable {
 				cast.add(new CastMember(JSON.getJSONObject(myCast, i)));
 			}
 		}
-		*/
 
 		theaters = new ArrayList<Theater>();
 		JSONObject myTheaters = JSON.getJSONObject(data, THEATERS);

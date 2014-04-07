@@ -21,5 +21,12 @@ public class CastMember extends Person implements Serializable {
 		
 		character = JSON.getString(data, CHARACTER);
 	}
+	
+	/*
+	@Override
+	public String toString() {
+		return this.name + " (as " + this.character + ")";
+	}
+	*/
 
 }

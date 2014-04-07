@@ -1,5 +1,6 @@
 package edu.pitt.cs1635.movienight;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -25,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
@@ -33,6 +35,7 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class MovieDetailsActivity extends Activity {
 
+	private LayoutInflater inflater;
 	private ImageLoader imageLoader;
 	private AlertDialog.Builder confirmBuilder;
 	private Movie movie;
@@ -43,6 +46,8 @@ public class MovieDetailsActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_movie_details);
+		
+		inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		// create alert dialog
 		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
@@ -132,6 +137,36 @@ public class MovieDetailsActivity extends Activity {
 		ListView theaters = (ListView) findViewById(R.id.theaters);
 		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, R.layout.theater_item, movie.theaters));
 		
+		// populate movie details information
+		List<LinearLayout> details = new ArrayList<LinearLayout>();
+		
+		// create description item
+		LinearLayout description = createMovieDetail(getString(R.string.overview));
+		TextView detailsOverview = new TextView(this);
+		detailsOverview.setText(movie.description);
+		description.addView(detailsOverview);
+		details.add(description);
+		
+		// create cast item
+		// @todo make this nicer with images and whatnot
+		LinearLayout cast = createMovieDetail(getString(R.string.cast_members));
+		TextView castView = new TextView(this);
+		castView.setText(Utility.join(movie.cast, ", "));
+		cast.addView(castView);
+		details.add(cast);
+		
+		// add all items to movie details scrollview
+		LinearLayout movieDetails = (LinearLayout) findViewById(R.id.details);
+		for (LinearLayout item : details) {
+			movieDetails.addView(item);
+		}
+		
+	}
+	
+	private LinearLayout createMovieDetail(String label) {
+		LinearLayout result = (LinearLayout) inflater.inflate(R.layout.movie_info_item, null);
+		((TextView) result.findViewById(R.id.label)).setText(label.toUpperCase());
+		return result;
 	}
 
 	/*

@@ -26,5 +26,7 @@
     <string name="title_activity_event_details">Event Details</string>
     <string name="unknown_location">Unknown Location</string>
     <string name="location_icon">Location Icon</string>
+    <string name="overview">Overview</string>
+    <string name="cast_members">Cast Members</string>
 
 </resources>

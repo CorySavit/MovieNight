@@ -26,4 +26,8 @@ public class Person implements Serializable {
 		photo = JSON.getString(data, PHOTO);
 		
 	}
+	
+	public String toString() {
+		return name;
+	}
 }
