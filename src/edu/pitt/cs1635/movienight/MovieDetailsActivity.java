@@ -21,12 +21,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
@@ -119,7 +118,7 @@ public class MovieDetailsActivity extends Activity {
 		
 		// populate feature events listview
 		ListView events = (ListView) findViewById(R.id.events);
-		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, R.layout.event_item, movie.events));
+		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, movie.events));
 		events.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -135,7 +134,7 @@ public class MovieDetailsActivity extends Activity {
 		
 		// populate theater listview
 		ListView theaters = (ListView) findViewById(R.id.theaters);
-		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, R.layout.theater_item, movie.theaters));
+		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, movie.theaters));
 		
 		// populate movie details information
 		List<LinearLayout> details = new ArrayList<LinearLayout>();
@@ -168,19 +167,39 @@ public class MovieDetailsActivity extends Activity {
 		((TextView) result.findViewById(R.id.label)).setText(label.toUpperCase());
 		return result;
 	}
+	
+	private static class TheaterViewHolder {
+		TextView name;
+		LinearLayout showtimes;
+	}
 
 	/*
 	 * Used to populate the ListView of theaters (in a movie detail)
 	 */
-	private class TheatersAdapter extends ArrayAdapter<Theater> {
-
+	private class TheatersAdapter extends BaseAdapter {
+		
+		private TheaterViewHolder viewHolder;
 		private List<Theater> theaters;
 		private LayoutInflater inflater = null;
 
-		public TheatersAdapter(Context context, int layoutResourceId, List<Theater> data) {
-			super(context, layoutResourceId, data);
+		public TheatersAdapter(Activity activity, List<Theater> data) {
 			theaters = data;
-			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+		
+		@Override
+		public int getCount() {
+			return theaters.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return theaters.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
 		}
 
 		@Override
@@ -190,29 +209,35 @@ public class MovieDetailsActivity extends Activity {
 			View view = convertView;
 			if (convertView == null) {
 				view = inflater.inflate(R.layout.theater_item, parent, false);
+				
+				// limit calls to findViewById()
+				// see http://www.piwai.info/android-adapter-good-practices/#ViewHolder-Pattern
+				viewHolder = new TheaterViewHolder();
+				viewHolder.name = (TextView) view.findViewById(R.id.name);
+				viewHolder.showtimes = (LinearLayout) view.findViewById(R.id.showtimes);
+				
+				view.setTag(R.id.TAG_VIEW_HOLDER, viewHolder);
+			} else {
+				viewHolder = (TheaterViewHolder) view.getTag(R.id.TAG_VIEW_HOLDER);
 			}
 
 			// get appropriate theater data
 			Theater theater = theaters.get(position);
-
-			// set tag (id)
-			view.setTag(theater);
+			view.setTag(R.id.TAG_THEATER, theater);
 
 			// set name
-			TextView name = (TextView) view.findViewById(R.id.name);
-			name.setText(theater.name);
+			viewHolder.name.setText(theater.name);
 
 			// set showtimes
-			LinearLayout showtimes = (LinearLayout) view.findViewById(R.id.showtimes);
+			viewHolder.showtimes.removeAllViews();
 			int size = theater.showtimes.size();
-			// @todo check to see whether or not showtimes.getChildCount() is a hack...
-			for (int i = 0; i < size && showtimes.getChildCount() < size; i++) {
+			for (int i = 0; i < size; i++) {
 				LinearLayout layout = (LinearLayout) View.inflate(MovieDetailsActivity.this, R.layout.showtime_button, null);
 				TextView tv = (TextView) layout.findViewById(R.id.time);
 				Showtime time = theater.showtimes.get(i); 
 				tv.setText(time.toString());
 				tv.setTag(time);
-				showtimes.addView(layout);
+				viewHolder.showtimes.addView(layout);
 
 				// @todo check to see if we should not be doing this for each textview
 				tv.setOnClickListener(new OnClickListener() {
@@ -220,7 +245,7 @@ public class MovieDetailsActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						// @todo this is most likely not how you do this
-						myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag());
+						myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag(R.id.TAG_THEATER));
 						myShowtime = (Showtime) v.getTag();
 						Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
 						confirmBuilder.setMessage(message).create().show();
@@ -234,17 +259,25 @@ public class MovieDetailsActivity extends Activity {
 
 	}
 	
+	private static class EventViewHolder {
+		TextView title;
+		TextView subtitle;
+		LinearLayout guests;
+	}
+	
 	/*
 	 * Used to populate the ListView of featured events
 	 */
-	private class EventsAdapter extends ArrayAdapter<Event> {
+	private class EventsAdapter extends BaseAdapter {
+		
+		private EventViewHolder viewHolder;
 		private DisplayImageOptions imageOptions;
 		private List<Event> events;
 		private LayoutInflater inflater;
 
-		public EventsAdapter(Context context, int layoutResourceId, List<Event> data) {
-			super(context, layoutResourceId, data);
+		public EventsAdapter(Activity activity, List<Event> data) {
 			events = data;
+			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			imageOptions = new DisplayImageOptions.Builder()
 				.showImageOnLoading(R.drawable.blank_profile)
 				.showImageForEmptyUri(R.drawable.blank_profile)
@@ -252,7 +285,21 @@ public class MovieDetailsActivity extends Activity {
 				.cacheInMemory(true)
 				.cacheOnDisc(true)
 				.build();
-			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+		
+		@Override
+		public int getCount() {
+			return events.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return events.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
 		}
 
 		@Override
@@ -262,34 +309,37 @@ public class MovieDetailsActivity extends Activity {
 			View view = convertView;
 			if (convertView == null) {
 				view = inflater.inflate(R.layout.featured_event_item, parent, false);
+				
+				viewHolder = new EventViewHolder();
+				viewHolder.title = (TextView) view.findViewById(R.id.title);
+				viewHolder.subtitle = (TextView) view.findViewById(R.id.subtitle);
+				viewHolder.guests = (LinearLayout) view.findViewById(R.id.guests);
+				
+				view.setTag(R.id.TAG_VIEW_HOLDER, viewHolder);
+			} else {
+				viewHolder = (EventViewHolder) view.getTag(R.id.TAG_VIEW_HOLDER);
 			}
 
 			// get appropriate event data
 			Event event = events.get(position);
-
-			// set tag (id)
-			view.setTag(event);
+			view.setTag(R.id.TAG_EVENT, event);
 
 			// set date
-			TextView title = (TextView) view.findViewById(R.id.title);
-			title.setText(event.showtime + " on " + event.showtime.getDate());
+			viewHolder.title.setText(event.showtime + " on " + event.showtime.getDate());
 			
 			// set subtitle
-			TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
 			int numGuest = event.guests.size();
-			subtitle.setText("at " + event.theater + " with " + numGuest + " people");
+			viewHolder.subtitle.setText("at " + event.theater + " with " + numGuest + " people");
 			
 			// set profile images
-			// @todo too many profile photos seems to be added to the first event
-			LinearLayout guests = (LinearLayout) view.findViewById(R.id.guests);
+			// TODO check to see if this is the best way to be doing this
+			viewHolder.guests.removeAllViews();
 			int max = Math.min(numGuest, 6);
-			for (int i = 0; i < max && guests.getChildCount() < max; i++) {
+			for (int i = 0; i < max; i++) {
 				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
 				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
 		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
-				//TextView tv = (TextView) myFrame.findViewById(R.id.photo);
-				//tv.setText(position + "--" + i);
-		        guests.addView(myFrame);
+				viewHolder.guests.addView(myFrame);
 			}
 
 			return view;

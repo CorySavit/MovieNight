@@ -28,5 +28,9 @@
     <string name="location_icon">Location Icon</string>
     <string name="overview">Overview</string>
     <string name="cast_members">Cast Members</string>
+    
+    <item type="id" name="TAG_VIEW_HOLDER"></item>
+    <item type="id" name="TAG_EVENT"></item>
+    <item type="id" name="TAG_THEATER"></item>
 
 </resources>
