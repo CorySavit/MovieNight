@@ -68,6 +68,10 @@
             android:name="edu.pitt.cs1635.movienight.Profile"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="edu.pitt.cs1635.movienight.ProfileEdit"
+            android:label="@string/app_name" >
+        </activity>
 
         <!-- Meta Data for google play services and google maps -->
         <meta-data
