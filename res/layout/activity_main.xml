@@ -29,12 +29,11 @@
 
     <RelativeLayout
         android:id="@+id/curr_location_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:background="@android:drawable/dark_header" >
+        android:background="@android:drawable/dark_header"
+        android:padding="@dimen/global_padding_small" >
 
         <ImageView
             android:id="@+id/curr_loc_icon"

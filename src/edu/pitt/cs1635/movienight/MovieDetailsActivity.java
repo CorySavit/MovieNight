@@ -160,6 +160,11 @@ public class MovieDetailsActivity extends Activity {
 			movieDetails.addView(item);
 		}
 		
+		// ratings
+		// @todo actually implement this
+		TextView rating = (TextView) findViewById(R.id.rating);
+		rating.setText("This movie has an aggregate MovieNight rating of " + movie.mnRating + ".");
+		
 	}
 	
 	private LinearLayout createMovieDetail(String label) {
