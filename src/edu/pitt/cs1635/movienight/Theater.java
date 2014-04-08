@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Theater implements Serializable {
+	private static final long serialVersionUID = 1L;
 
 	// JSON keys
 	static final String ID = "id";
@@ -26,18 +28,25 @@ public class Theater implements Serializable {
 
 	public Theater(JSONObject data) {
 		
+		// @todo sanity check for mock data
+		if (data == null) {return;}
+		
 		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
 		ticketurl = JSON.getString(data, TICKET_URL);
 
 		// add showtimes
-		inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm");
+		inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
 		showtimes = new ArrayList<Showtime>();
 		JSONArray myShowtimes = JSON.getJSONArray(data, SHOWTIMES);
 		for (int i = 0; i < myShowtimes.length(); i++) {
 			showtimes.add(new Showtime(JSON.getJSONObject(myShowtimes, i)));
 		}
 
+	}
+	
+	public String toString() {
+		return name;
 	}
 	
 }

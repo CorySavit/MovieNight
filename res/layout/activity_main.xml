@@ -1,19 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout 
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white" >
-    
+    android:background="@color/white"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="start"
+    android:orientation="vertical" >
+
     <GridView
         android:id="@+id/posterGrid"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="5dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/curr_location_bar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:clipToPadding="false"
-        android:verticalSpacing="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:horizontalSpacing="0dp"
+        android:numColumns="2"
+        android:padding="4dp"
         android:stretchMode="columnWidth"
-        android:numColumns="2" />
-    
-</FrameLayout>
+        android:verticalSpacing="0dp" >
+
+    </GridView>
+
+    <RelativeLayout
+        android:id="@+id/curr_location_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:drawable/dark_header"
+        android:padding="@dimen/global_padding_small" >
+
+        <ImageView
+            android:id="@+id/curr_loc_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/location_icon"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_action_place" />
+
+        <TextView
+            android:id="@+id/loc_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/curr_loc_icon"
+            android:text="@string/unknown_location"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/white" />
+        
+    </RelativeLayout>
+
+</RelativeLayout>
