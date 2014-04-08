@@ -153,6 +153,8 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_profile:
+			Intent profileView = new Intent(this, Profile.class);
+			startActivity(profileView);
 			return true;
 		case R.id.action_map:
 			Intent mapView = new Intent(this, MapActivity.class);

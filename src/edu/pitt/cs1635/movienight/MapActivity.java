@@ -223,6 +223,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			Intent profileView = new Intent(this, Profile.class);
+			startActivity(profileView);
 			return true;
 		case R.id.action_home:
 			finish();

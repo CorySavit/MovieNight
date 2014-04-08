@@ -36,6 +36,7 @@
             android:id="@+id/username_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
             android:text="Username:"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
@@ -44,22 +45,28 @@
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
             android:text="John Smith"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/profile_email_block"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_username_block"
+        android:layout_alignBottom="@id/profile_image"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="17dp"
         android:layout_toRightOf="@id/profile_image"
+        android:background="@color/gray"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/email_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
             android:text="Email:"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
@@ -68,6 +75,7 @@
             android:id="@+id/user_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
             android:text="john.smith@pitt.edu"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -75,12 +83,13 @@
 
     <Button
         android:id="@+id/edit_profile_btn"
+        style="@style/YellowButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="17dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
-        android:text="Edit Profile" />
+        android:text="E d i t  P r o f i l e" />
 
 </RelativeLayout>
