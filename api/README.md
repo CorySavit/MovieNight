@@ -6,8 +6,38 @@ In order to run the API locally, duplicate `auth.example.php`, rename the file t
 
 ## Methods
 
-Below are a list of methods supported by the API.
+Below are a list of methods supported by the API. The response for all methods include `success: {0,1}` and `error: {<msg>,null}`.
+
+### /events
+
+* **GET** — returns set of mock data at the moment
+
+### /friends
+
+* **GET** — returns set of mock data at the moment
 
 ### /movies
 
-Returns a list of all movies currently playing in local theatres, with showtimes.
+* **GET** — returns a list of all movies currently playing in a predefined location
+
+### /user
+
+* **POST** — create new user
+
+	**Request** {`first_name`, `last_name`, `email`, `password`}
+	
+	**Response** {`id`}
+
+### /user/{id}
+
+* **GET** — logs user in
+	
+	**Response** {`id`, `email`, `first_name`, `last_name`, `created_at`}
+
+### /user/login
+
+* **POST** — logs user in
+
+	**Request** {`email`, `password`}
+	
+	**Response** {`login: {0,1}`}

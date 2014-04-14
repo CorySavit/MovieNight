@@ -5,7 +5,13 @@ require_once 'auth.php';
 require_once 'tmdb.php';
 require_once 'models.php';
 
+// setup database
+require_once 'medoo.php';
+$db = new medoo(DB_NAME);
+define("INVALID_REQUEST", "Invalid Request");
+
 $request = explode('/', $_GET['request']);
+$request_type = $_SERVER['REQUEST_METHOD'];
 
 if ($request[0] == "movies") {
   // default zip code
@@ -127,6 +133,79 @@ if ($request[0] == "movies") {
 
   print json_encode(getEvents());
 
+} else if ($request[0] == "user") {
+
+  if (sizeof($request) == 1) {
+    switch ($request_type) {
+      case 'POST':
+
+        // create new user
+        $hash = hashSSHA($_POST['password']);
+        $date = date("Y-m-d H:i:s");
+        $id = $db->insert('users', array(
+          'email' => $_POST['email'],
+          'first_name' => $_POST['first_name'],
+          'last_name' => $_POST['last_name'],
+          'password' => $hash["encrypted"],
+          'salt' => $hash["salt"],
+          'created_at' => $date,
+          'updated_at' => $date
+        ));
+
+        echo formatResponse(array(
+          'id' => $id
+        ));
+
+        break;
+      default:
+        echo INVALID_REQUEST;
+    }
+  } else if ($request[1] == 'login') {
+    switch ($request_type) {
+      case 'POST':
+
+        // login
+        $data = $db->get('users', '*', array(
+          'email' => $_POST['email']
+        ));
+        // @todo check to see if query had any errors
+        // @todo this assumes password is sent via plaintext (obviously unsecure)
+        echo formatResponse(array(
+          'login' => checkhashSSHA($data['salt'], $_POST['password']) == $data['password'] ? 1 : 0
+        ));
+
+        break;
+      default:
+        echo INVALID_REQUEST;
+    }
+  } else  {
+    // otherwise assume $request[1] is user id
+    switch ($request_type) {
+      case 'GET':
+
+        // get user information
+        $data = $db->get('users', array(
+          'id',
+          'email',
+          'first_name',
+          'last_name',
+          'created_at'
+        ), array('id' => $request[1]));
+        echo formatResponse($data);
+
+        break;
+      case 'PUT':
+        // @todo update user information
+        echo INVALID_REQUEST;
+
+        break;
+      default:
+        echo INVALID_REQUEST;
+    }
+  }
+
+} else {
+  echo INVALID_REQUEST;
 }
 
 function getUsers($guest = false) {
@@ -172,4 +251,27 @@ function getEvents() {
 // strips simple object of null properties
 function stripObject($obj) {
   return (object) array_filter((array) $obj);
+}
+
+// encrypt password
+function hashSSHA($password) {
+  $salt = sha1(rand());
+  $salt = substr($salt, 0, 10);
+  $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
+  $hash = array("salt" => $salt, "encrypted" => $encrypted);
+  return $hash;
+}
+
+function checkhashSSHA($salt, $password) {
+  $hash = base64_encode(sha1($password . $salt, true) . $salt);
+  return $hash;
+}
+
+// format a JSON response
+function formatResponse($array) {
+  global $db;
+  $error = $db->error();
+  $array['success'] = is_null($error[2]) ? 1 : 0;
+  $array['error'] = $error[2];
+  return json_encode($array);
 }
