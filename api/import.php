@@ -3,6 +3,9 @@
 require_once 'auth.php';
 require_once 'tmdb.php';
 
+// prints out some verbose output
+define("DEBUG", true);
+
 // setup database
 require_once 'medoo.php';
 $db = new medoo(DB_NAME);
@@ -26,50 +29,36 @@ foreach ($result as $data) {
 
   if ($movie) {
     // movie already exists in database
+    myLog("\nmovie_".$movie['id']." already exists in database.");
 
     // check if we need to expand date interval
-    $update = false;
-    if ($date < $movie['start_date']) {
-
-      // update start date
-      $db->update('movies', array(
-        'start_date' => $date
-      ), array('id' => $movie['id']));
-      $update = true;
-
-    } else if ($date > $movie['end_date']) {
+    // note that the start (release) date never changes
+    if ($date > $movie['end_date']) {
 
       // update end date
+      myLog("update movie_".$movie['id']." end_date to ".$date);
       $db->update('movies', array(
         'end_date' => $date
       ), array('id' => $movie['id']));
-      $update = true;
 
     }
 
-    // if we updated
-    if ($update) {
-      // do stuff?
-    }
-
-    // add showtimes (if they are not already in database)
-    addShowtimes($data->showtimes, $movie['id']);
+    // @todo update things like rating again -- or move that into separate script?
 
   } else {
     // movie does not already exist in database
 
     $tmdb = new TMDB($data->title, $data->releaseYear);
 
-    // parse runtime "PT02H14M" --> "2 hr 14 min"
-    preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
-    $myRuntime = '';
-    $hours = intval($runtime[1]);
-    if ($hours !== 0) {
-      // don't include hours if they are 0
-      $myRuntime .= $hours.' hr ';
+    // try to get runtime from tmdb first
+    $myRuntime = $tmdb->getRuntime();
+    if (is_null($myRuntime)) {
+      // parse runtime "PT02H14M" --> "2 hr 14 min"
+      preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
+      $myRuntime = intval($runtime[1]) * 60 + intval($runtime[2]);
     }
-    $myRuntime .= intval($runtime[2]).' min';
 
+    myLog("\ninsert movie \"".$data->title."\" into database");
     $movie_id = $db->insert('movies', array(
       'tms_id' => $data->rootId,
       'tmdb_id' => $tmdb->getTMDBId(),
@@ -80,8 +69,10 @@ foreach ($result as $data) {
       'poster' => $tmdb->getPosterURL(),
       'backdrop' => $tmdb->getBackdropURL(),
       'runtime' => $myRuntime,
-      'start_date' => $date,
-      'end_date' => $date
+      'start_date' => $data->releaseDate,
+      'end_date' => $date,
+      'tmdb_rating' => $tmdb->getRating(),
+      'tmdb_rating_count' => $tmdb->getRatingCount()
     ));
 
     // add genres
@@ -100,12 +91,16 @@ foreach ($result as $data) {
         $genre_id = $db->select('genres', 'id', array('name' => $genre['name']));
       }
 
-      if (!$genre_id) {
+      if (empty($genre_id)) {
         // insert new genre if it doesn't exist
+        myLog("insert genre \"".$genre['name']."\" into database");
         $genre_id = $db->insert('genres', $genre);
+      } else {
+        $genre_id = $genre_id[0];
       }
 
       // create genre relationship
+      myLog("add genre \"".$genre['name']."\" to movie");
       $db->insert('movies2genres', array(
         'movie_id' => $movie_id,
         'genre_id' => $genre_id
@@ -113,12 +108,13 @@ foreach ($result as $data) {
 
     }
 
-    // add showtimes
-    addShowtimes($data->showtimes, $movie_id);
-
     // @todo add cast
 
+
   }
+
+  // add showtimes (even if the movie is already in the database)
+  addShowtimes($data->showtimes, $movie_id);
 
   exit(1);
 
@@ -132,6 +128,7 @@ function addShowtimes($showtimes, $movie_id) {
     $theater_id = $db->select('theaters', 'id', array('tms_id' => $showtime->theatre->id));
     if (!$theater_id) {
       // @todo find location via google api
+      myLog("insert theater \"".$showtime->theatre->name."\" into database");
       $theater_id = $db->insert('theaters', array(
         'tms_id' => $showtime->theatre->id,
         'name' => $showtime->theatre->name
@@ -163,11 +160,9 @@ function addShowtimes($showtimes, $movie_id) {
       )
     ));
 
-    print ($movie_id."\n".$theater_id."\n".$time."\n".$flag."\n");
-    print_r($showtime_id);
-
-    if (!$showtime_id) {
+    if (empty($showtime_id)) {
       // add showtime to database
+      myLog("insert showtime \"".$time."\" into database");
       $ticket_url = isset($showtime->ticketURI) ? $showtime->ticketURI : null;
       $db->insert('showtimes', array(
         'movie_id' => $movie_id,
@@ -180,4 +175,10 @@ function addShowtimes($showtimes, $movie_id) {
 
   }
 
+}
+
+function myLog($output) {
+  if (DEBUG) {
+    echo $output."\n";
+  }
 }

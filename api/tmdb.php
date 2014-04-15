@@ -77,6 +77,10 @@ class TMDB {
 			return ($this->getMovie('backdrop_path') == "") ? null : $this->getImagePath($size).$this->getMovie('backdrop_path');
 		}
 
+		public function getProfileURL($path, $size="w185") {
+			return $this->getImagePath($size).$path;
+		}
+
 		public function getGenres() {
 			return $this->getMovie('genres');
 		}
@@ -87,6 +91,18 @@ class TMDB {
 
 		public function getTagline() {
 			return $this->getMovie('tagline');
+		}
+
+		public function getRuntime() {
+			return $this->getMovie('runtime');
+		}
+
+		public function getRating() {
+			return $this->getMovie('vote_average');
+		}
+
+		public function getRatingCount() {
+			return $this->getMovie('vote_count');
 		}
 
 		private function setCredits() {
