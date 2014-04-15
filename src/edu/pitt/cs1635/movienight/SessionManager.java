@@ -14,7 +14,8 @@ public class SessionManager {
      
     private static final String PREF_NAME = "MovieNightPrefs";
     private static final String IS_LOGIN = "IsLoggedIn";
-    public static final String KEY_NAME = "name";
+    public static final String KEY_FIRSTNAME = "firstName";
+    public static final String KEY_LASTNAME = "lastName";
     public static final String KEY_EMAIL = "email";
     public static final String KEY_PASS = "password";
     public static final String KEY_API = "api_key";
@@ -26,10 +27,11 @@ public class SessionManager {
         editor = pref.edit();
     }
     
-    public void createLoginSession(String name, String email, String password){
+    public void createLoginSession(String firstName, String lastName, String email, String password){
     	//probabably would be a good idea to connect with server and return the api key here.
         editor.putBoolean(IS_LOGIN, true);
-        editor.putString(KEY_NAME, name);
+        editor.putString(KEY_FIRSTNAME, firstName);
+        editor.putString(KEY_LASTNAME, lastName);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASS, password);
         
@@ -40,8 +42,10 @@ public class SessionManager {
     
     public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<String, String>();
-        // user name
-        user.put(KEY_NAME, pref.getString(KEY_NAME, null));
+        // first name
+        user.put(KEY_FIRSTNAME, pref.getString(KEY_FIRSTNAME, null));
+        // last name
+        user.put(KEY_LASTNAME, pref.getString(KEY_LASTNAME, null));
         // user email id
         user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
         // return user
