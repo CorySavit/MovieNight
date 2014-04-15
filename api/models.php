@@ -39,7 +39,7 @@ class Movie {
 class Theater {
   public $id;
   public $name;
-  public $ticketurl;
+  public $ticketurl; // @todo move this to showtime
   public $showtimes;
 
   public function __construct($id = null, $name = null) {

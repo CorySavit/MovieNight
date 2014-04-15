@@ -62,7 +62,7 @@ class TMDB {
 		}
 
 		public function getIMDBId() {
-			return $this->getMovie('imdb_id');
+			return substr($this->getMovie('imdb_id'), 2);
 		}
 
 		private function getImagePath($size="w342") {
