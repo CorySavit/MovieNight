@@ -1,5 +1,4 @@
 <?php
-
 require_once 'auth.php';
 
 /*! Medoo 0.9.1.1 - Copyright 2013, Angel Lai - MIT license - http://medoo.in */

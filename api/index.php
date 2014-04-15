@@ -1,12 +1,8 @@
 <?php
 header('Content-type: application/json');
-
-require_once 'auth.php';
-require_once 'tmdb.php';
-require_once 'models.php';
+require_once 'shared.php';
 
 // setup database
-require_once 'medoo.php';
 $db = new medoo(DB_NAME);
 define("INVALID_REQUEST", "Invalid Request");
 

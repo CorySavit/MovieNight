@@ -11,3 +11,6 @@ define("DB_SERVER", "###");
 define("DB_NAME", "###");
 define("DB_USERNAME", "###");
 define("DB_PASSWORD", "###");
+
+// location stuff
+define("PLACES_KEY", "###");

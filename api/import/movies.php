@@ -1,21 +1,14 @@
 <?php
-
-require_once 'auth.php';
-require_once 'tmdb.php';
-
-// prints out some verbose output
-define("DEBUG", true);
+require_once '../shared.php';
 
 // setup database
-require_once 'medoo.php';
 $db = new medoo(DB_NAME);
-define("INVALID_REQUEST", "Invalid Request");
 
+// today's date for the time being
 $date = date("Y-m-d");
 
-//$zip = 15213;
-//echo file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY);
-$result = json_decode(file_get_contents('mock/tms'));
+//$result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate='.date("Y-m-d").'&lat='.STATIC_LAT.'&lng='.STATIC_LNG.'&radius='.RADIUS_MILES.'&api_key=' . ONCONNECT_KEY));
+$result = json_decode(file_get_contents('../mock/movies'));
 
 foreach ($result as $data) {
 
@@ -51,9 +44,7 @@ foreach ($result as $data) {
       'backdrop' => $tmdb->getBackdropURL(),
       'runtime' => $myRuntime,
       'start_date' => $data->releaseDate,
-      'end_date' => $date,
-      'tmdb_rating' => $tmdb->getRating(),
-      'tmdb_rating_count' => $tmdb->getRatingCount()
+      'end_date' => $date
     ));
 
     // add genres
@@ -111,26 +102,100 @@ foreach ($result as $data) {
 
   }
 
+  // grab the close theaters from our database (only do this once for each movie)
+  // uses Haversine formula
+  // see https://developers.google.com/maps/articles/phpsqlsearch_v3#findnearsql
+  $theaters = $db->query("SELECT
+      id, google_id, name, (
+        3959 * acos(
+          cos(radians(".STATIC_LAT."))
+          * cos(radians(lat))
+          * cos(radians(lng) - radians(".STATIC_LNG."))
+          + sin(radians(".STATIC_LAT."))
+          * sin(radians(lat))
+        )
+    ) AS distance
+    FROM theaters
+    HAVING distance <= 31
+    ORDER BY distance;")->fetchAll();
+
   // add showtimes (even if the movie is already in the database)
   addShowtimes($data->showtimes, $movie_id);
-
-  exit(1);
 
 }
 
 function addShowtimes($showtimes, $movie_id) {
-  global $db;
+  global $db, $theaters;
   
   foreach ($showtimes as $showtime) {
 
     $theater_id = $db->get('theaters', 'id', array('tms_id' => $showtime->theatre->id));
     if (!$theater_id) {
-      // @todo find location via google api
-      myLog("insert theater \"".$showtime->theatre->name."\" into database");
-      $theater_id = $db->insert('theaters', array(
-        'tms_id' => $showtime->theatre->id,
-        'name' => $showtime->theatre->name
-      ));
+      
+      // traverse through the close theaters in our database
+      foreach ($theaters as $theater) {
+        if ($theater['name'] == $showtime->theatre->name) {
+          $theater_id = $theater['id'];
+        }
+      }
+
+      if ($theater_id) {
+        // theater already exists in the database (with same name)
+        // update tmd_id accordingly
+        myLog('update tms_id of theater "'.$theater_id.'"');
+        $db->update('theaters',
+          array('tms_id' => $showtime ->theatre->id),
+          array('id' => $theater_id)
+        );
+      } else {
+        // theater does not exist in the database
+        // do a google places location search and only look at first result
+        $nearbysearch = json_decode(file_get_contents('https://maps.googleapis.com/maps/api/place/nearbysearch/json?location='.STATIC_LAT.','.STATIC_LNG.'&radius='.RADIUS_METERS.'&keyword='.urlencode($showtime->theatre->name).'&sensor=false&key='.PLACES_KEY));
+        if ($nearbysearch->status == 'OK') {
+          
+          $nearbysearch = $nearbysearch->results[0];
+          foreach ($theaters as $theater) {
+            if ($theater['google_id'] == $nearbysearch->id) {
+              // if this google_id matches one in our database, then update the tms_id accordingly
+              $theater_id = $theater['id'];
+              myLog('update tms_id of theater "'.$theater_id.'" via nearbysearch query');
+              $db->update('theaters',
+                array('tms_id' => $showtime ->theatre->id),
+                array('id' => $theater_id)
+              );
+            }
+          }
+
+          if (!$theater_id) {
+            // if theater does not exist in our database
+            // add new theater with results of google places nearbysearch
+            // note that we are still using TMS theater name with google places geographic data
+            myLog("insert theater \"".$showtime->theatre->name."\" into database via nearbysearch query");
+            $theater_id = $db->insert('theaters', array(
+              'tms_id' => $showtime->theatre->id,
+              'google_id' => $nearbysearch->id,
+              'name' => $showtime->theatre->name,
+              'address' => $nearbysearch->vicinity,
+              'lat' => $nearbysearch->geometry->location->lat,
+              'lng' => $nearbysearch->geometry->location->lng
+            ));
+          }
+
+        } else {
+
+          // as a last resort, we insert a theater with queried location data
+          // @todo should we be even setting the lat/lng?
+          myLog("insert theater \"".$showtime->theatre->name."\" into database");
+          $theater_id = $db->insert('theaters', array(
+            'tms_id' => $showtime->theatre->id,
+            'name' => $showtime->theatre->name,
+            'lat' => STATIC_LAT,
+            'lng' => STATIC_LNG
+          ));
+
+        }
+      }
+
     }
 
     // parse showtime "2014-03-14T13:10" --> "2014-03-14 13:10"
