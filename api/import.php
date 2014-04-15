@@ -17,7 +17,6 @@ $date = date("Y-m-d");
 //echo file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY);
 $result = json_decode(file_get_contents('mock/tms'));
 
-//$movies = array();
 foreach ($result as $data) {
 
   // see if movie already exists in database
@@ -27,25 +26,7 @@ foreach ($result as $data) {
     'end_date'
   ), array('tms_id' => $data->rootId));
 
-  if ($movie) {
-    // movie already exists in database
-    myLog("\nmovie_".$movie['id']." already exists in database.");
-
-    // check if we need to expand date interval
-    // note that the start (release) date never changes
-    if ($date > $movie['end_date']) {
-
-      // update end date
-      myLog("update movie_".$movie['id']." end_date to ".$date);
-      $db->update('movies', array(
-        'end_date' => $date
-      ), array('id' => $movie['id']));
-
-    }
-
-    // @todo update things like rating again -- or move that into separate script?
-
-  } else {
+  if (empty($movie)) {
     // movie does not already exist in database
 
     $tmdb = new TMDB($data->title, $data->releaseYear);
@@ -84,19 +65,17 @@ foreach ($result as $data) {
         // @todo should probably search where 'name' as well
         $genre['tmdb_id'] = $genre['id'];
         unset($genre['id']);
-        $genre_id = $db->select('genres', 'id', array('tmdb_id' => $genre['tmdb_id']));
+        $genre_id = $db->get('genres', 'id', array('tmdb_id' => $genre['tmdb_id']));
       } else {
         // search for existing name in database
         $genre = array('name' => $genre);
-        $genre_id = $db->select('genres', 'id', array('name' => $genre['name']));
+        $genre_id = $db->get('genres', 'id', array('name' => $genre['name']));
       }
 
       if (empty($genre_id)) {
         // insert new genre if it doesn't exist
         myLog("insert genre \"".$genre['name']."\" into database");
         $genre_id = $db->insert('genres', $genre);
-      } else {
-        $genre_id = $genre_id[0];
       }
 
       // create genre relationship
@@ -110,6 +89,25 @@ foreach ($result as $data) {
 
     // @todo add cast
 
+
+  } else {
+    // movie already exists in database
+    $movie_id = $movie['id'];
+    myLog("\nmovie \"".$movie_id."\" already exists in database.");
+
+    // check if we need to expand date interval
+    // note that the start (release) date never changes
+    if ($date > $movie['end_date']) {
+
+      // update end date
+      myLog("update movie_".$movie['id']." end_date to ".$date);
+      $db->update('movies', array(
+        'end_date' => $date
+      ), array('id' => $movie['id']));
+
+    }
+
+    // @todo update things like rating again -- or move that into separate script?
 
   }
 
@@ -125,7 +123,7 @@ function addShowtimes($showtimes, $movie_id) {
   
   foreach ($showtimes as $showtime) {
 
-    $theater_id = $db->select('theaters', 'id', array('tms_id' => $showtime->theatre->id));
+    $theater_id = $db->get('theaters', 'id', array('tms_id' => $showtime->theatre->id));
     if (!$theater_id) {
       // @todo find location via google api
       myLog("insert theater \"".$showtime->theatre->name."\" into database");
@@ -133,8 +131,6 @@ function addShowtimes($showtimes, $movie_id) {
         'tms_id' => $showtime->theatre->id,
         'name' => $showtime->theatre->name
       ));
-    } else {
-      $theater_id = $theater_id[0];
     }
 
     // parse showtime "2014-03-14T13:10" --> "2014-03-14 13:10"
@@ -151,7 +147,7 @@ function addShowtimes($showtimes, $movie_id) {
     }
 
     // see if showtime already exists in database
-    $showtime_id = $db->select('showtimes', 'id', array(
+    $showtime_id = $db->get('showtimes', 'id', array(
       'AND' => array (
         'movie_id' => $movie_id,
         'theater_id' => $theater_id,
