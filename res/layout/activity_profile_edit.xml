@@ -23,32 +23,47 @@
         android:id="@+id/profile_username_block"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/profile_image_btn"
         android:layout_marginBottom="17dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:layout_marginTop="17dp"
-        android:layout_below="@id/profile_image_btn"
         android:background="@color/gray"
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/username_title"
+            android:id="@+id/TextView01"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
-            android:text="Username:"
+            android:text="First Name:"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editText1"
+            android:id="@+id/firstname_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName" />
+
+        <TextView
+            android:id="@+id/lastname_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="Last Name:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/lastname_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName" >
 
             <requestFocus />
         </EditText>
-
     </LinearLayout>
 
     <LinearLayout
@@ -71,7 +86,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/editText2"
+            android:id="@+id/email_edit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress" />
