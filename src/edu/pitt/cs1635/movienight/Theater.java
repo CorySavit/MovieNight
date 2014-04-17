@@ -15,14 +15,14 @@ public class Theater implements Serializable {
 	// JSON keys
 	static final String ID = "id";
 	static final String NAME = "name";
+	static final String ADDRESS = "address";
 	static final String SHOWTIMES = "showtimes";
-	static final String TICKET_URL = "ticketurl";
 
 	// object variables
 	int id;
 	String name;
+	String address;
 	List<Showtime> showtimes;
-	String ticketurl;
 
 	private SimpleDateFormat inputFormat;
 
@@ -33,7 +33,7 @@ public class Theater implements Serializable {
 		
 		id = JSON.getInt(data, ID);
 		name = JSON.getString(data, NAME);
-		ticketurl = JSON.getString(data, TICKET_URL);
+		address = JSON.getString(data, ADDRESS); 
 
 		// add showtimes
 		inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
@@ -42,7 +42,10 @@ public class Theater implements Serializable {
 		for (int i = 0; i < myShowtimes.length(); i++) {
 			showtimes.add(new Showtime(JSON.getJSONObject(myShowtimes, i)));
 		}
-
+	}
+	
+	public Theater(String name) {
+		this.name = name;
 	}
 	
 	public String toString() {

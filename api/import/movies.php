@@ -116,8 +116,7 @@ foreach ($result as $data) {
         )
     ) AS distance
     FROM theaters
-    HAVING distance <= 31
-    ORDER BY distance;")->fetchAll();
+    HAVING distance <= 31;")->fetchAll();
 
   // add showtimes (even if the movie is already in the database)
   addShowtimes($data->showtimes, $movie_id);

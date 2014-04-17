@@ -3,6 +3,10 @@ package edu.pitt.cs1635.movienight;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
@@ -13,9 +17,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +31,7 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -79,9 +86,6 @@ public class MovieDetailsActivity extends Activity {
 		
 		imageLoader = ImageLoader.getInstance();
 
-		// set header content
-		movie.setHeader(this);
-
 		/*
 		 * Setup tabs
 		 */
@@ -108,62 +112,12 @@ public class MovieDetailsActivity extends Activity {
 		}
 
 		// ensure that all but the first tab content are invisible
+		// @todo unless featured events are empty
 		for (int index = 1; index < tabContent.getChildCount(); index++) {
 			tabContent.getChildAt(index).setVisibility(View.GONE);
 		}
 		
-		/*
-		 * Populate tab content
-		 */
-		
-		// populate feature events listview
-		ListView events = (ListView) findViewById(R.id.events);
-		events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, movie.events));
-		events.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				
-				Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
-				intent.putExtra("movie", movie);
-				intent.putExtra("event", movie.events.get(position));
-				startActivity(intent);
-			}
-			
-		});
-		
-		// populate theater listview
-		ListView theaters = (ListView) findViewById(R.id.theaters);
-		theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, movie.theaters));
-		
-		// populate movie details information
-		List<LinearLayout> details = new ArrayList<LinearLayout>();
-		
-		// create description item
-		LinearLayout description = createMovieDetail(getString(R.string.overview));
-		TextView detailsOverview = new TextView(this);
-		detailsOverview.setText(movie.description);
-		description.addView(detailsOverview);
-		details.add(description);
-		
-		// create cast item
-		// @todo make this nicer with images and whatnot
-		LinearLayout cast = createMovieDetail(getString(R.string.cast_members));
-		TextView castView = new TextView(this);
-		castView.setText(Utility.join(movie.cast, ", "));
-		cast.addView(castView);
-		details.add(cast);
-		
-		// add all items to movie details scrollview
-		LinearLayout movieDetails = (LinearLayout) findViewById(R.id.details);
-		for (LinearLayout item : details) {
-			movieDetails.addView(item);
-		}
-		
-		// ratings
-		// @todo actually implement this
-		TextView rating = (TextView) findViewById(R.id.rating);
-		rating.setText("This movie has an aggregate MovieNight rating of " + movie.mnRating + ".");
+		new GetMovieInfo().execute();
 		
 	}
 	
@@ -176,6 +130,93 @@ public class MovieDetailsActivity extends Activity {
 	private static class TheaterViewHolder {
 		TextView name;
 		LinearLayout showtimes;
+	}
+	
+	/*
+	 * Asynchronous background task that fetches a list of movies from the API 
+	 */
+	private class GetMovieInfo extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			
+			// make call to API
+			String str = API.getInstance().get("movies/" + movie.id);
+
+			if (str != null) {
+				try {
+					movie = new Movie(new JSONObject(str));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL");
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			
+			// set header content
+			movie.setHeader(MovieDetailsActivity.this);
+			
+			/*
+			 * Populate tab content
+			 */
+			
+			// populate feature events listview
+			ListView events = (ListView) findViewById(R.id.events);
+			events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, movie.events));
+			events.setOnItemClickListener(new OnItemClickListener() {
+
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					
+					Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
+					intent.putExtra("movie", movie);
+					intent.putExtra("event", movie.events.get(position));
+					startActivity(intent);
+				}
+				
+			});
+			
+			// populate theater listview
+			ListView theaters = (ListView) findViewById(R.id.theaters);
+			theaters.setAdapter(new TheatersAdapter(MovieDetailsActivity.this, movie.theaters));
+			
+			// populate movie details information
+			List<LinearLayout> details = new ArrayList<LinearLayout>();
+			
+			// create description item
+			LinearLayout description = createMovieDetail(getString(R.string.overview));
+			TextView detailsOverview = new TextView(MovieDetailsActivity.this);
+			detailsOverview.setText(movie.description);
+			description.addView(detailsOverview);
+			details.add(description);
+			
+			// create cast item
+			// @todo make this nicer with images and whatnot
+			LinearLayout cast = createMovieDetail(getString(R.string.cast_members));
+			TextView castView = new TextView(MovieDetailsActivity.this);
+			castView.setText(Utility.join(movie.cast, ", "));
+			cast.addView(castView);
+			details.add(cast);
+			
+			// add all items to movie details scrollview
+			LinearLayout movieDetails = (LinearLayout) findViewById(R.id.details);
+			for (LinearLayout item : details) {
+				movieDetails.addView(item);
+			}
+			
+			// ratings
+			// @todo actually implement this
+			TextView rating = (TextView) findViewById(R.id.rating);
+			rating.setText("This movie has an aggregate MovieNight rating of " + movie.mnRating + ".");
+		}
+
 	}
 
 	/*
@@ -334,7 +375,7 @@ public class MovieDetailsActivity extends Activity {
 			
 			// set subtitle
 			int numGuest = event.guests.size();
-			viewHolder.subtitle.setText("at " + event.theater + " with " + numGuest + " people");
+			viewHolder.subtitle.setText("at " + event.showtime.theater.name + " with " + numGuest + " people");
 			
 			// set profile images
 			// TODO check to see if this is the best way to be doing this

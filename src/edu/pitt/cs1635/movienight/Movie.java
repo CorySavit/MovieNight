@@ -19,68 +19,52 @@ import android.widget.TextView;
 
 public class Movie implements Serializable {
 	private static final long serialVersionUID = 1L;
-
-	// JSON keys
-	static final String ID = "id";
-	static final String TMS_ID = "tmsid";
-	static final String TMDB_ID = "tmdbid";
-	static final String IMDB_ID = "imdbid";
 	
+	static final String ID = "id";
+	static final String TMDB_ID = "tmdb_id";
 	static final String TITLE = "title";
 	static final String DESCRIPTION = "description";
-	static final String GENRES = "genres";
-	static final String RATING = "rating";
-	static final String RUNTIME = "runtime";
+	static final String MPAA_RATING = "mpaa_rating";
 	static final String POSTER = "poster";
-	static final String BACKDROP = "backdrop";
-	static final String CAST = "cast";
+	static final String RUNTIME = "runtime";
 	static final String MN_RATING = "mn_rating";
-	
-	static final String THEATERS = "theaters";
+	static final String GENRES = "genres";
 	static final String EVENTS = "events";
+	static final String THEATERS = "theaters";
+	static final String CAST = "cast";
 
-	// object variables
-	String id; // @todo these ids should probably be ints
-	String tmsid;
+	int id;
 	int tmdbid;
-	String imdbid;
-	
 	String title;
 	String description;
-	List<Genre> genres;
-	String rating;
-	String runtime;
+	String mpaaRating;
 	String poster;
-	String backdrop;
-	List<CastMember> cast;
+	String runtime;
 	int mnRating;
-	
-	List<Theater> theaters;
+	List<String> genres;
 	List<Event> events;
+	List<Theater> theaters;
+	List<CastMember> cast;
 
 	public Movie(JSONObject data) {
 
 		// @todo sanity check for mock data
 		if (data == null) {return;}
 		
-		id = JSON.getString(data, ID);
-		tmsid = JSON.getString(data, TMS_ID);
+		id = JSON.getInt(data, ID);
 		tmdbid = JSON.getInt(data, TMDB_ID);
-		imdbid = JSON.getString(data, IMDB_ID);
-		
 		title = JSON.getString(data, TITLE);
 		description = JSON.getString(data, DESCRIPTION);
-		rating = JSON.getString(data, RATING);
-		runtime = JSON.getString(data, RUNTIME);
+		mpaaRating = JSON.getString(data, MPAA_RATING);
 		poster = JSON.getString(data, POSTER);
-		backdrop = JSON.getString(data, BACKDROP);
+		runtime = JSON.getString(data, RUNTIME);
 		mnRating = JSON.getInt(data, MN_RATING);
 
-		genres = new ArrayList<Genre>();
+		genres = new ArrayList<String>();
 		JSONArray myGenres = JSON.getJSONArray(data, GENRES);
 		if (myGenres != null) {
 			for (int i = 0; i < myGenres.length(); i++) {
-				genres.add(new Genre(JSON.getJSONObject(myGenres, i)));
+				genres.add(JSON.getString(myGenres, i));
 			}
 		}
 		
@@ -93,12 +77,10 @@ public class Movie implements Serializable {
 		}
 
 		theaters = new ArrayList<Theater>();
-		JSONObject myTheaters = JSON.getJSONObject(data, THEATERS);
+		JSONArray myTheaters = JSON.getJSONArray(data, THEATERS);
 		if (myTheaters != null) {
-			Iterator<?> keys = myTheaters.keys();
-			while (keys.hasNext()) {
-				String key = (String) keys.next();
-				theaters.add(new Theater(JSON.getJSONObject(myTheaters, key)));
+			for (int i = 0; i < myTheaters.length(); i++) {
+				theaters.add(new Theater(JSON.getJSONObject(myTheaters, i)));
 			}
 		}
 		
@@ -123,8 +105,8 @@ public class Movie implements Serializable {
 		// set subtitle
 		TextView subtitle1View = (TextView) activity.findViewById(R.id.subtitle);
 		List<String> subtitle = new ArrayList<String>();
-		if (rating != null) {
-			subtitle.add(rating);
+		if (mpaaRating != null) {
+			subtitle.add(mpaaRating);
 		}
 		if (runtime != null) {
 			subtitle.add(runtime);

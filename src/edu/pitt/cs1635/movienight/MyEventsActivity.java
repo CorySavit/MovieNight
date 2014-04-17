@@ -43,7 +43,7 @@ public class MyEventsActivity extends Activity {
 		events.add((Event) intent.getSerializableExtra("data"));
 		
 		// display toast notification
-		Toast.makeText(getApplicationContext(), "Created " + events.get(0).movie.title + " MovieNight!", Toast.LENGTH_LONG).show();
+		Toast.makeText(getApplicationContext(), "Created " + events.get(0).showtime.movie.title + " MovieNight!", Toast.LENGTH_LONG).show();
 		
 		// get the rest of my events
 		new GetEvents().execute();
@@ -145,7 +145,7 @@ public class MyEventsActivity extends Activity {
 	        
 	        // set title
 	        TextView title = (TextView) view.findViewById(R.id.title);
-	        title.setText(event.movie.title);
+	        title.setText(event.showtime.movie.title);
 	        
 	        // set subtitle
 	        TextView subtitle = (TextView) view.findViewById(R.id.subtitle);

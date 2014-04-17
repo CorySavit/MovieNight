@@ -55,21 +55,16 @@ define("FLAG_3D", 1);
 define("FLAG_IMAX", 2);
 
 class Showtime {
+  public $id;
   public $time;
   public $flag;
 
-  public function __construct($time = null) {
-    if (!is_null($time)) {
-      $this->time = $time;
+  public function __construct($array) {
+    foreach($array as $key => $value) {
+      if (property_exists($this, $key)) {
+        $this->$key = $value;
+      }
     }
-    $flag = 0;
-  }
-
-  public function cmp($a, $b) {
-    if ($a->time == $b->time) {
-      return 0;
-    }
-    return ($a->time < $b->time) ? -1 : 1;
   }
 }
 

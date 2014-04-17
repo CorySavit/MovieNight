@@ -8,7 +8,7 @@ class TMDB {
 	private $_config;
 	private $_movie;
 
-		public function  __construct($query, $year) {
+		public function  __construct($query = null, $year = null) {
 			$this->setApikey(THEMOVIEDB_KEY);
 			$this->setLang();
 			
@@ -18,14 +18,18 @@ class TMDB {
 				exit;
 			}
 
-			// search for movie based on query string and year
-			$result = $this->_call("search/movie", "query=".urlencode($query));
-			if (sizeof($result['results'])) {
-				$this->_movie = $this->_call("movie/".$result['results'][0]['id']);
-			} else {
-				//echo "Unable to find movie.";
-				$this->_movie = null;
+			// if query and year are passed in
+			if (!is_null($query) && !is_null($year)) {
+				// search for movie based on query string and year
+				$result = $this->_call("search/movie", "query=".urlencode($query));
+				if (sizeof($result['results'])) {
+					$this->_movie = $this->_call("movie/".$result['results'][0]['id']);
+				} else {
+					//echo "Unable to find movie.";
+					$this->_movie = null;
+				}
 			}
+
 		}
 
 		private function setApikey($apikey) {
@@ -105,20 +109,32 @@ class TMDB {
 			return $this->getMovie('vote_count');
 		}
 
-		private function setCredits() {
-			if ($this->isMovieSet()) {
-				$result = $this->_call("movie/".$this->getMovie('id')."/credits");
-				$this->_movie['cast'] = $result['cast'];
-				$this->_movie['crew'] = $result['crew'];
+		private function getCredits($id = null) {
+			if (!is_null($id) || $this->isMovieSet()) {
+				$id = !is_null($id) ? $id : $this->isMovieSet();
+				return $this->_call("movie/".$id."/credits");
 			}
 		}
 
-		public function getCast() {
-			$key = 'cast';
-			if ($this->isMovieSet() && !array_key_exists($key, $this->_movie)) {
-				$this->setCredits();
+		private function setCredits() {
+			if ($this->isMovieSet()) {
+				$credits = $this->getCredits();
+				$this->_movie['cast'] = $credits['cast'];
+				$this->_movie['crew'] = $credits['crew'];
 			}
-			return $this->getMovie($key);
+		}
+
+		public function getCast($id = null) {
+			if (is_null($id)) {
+				$key = 'cast';
+				if ($this->isMovieSet() && !array_key_exists($key, $this->_movie)) {
+					$this->setCredits();
+				}
+				return $this->getMovie($key);
+			} else {
+				$result = $this->getCredits($id);
+				return $result['cast'];
+			}
 		}
 
 		public function getCrew() {

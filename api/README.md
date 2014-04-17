@@ -20,6 +20,13 @@ Below are a list of methods supported by the API. The response for all methods i
 
 * **GET** — returns a list of all movies currently playing in a predefined location
 
+	**Response** {`id`, `title`, `poster`, `mn_rating`}
+
+### /movies/{id}
+
+* **GET** — returns information for a specific movie
+
+
 ### /user
 
 * **POST** — create new user

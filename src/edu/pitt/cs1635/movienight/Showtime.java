@@ -8,20 +8,29 @@ import java.util.Locale;
 
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class Showtime implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	// JSON keys
+	static final String ID = "id";
 	static final String TIME = "time";
 	static final String FLAG = "flag";
+	static final String TICKET_URL = "ticket_url";
+	static final String THEATER_NAME = "theater_name";
 	
 	// define flags
 	static final int FLAG_3D = 1;
 	static final int FLAG_IMAX = 2;
 
 	// object variables
+	int id;
+	Movie movie;
+	Theater theater;
 	Date time;
 	int flag;
+	String ticketURL;
 
 	private SimpleDateFormat inputFormat;
 
@@ -31,8 +40,12 @@ public class Showtime implements Serializable {
 			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
 			time = inputFormat.parse(JSON.getString(data, TIME));
 			
-			// convert flag
+			id = JSON.getInt(data, ID);
 			flag = JSON.getInt(data, FLAG);
+			ticketURL = JSON.getString(data, TICKET_URL);
+			
+			// @todo this is tailored for movie details featured events tab right now
+			theater = new Theater(JSON.getString(data, THEATER_NAME));
 
 		} catch (ParseException e) {
 			e.printStackTrace();

@@ -4,122 +4,133 @@ require_once 'shared.php';
 
 // setup database
 $db = new medoo(DB_NAME);
-define("INVALID_REQUEST", "Invalid Request");
 
 $request = explode('/', $_GET['request']);
 $request_type = $_SERVER['REQUEST_METHOD'];
 
 if ($request[0] == "movies") {
-  // default zip code
-  $zip = 15213;
 
-  print file_get_contents('mock/movies');
-  exit(1);
+  $date = '2014-04-15';
 
-  // get our list of movies from TMS API
-  $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate=' . date("Y-m-d") . '&zip=' . $zip . '&api_key=' . ONCONNECT_KEY));
-  //print_r($result);
-  //exit(1);
+  if (sizeof($request) == 1) {
+    switch ($request_type) {
+      case 'GET':
 
-  $movies = array();
-  foreach ($result as $data) {
-    
-    // group movies by rootID which will inevitable collapse 3D/IMAX experiences accordingly
-    if (!array_key_exists($data->rootId, $movies)) {
-      // find movie in The Movie Database
-      $tmdb = new TMDB($data->title, $data->releaseYear);
-      $movie = new Movie();
+        // get movies playing near current location
+        $movies = $db->query("SELECT movies.id, movies.title, movies.poster
+          FROM showtimes JOIN movies ON (movie_id = movies.id)
+          WHERE DATE(time) = DATE(".$db->quote($date).") AND theater_id IN (
+            SELECT id
+            FROM theaters
+            WHERE (
+                3959 * acos(
+                  cos(radians(".STATIC_LAT."))
+                  * cos(radians(lat))
+                  * cos(radians(lng) - radians(".STATIC_LNG."))
+                  + sin(radians(".STATIC_LAT."))
+                  * sin(radians(lat))
+                )
+            ) <= 31
+          ) GROUP BY movie_id;")->fetchAll(PDO::FETCH_ASSOC);
 
-      $movie->id = $data->tmsId; // this will probably be our database's ID
-      $movie->tmsid = $data->tmsId;
-      //$movie->tmdbid = $tmdb->getTMDBId();
-      //$movie->imdbid = $tmdb->getIMDBId();
+        // @todo incorporate actual ratings
+        foreach ($movies as &$movie) {
+          $movie['mn_rating'] = rand(-1,1) * rand(1,10);
+        }
 
-      $movie->title = $data->title;
-      $movie->description = is_null($tmdb->getOverview()) ? $data->description : $tmdb->getOverview();
-      $movie->rating = $data->ratings[0]->code;
-      $movie->poster = $tmdb->getPosterURL();
-      $movie->backdrop = $tmdb->getBackdropURL();
-      $movie->cast = $tmdb->getCast();
+        print json_encode($movies);
 
-      // add genres; note that we try to use TMDB because unique IDs will become useful later (when doing recommendations)
-      $movie->genres = array();
-      if (!is_null($tmdb->getGenres())) {
-        // add genre from TMDB
-        $genres = $tmdb->getGenres();
+        break;
+      default:
+        echo INVALID_REQUEST;
+    }
+  } else {
+    // assume second parameter is id
+
+    // get movie information
+    $movie = $db->get('movies', array(
+      'id',
+      'tmdb_id',
+      'title',
+      'description',
+      'mpaa_rating',
+      'poster',
+      'runtime'
+    ), array('id' => $request[1]));
+
+    // get genres
+    $movie['genres'] = $db->query("select g.name
+      from movies2genres join genres as g on genre_id = g.id
+      where movie_id = 1;")->fetchAll(PDO::FETCH_COLUMN);
+
+    // get featured events
+    // @todo add "and time > CURRENT_TIME"
+    $movie['events'] = $db->query("select e.id, s.time, s.flag, t.name as theater_name
+      from events as e
+      join showtimes as s on showtime_id = s.id
+      join theaters as t on s.theater_id = t.id
+      where movie_id = ".$movie['id']." and public = 1
+      order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
+
+    // add guest list
+    foreach ($movie['events'] as &$event) {
+      $event['guests'] = $db->query("select u.id, u.photo
+        from users2events
+        join users as u on user_id = u.id
+        where event_id = ".$event['id'].";")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // get showtimes
+    $theaters = $db->query("select s.id, time, flag, theater_id, name, address
+      from showtimes as s join theaters as t on theater_id = t.id
+      where movie_id = ".$movie['id']." and date(time) = date(".$db->quote($date).")
+      order by time asc;")->fetchAll(PDO::FETCH_ASSOC);
+
+    $movie['theaters'] = array();
+    foreach ($theaters as $theater) {
+      if (array_key_exists($theater['theater_id'], $movie['theaters'])) {
+        array_push($movie['theaters'][$theater['theater_id']]['showtimes'], new Showtime($theater));
       } else {
-        // fallback to TMS
-        $genres = $data->genres;
+        $movie['theaters'][$theater['theater_id']] = array(
+          'id' => $theater['theater_id'],
+          'name' => $theater['name'],
+          'address' => $theater['address'],
+          'showtimes' => array(new Showtime($theater))
+        );
       }
-      foreach ($genres as $genre) {
-        // @todo if from TMS, search for existing genre in database and set id accordingly
-        array_push($movie->genres, new Genre($genre));
-      }
+    }
+    $movie['theaters'] = array_values($movie['theaters']);
 
-      // parse runtime "PT02H14M" --> "2 hr 14 min"
-      preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
-      $movie->runtime = '';
-      $hours = intval($runtime[1]);
-      if ($hours !== 0) {
-        // don't include hours if they are 0
-        $movie->runtime .= $hours.' hr ';
-      }
-      $movie->runtime .= intval($runtime[2]).' min';
-
-      // @todo this is just randomly generating stuff at the moment
-      $movie->mn_rating = rand(-1,1) * rand(1,10);
-
-      // @todo all movies have the same events for now
-      $movie->events = getEvents();
-
-    } else {
-      $movie = $movies[$data->rootId];
+    // get cast from TMDB
+    $tmdb = new TMDB();
+    $cast = $tmdb->getCast($movie['tmdb_id']);
+    $movie['cast'] = array();
+    foreach ($cast as $member) {
+      array_push($movie['cast'], array(
+        'name' => $member['name'],
+        'character' => $member['character'],
+        'photo' => $tmdb->getProfileURL($member['profile_path'])
+      ));
     }
 
-    // group showtimes by theater
-    foreach ($data->showtimes as $showtime) {
-      $id = $showtime->theatre->id;
+    print json_encode($movie);
 
-      // add new theater if it does not already exist
-      if (!array_key_exists($id, $movie->theaters)) {
-        $theater = new Theater($id, $showtime->theatre->name);
-        if (isset($showtime->ticketURI)) {
-          $theater->ticketurl = $showtime->ticketURI;
-        }
-        $movie->theaters[$id] = $theater;
-      }
-
-      // parse showtime "2014-03-14T13:10" --> "2014-03-14 13:10"
-      $time = new Showtime(str_replace('T', ' ', $showtime->dateTime));
-
-      // check if showtime is 3D or IMAX experience
-      if (isset($showtime->quals)) {
-        if (strpos($showtime->quals, '3D')) {
-          $time->flag = FLAG_3D;
-        } else if (strpos($showtime->quals, 'IMAX')) {
-          $time->flag = FLAG_IMAX;
-        }
-      }
-
-      // add showtime to appropriate theater object
-      array_push($movie->theaters[$id]->showtimes, $time);
-    }
-    
-    $movies[$data->rootId] = $movie;
   }
 
-  // go back and sort showtimes (despite that this is really inefficient)
-  foreach ($movies as $movie) {
-    foreach ($movie->theaters as $theater) {
-      usort($theater->showtimes, array('Showtime', 'cmp'));
-    }
+
+  /*
+  // parse runtime "PT02H14M" --> "2 hr 14 min"
+  preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
+  $movie->runtime = '';
+  $hours = intval($runtime[1]);
+  if ($hours !== 0) {
+    // don't include hours if they are 0
+    $movie->runtime .= $hours.' hr ';
   }
-
-  // sort movies by rating
-  usort($movies, array('Movie', 'cmp'));
-
-  //print_r($movies);
-  print json_encode($movies);
+  $movie->runtime .= intval($runtime[2]).' min';
+  */
+  
+  
 
 } else if ($request[0] == "friends") {
 
@@ -144,8 +155,8 @@ if ($request[0] == "movies") {
           'last_name' => $_POST['last_name'],
           'password' => $hash["encrypted"],
           'salt' => $hash["salt"],
-          'created_at' => $date,
-          'updated_at' => $date
+          'photo' => get_gravatar($_POST['email']),
+          'created_at' => $date
         ));
 
         echo formatResponse(array(

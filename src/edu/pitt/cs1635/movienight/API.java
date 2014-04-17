@@ -1,10 +1,14 @@
 package edu.pitt.cs1635.movienight;
 
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+
 public class API {
 	private static API instance = null;
 	private ServiceHandler sh;
 	
-	private static final String BASE_URL = "http://labs.amoscato.com/movienight-api/";
+	private static final String BASE_URL = "http://labs.amoscato.com/movienight-api/v2/";
 	
 	// protected constructor defeats instantiation
 	protected API() {
@@ -23,5 +27,9 @@ public class API {
 	// gets something from the API
 	public String get(String method) {
 		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.GET);
+	}
+	
+	public String get(String method, List<NameValuePair> params) {
+		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.GET, params); 
 	}
 }
