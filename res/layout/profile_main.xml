@@ -84,10 +84,17 @@
         style="@style/YellowButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="17dp"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
+        android:layout_above="@+id/logout_btn"
+        android:layout_alignParentRight="true"
         android:text="E d i t  P r o f i l e" />
+
+    <Button
+        android:id="@+id/logout_btn"
+        style="@style/LogoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:text="Logout" />
 
 </RelativeLayout>

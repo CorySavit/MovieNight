@@ -40,6 +40,19 @@ public class SessionManager {
        
     }
     
+    public void logout(){
+
+        editor.putBoolean(IS_LOGIN, false);
+        editor.putString(KEY_FIRSTNAME, "");
+        editor.putString(KEY_LASTNAME, "");
+        editor.putString(KEY_EMAIL, "");
+        editor.putString(KEY_PASS, "");
+  
+        editor.commit();
+        
+       
+    }
+    
     public HashMap<String, String> getUserDetails(){
         HashMap<String, String> user = new HashMap<String, String>();
         // first name
@@ -48,8 +61,12 @@ public class SessionManager {
         user.put(KEY_LASTNAME, pref.getString(KEY_LASTNAME, null));
         // user email id
         user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
-        // return user
+        
         return user;
+    }
+    
+    public Boolean isLoggedIn(){
+    	return pref.getBoolean(IS_LOGIN, false);
     }
     
     public int getUserKey(){

@@ -32,4 +32,12 @@ public class API {
 	public String get(String method, List<NameValuePair> params) {
 		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.GET, params); 
 	}
+	
+	public String post(String method) {
+		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.POST);
+	}
+	
+	public String post(String method, List<NameValuePair> params) {
+		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.POST, params); 
+	}
 }

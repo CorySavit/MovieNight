@@ -11,6 +11,8 @@ import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -73,6 +75,19 @@ public class Profile extends Activity {
 				Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
 				startActivity(intent);
 				
+			}
+			
+		});
+		
+		Button logoutButton = (Button) findViewById(R.id.logout_btn);
+		logoutButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				session = new SessionManager(getApplicationContext());
+				session.logout();
+				Intent intent = getIntent();
+		         finish();
 			}
 			
 		});

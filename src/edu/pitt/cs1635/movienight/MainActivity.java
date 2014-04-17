@@ -12,8 +12,10 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -153,9 +155,42 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_profile:
+			SessionManager session = new SessionManager(getApplicationContext());
+			
+			if(!session.isLoggedIn()){
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+				alertDialogBuilder.setTitle("Sign In / Sign Out");
+	 
+				// set dialog message
+				alertDialogBuilder
+					.setCancelable(false)
+					.setPositiveButton("Sign In",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							// if this button is clicked, close
+							// current activity
+							Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
+							startActivity(intent);
+
+						}
+					  })
+					.setNegativeButton("Sign Up",new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,int id) {
+							Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
+							startActivity(intent);
+
+						}
+					});
+	 
+					// create alert dialog
+					AlertDialog alertDialog = alertDialogBuilder.create();
+	 
+					// show it
+					alertDialog.show();
+			} else {
 			Intent profileView = new Intent(this, Profile.class);
 			startActivity(profileView);
 			return true;
+			}
 		case R.id.action_map:
 			Intent mapView = new Intent(this, MapActivity.class);
 			startActivity(mapView);
