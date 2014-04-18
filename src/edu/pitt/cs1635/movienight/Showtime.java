@@ -18,7 +18,9 @@ public class Showtime implements Serializable {
 	static final String TIME = "time";
 	static final String FLAG = "flag";
 	static final String TICKET_URL = "ticket_url";
+	static final String THEATER_ID = "theater_id";
 	static final String THEATER_NAME = "theater_name";
+	static final String THEATER_ADDRESS = "address";
 	
 	// define flags
 	static final int FLAG_3D = 1;
@@ -44,8 +46,8 @@ public class Showtime implements Serializable {
 			flag = JSON.getInt(data, FLAG);
 			ticketURL = JSON.getString(data, TICKET_URL);
 			
-			// @todo this is tailored for movie details featured events tab right now
-			theater = new Theater(JSON.getString(data, THEATER_NAME));
+			// @todo this is tailored for movie/event details featured events tab right now
+			theater = new Theater(JSON.getInt(data, THEATER_ID), JSON.getString(data, THEATER_NAME), JSON.getString(data, THEATER_ADDRESS));
 
 		} catch (ParseException e) {
 			e.printStackTrace();

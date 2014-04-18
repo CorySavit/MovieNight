@@ -27,14 +27,30 @@ define("RADIUS_MILES", 31);
  * @source http://gravatar.com/site/implement/images/php/
  */
 function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts = array() ) {
-    $url = 'http://www.gravatar.com/avatar/';
-    $url .= md5( strtolower( trim( $email ) ) );
-    $url .= "?s=$s&d=$d&r=$r";
-    if ( $img ) {
-        $url = '<img src="' . $url . '"';
-        foreach ( $atts as $key => $val )
-            $url .= ' ' . $key . '="' . $val . '"';
-        $url .= ' />';
+  $url = 'http://www.gravatar.com/avatar/';
+  $url .= md5( strtolower( trim( $email ) ) );
+  $url .= "?s=$s&d=$d&r=$r";
+  if ( $img ) {
+      $url = '<img src="' . $url . '"';
+      foreach ( $atts as $key => $val )
+          $url .= ' ' . $key . '="' . $val . '"';
+      $url .= ' />';
+  }
+  return $url;
+}
+
+// gets guest list for event
+function get_guests(&$event) {
+  global $db;
+
+  if (is_array($event)) {
+    foreach ($event as &$item) {
+      $item['guests'] = get_guests($item['id']);
     }
-    return $url;
+  } else {
+    return $db->query("select u.id, u.photo
+      from users2events
+      join users as u on user_id = u.id
+      where event_id = ".$event['id'].";")->fetchAll(PDO::FETCH_ASSOC);
+  }
 }
