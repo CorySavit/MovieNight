@@ -28,11 +28,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
@@ -41,7 +44,7 @@ import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 
 public class MainActivity extends Activity {
-
+	SessionManager session;
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
 	private List<Movie> movieList;
@@ -54,9 +57,10 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		session = new SessionManager(getApplicationContext());
 		//get preferences
 		settings = getPreferences(MODE_PRIVATE);
+		
 		
 		// create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
@@ -155,7 +159,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_profile:
-			SessionManager session = new SessionManager(getApplicationContext());
+			
 			
 			if(!session.isLoggedIn()){
 				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
@@ -168,9 +172,11 @@ public class MainActivity extends Activity {
 						public void onClick(DialogInterface dialog,int id) {
 							// if this button is clicked, close
 							// current activity
-							Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
-							startActivity(intent);
-
+							Log.d("SignInClicked", "True");
+							
+							dialog.cancel();
+							AlertDialog alert = loginDialog(MainActivity.this, "Enter you email and password");
+							alert.show();
 						}
 					  })
 					.setNegativeButton("Sign Up",new DialogInterface.OnClickListener() {
@@ -348,5 +354,37 @@ public class MainActivity extends Activity {
 	    
 	    
 	}
+	
+	public AlertDialog loginDialog(Context c, String message) {
+		Log.d("Made it to LoginDialog", "True");
+	    LayoutInflater factory = LayoutInflater.from(c);           
+	    final View textEntryView = factory.inflate(R.layout.activity_signin, null);
+	    final AlertDialog.Builder failAlert = new AlertDialog.Builder(c);
+	    failAlert.setTitle("Login Failed");
+	    failAlert.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            // Cancelled
+	        }
+	    });
+	    AlertDialog.Builder alert = new AlertDialog.Builder(c);
+	    alert.setTitle("Login");
+	    alert.setMessage(message);
+	    alert.setView(textEntryView);
+	    alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	                final EditText emailInput = (EditText) textEntryView.findViewById(R.id.email_login);
+	                final EditText passwordInput = (EditText) textEntryView.findViewById(R.id.password_login);
+	                session.login(emailInput.getText().toString(), passwordInput.getText().toString());
+	        }
+	    });
+	    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            // Canceled.
+	        }
+	    });
+	    return alert.create();
+	}
+	
+
 
 }

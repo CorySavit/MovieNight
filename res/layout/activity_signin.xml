@@ -1,107 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ProfileEdit"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/profile_email_block"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
+    android:layout_marginLeft="17dp"
+    android:layout_marginRight="17dp"
     android:orientation="vertical" >
 
-    <ImageButton
-        android:id="@+id/profile_image_btn"
+    <TextView
+        android:id="@+id/email_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="17dp"
-        android:layout_marginTop="17dp"
-        android:adjustViewBounds="true"
-        android:maxHeight="100dp"
-        android:maxWidth="100dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/blank_profile" />
+        android:layout_marginLeft="2dp"
+        android:text="Email:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/profile_username_block"
-        android:layout_width="fill_parent"
+    <EditText
+        android:id="@+id/email_login"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_image_btn"
-        android:layout_marginBottom="17dp"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
-        android:layout_marginTop="17dp"
-        android:background="@color/gray"
-        android:orientation="vertical" >
+        android:inputType="textEmailAddress" />
 
-        <TextView
-            android:id="@+id/TextView01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:text="First Name:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/firstname_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName" />
-
-        <TextView
-            android:id="@+id/lastname_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:text="Last Name:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/lastname_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName" >
-
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/profile_email_block"
-        android:layout_width="fill_parent"
+    <TextView
+        android:id="@+id/password_title"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_username_block"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
-        android:background="@color/gray"
-        android:orientation="vertical" >
+        android:layout_marginLeft="2dp"
+        android:text="Password:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/email_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:text="Email:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/email_edit"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/save_profile_btn"
-        style="@style/YellowButton"
-        android:layout_width="fill_parent"
+    <EditText
+        android:id="@+id/password_login"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="17dp"
-        android:layout_marginLeft="17dp"
-        android:layout_marginRight="17dp"
-        android:text="S A V E  C H A N G E S" />
-
-</RelativeLayout>
+        android:inputType="textPassword" />
+</LinearLayout>

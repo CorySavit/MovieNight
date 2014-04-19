@@ -1,9 +1,19 @@
 package edu.pitt.cs1635.movienight;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
+import android.util.Log;
  
 public class SessionManager {
 
@@ -41,6 +51,14 @@ public class SessionManager {
        
     }
     
+    public void login(String email, String password){
+    	ArrayList<NameValuePair> loginCreds = new ArrayList<NameValuePair>();
+    	loginCreds.add(new BasicNameValuePair("email", email));
+    	loginCreds.add(new BasicNameValuePair("password", password));
+    	new PostLogin().execute(loginCreds);
+    	
+    }
+    
     public void logout(){
 
         editor.putBoolean(IS_LOGIN, false);
@@ -74,7 +92,60 @@ public class SessionManager {
     	return pref.getInt(KEY_API, 0);
     }
     
-    
+    private class PostLogin extends AsyncTask<ArrayList<NameValuePair>, Void, Boolean> {
+		JSONObject login = null;
+		@Override
+		protected Boolean doInBackground(ArrayList<NameValuePair>... arg0) {
+			Boolean loginTrue = false;
+			
+			// make call to API
+			String str = API.getInstance().post("user/login", arg0[0]);
+
+			if (str != null) {
+				try {
+					login = new JSONObject(str);
+					Log.d("Login?", login.getString("login")) ;
+					Log.d("Success?", login.getString("success"));
+					Integer loginSuccess =login.getInt("login");
+					Log.d("Success?", login.getString("success"));
+					if(loginSuccess==1){
+						loginTrue = true;
+						editor.putBoolean(IS_LOGIN, true);
+						editor.putString(KEY_FIRSTNAME, "TestFName");
+						editor.putString(KEY_LASTNAME, "TestLName");
+						editor.putString(KEY_EMAIL, "TestEmail");
+						editor.putString(KEY_PASS, "TestPassword");
+						editor.putString(KEY_API, "TestApiKey");
+						editor.commit();
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL");
+			}
+
+			return loginTrue;
+		}
+
+
+
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			super.onPostExecute(result);
+			if (result){
+				//Successful login. Display Toast Message?
+			
+			}
+			else if (!result){
+				//Unsuccessful login. Display Toast Message?
+			}
+
+		}
+
+	}
     
 }
 
