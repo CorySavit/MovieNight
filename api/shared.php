@@ -40,17 +40,48 @@ function get_gravatar( $email, $s = 80, $d = 'mm', $r = 'g', $img = false, $atts
 }
 
 // gets guest list for event
-function get_guests(&$event) {
+// @param attending determines whether or not only display people who are attending
+function get_guests(&$event, $attending = false) {
   global $db;
 
-  if (is_array($event)) {
+  $attend = $attending ? ' and (u2e.status = 1 or u2e.status = 2)' : '';
+
+  if (!array_key_exists('id', $event)) {
+    // we are dealing wtih an array of events
     foreach ($event as &$item) {
-      $item['guests'] = get_guests($item['id']);
+      $item['guests'] = get_guests($item, $attending);
     }
   } else {
-    return $db->query("select u.id, u.photo
-      from users2events
+    // we are just dealing with one event
+    $result = $db->query("select u.id, concat(u.first_name, ' ', u.last_name) as name, u.photo, u2e.status
+      from users2events as u2e
       join users as u on user_id = u.id
-      where event_id = ".$event['id'].";")->fetchAll(PDO::FETCH_ASSOC);
+      where event_id = ".$event['id'].$attend."
+      order by u2e.timestamp desc;")->fetchAll(PDO::FETCH_ASSOC);
+
+    return $result;
   }
+}
+
+// format a JSON response
+function formatResponse($array = array()) {
+  global $db;
+  $error = $db->error();
+  $array['success'] = is_null($error[2]) ? 1 : 0;
+  $array['error'] = $error[2];
+  return json_encode($array);
+}
+
+// encrypt password
+function hashSSHA($password) {
+  $salt = sha1(rand());
+  $salt = substr($salt, 0, 10);
+  $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
+  $hash = array("salt" => $salt, "encrypted" => $encrypted);
+  return $hash;
+}
+
+function checkhashSSHA($salt, $password) {
+  $hash = base64_encode(sha1($password . $salt, true) . $salt);
+  return $hash;
 }

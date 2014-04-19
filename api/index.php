@@ -14,7 +14,7 @@ if ($request[0] == "movies") {
 
   if (sizeof($request) == 1) {
     switch ($request_type) {
-      case 'GET':
+      case 'GET': # /movies
 
         // get movies playing near current location
         $movies = $db->query("SELECT movies.id, movies.title, movies.poster
@@ -44,7 +44,8 @@ if ($request[0] == "movies") {
       default:
         echo INVALID_REQUEST;
     }
-  } else {
+
+  } else { # /movies/{id}
     // assume second parameter is id
 
     // get movie information
@@ -72,8 +73,8 @@ if ($request[0] == "movies") {
       where movie_id = ".$movie['id']." and public = 1
       order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
-    // add guest list
-    get_guests($movie['events']);
+    // add guests who are attending
+    get_guests($movie['events'], true);
 
     // get showtimes
     $theaters = $db->query("select s.id, time, flag, theater_id, name, address
@@ -135,7 +136,7 @@ if ($request[0] == "movies") {
 
   if (sizeof($request) == 1) {
     switch ($request_type) {
-      case 'GET':
+      case 'GET': # /events
 
         if (array_key_exists('user_id', $_GET)) {
           // get all of user's events
@@ -147,7 +148,8 @@ if ($request[0] == "movies") {
             join movies as m on movie_id = m.id
             where user_id = ".$_GET['user_id'].";")->fetchAll(PDO::FETCH_ASSOC);
 
-          get_guests($events);
+          // get guests who are attending
+          get_guests($events, true);
 
           echo json_encode($events);
 
@@ -156,7 +158,7 @@ if ($request[0] == "movies") {
         }
         break;
 
-      case 'POST':
+      case 'POST': # /events
 
         // create event
         $id = $db->insert('events', array(
@@ -182,8 +184,9 @@ if ($request[0] == "movies") {
 
   } else {
     // assume event id is passed in
+
     switch ($request_type) {
-      case 'GET':
+      case 'GET': # /events/{id}
 
         if (array_key_exists('user_id', $_GET)) {
           $event = $db->query("select e.id, s.time, s.flag, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
@@ -192,9 +195,25 @@ if ($request[0] == "movies") {
             join theaters as t on s.theater_id = t.id
             join users as u on e.admin_id = u.id
             left join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
-            where e.id = ".$request[1].";")->fetchAll(PDO::FETCH_ASSOC);
+            where e.id = ".$request[1].";")->fetch(PDO::FETCH_ASSOC);
+
+          // get all guests
+          $guests = get_guests($event);
+          $group = array(
+            STATUS_ACCEPTED => array(),
+            STATUS_INVITED => array(),
+            STATUS_DECLINED => array(),
+          );
+          foreach ($guests as $guest) {
+            $index = $guest['status'];
+            if ($guest['status'] == STATUS_ADMIN) {
+              $index = STATUS_ACCEPTED;
+            }
+            array_push($group[$index], $guest);
+          }
+          $event['guests'] = $group;
           
-          echo json_encode($event[0]);
+          echo json_encode($event);
 
         } else {
           echo INVALID_REQUEST;
@@ -202,7 +221,7 @@ if ($request[0] == "movies") {
 
         break;
 
-      case 'POST':
+      case 'POST': # /events/{id}
 
         // attach user to event
         $id = $db->insert('users2events', array(
@@ -217,7 +236,7 @@ if ($request[0] == "movies") {
 
         break;
 
-      case 'PUT':
+      case 'PUT': # /events/{id}
 
         // attach user to event
         parse_str(file_get_contents("php://input"), $_PUT);
@@ -243,7 +262,7 @@ if ($request[0] == "movies") {
 
   if (sizeof($request) == 1) {
     switch ($request_type) {
-      case 'POST':
+      case 'POST': # /user
 
         // create new user
         $hash = hashSSHA($_POST['password']);
@@ -268,7 +287,7 @@ if ($request[0] == "movies") {
     }
   } else if ($request[1] == 'login') {
     switch ($request_type) {
-      case 'POST':
+      case 'POST': # /user/login
 
         // login
         $data = $db->get('users', '*', array(
@@ -290,8 +309,9 @@ if ($request[0] == "movies") {
     }
   } else  {
     // otherwise assume $request[1] is user id
+
     switch ($request_type) {
-      case 'GET':
+      case 'GET': # /user/{id}
 
         // get user information
         $data = $db->get('users', array(
@@ -361,27 +381,4 @@ function getEvents() {
 // strips simple object of null properties
 function stripObject($obj) {
   return (object) array_filter((array) $obj);
-}
-
-// encrypt password
-function hashSSHA($password) {
-  $salt = sha1(rand());
-  $salt = substr($salt, 0, 10);
-  $encrypted = base64_encode(sha1($password . $salt, true) . $salt);
-  $hash = array("salt" => $salt, "encrypted" => $encrypted);
-  return $hash;
-}
-
-function checkhashSSHA($salt, $password) {
-  $hash = base64_encode(sha1($password . $salt, true) . $salt);
-  return $hash;
-}
-
-// format a JSON response
-function formatResponse($array = array()) {
-  global $db;
-  $error = $db->error();
-  $array['success'] = is_null($error[2]) ? 1 : 0;
-  $array['error'] = $error[2];
-  return json_encode($array);
 }

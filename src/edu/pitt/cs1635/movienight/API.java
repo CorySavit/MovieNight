@@ -8,7 +8,7 @@ public class API {
 	private static API instance = null;
 	private ServiceHandler sh;
 	
-	private static final String BASE_URL = "http://labs.amoscato.com/movienight-api/v2/";
+	private static final String BASE_URL = "http://labs.amoscato.com/movienight-api/";
 	
 	// protected constructor defeats instantiation
 	protected API() {
