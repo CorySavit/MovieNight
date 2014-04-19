@@ -276,9 +276,13 @@ if ($request[0] == "movies") {
         ));
         // @todo check to see if query had any errors
         // @todo this assumes password is sent via plaintext (obviously unsecure)
-        echo formatResponse(array(
-          'login' => checkhashSSHA($data['salt'], $_POST['password']) == $data['password'] ? 1 : 0
-        ));
+        $login_success = checkhashSSHA($data['salt'], $_POST['password']) == $data['password'] ? 1 : 0;
+        if($login_success == 1){
+          $data["login"] = $login_success;
+          echo formatResponse($data);
+        } else {
+          echo formatResponse(array("login"=> $login_success));
+        }
 
         break;
       default:

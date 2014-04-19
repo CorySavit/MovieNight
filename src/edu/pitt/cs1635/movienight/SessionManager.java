@@ -64,9 +64,7 @@ public class SessionManager {
         editor.putBoolean(IS_LOGIN, false);
         editor.putString(KEY_FIRSTNAME, "");
         editor.putString(KEY_LASTNAME, "");
-        editor.putString(KEY_EMAIL, "");
-        editor.putString(KEY_PASS, "");
-  
+        editor.putString(KEY_EMAIL, "");  
         editor.commit();
         
        
@@ -104,18 +102,16 @@ public class SessionManager {
 			if (str != null) {
 				try {
 					login = new JSONObject(str);
-					Log.d("Login?", login.getString("login")) ;
-					Log.d("Success?", login.getString("success"));
+	
 					Integer loginSuccess =login.getInt("login");
-					Log.d("Success?", login.getString("success"));
+
 					if(loginSuccess==1){
 						loginTrue = true;
 						editor.putBoolean(IS_LOGIN, true);
-						editor.putString(KEY_FIRSTNAME, "TestFName");
-						editor.putString(KEY_LASTNAME, "TestLName");
-						editor.putString(KEY_EMAIL, "TestEmail");
-						editor.putString(KEY_PASS, "TestPassword");
-						editor.putString(KEY_API, "TestApiKey");
+						editor.putString(KEY_FIRSTNAME, login.getString("first_name"));
+						editor.putString(KEY_LASTNAME, login.getString("last_name"));
+						editor.putString(KEY_EMAIL, login.getString("email"));
+						editor.putString(KEY_API, "id");
 						editor.commit();
 					}
 				} catch (JSONException e) {
