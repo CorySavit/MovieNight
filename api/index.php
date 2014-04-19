@@ -293,9 +293,14 @@ if ($request[0] == "movies") {
         $data = $db->get('users', '*', array(
           'email' => $_POST['email']
         ));
-        // @todo check to see if query had any errors
+
         // @todo this assumes password is sent via plaintext (obviously unsecure)
         $login_success = checkhashSSHA($data['salt'], $_POST['password']) == $data['password'] ? 1 : 0;
+
+        // don't return password/salt on API response
+        unset($data['password']);
+        unset($data['salt']);
+
         if($login_success == 1){
           $data["login"] = $login_success;
           echo formatResponse($data);
