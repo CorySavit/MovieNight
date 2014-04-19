@@ -37,11 +37,12 @@
     <string name="maybe">Maybe</string>
     <string name="declined">Declined</string>
     <string name="administrator">Administrator</string>
+    <string name="invited">Invited</string>
     
     <string-array name="status_array">
-        <item>Attending</item>
-        <item>Maybe</item>
-        <item>Declined</item>
+        <item>@string/attending</item>
+        <item>@string/maybe</item>
+        <item>@string/declined</item>
     </string-array>
     
     <item type="id" name="TAG_VIEW_HOLDER"></item>

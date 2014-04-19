@@ -1,12 +1,20 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.imageaware.ImageAware;
+import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -21,7 +29,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabContentFactory;
@@ -187,6 +199,10 @@ public class EventDetailsActivity extends Activity {
 		protected void onPostExecute(JSONObject result) {
 			super.onPostExecute(result);
 			
+			/*
+			 * Event information tab
+			 */
+			
 			// time
 			TextView time = (TextView) findViewById(R.id.time);
 			time.setText(event.showtime.toString());
@@ -206,8 +222,143 @@ public class EventDetailsActivity extends Activity {
 			
 			// set status
 			setStatus(event.status);
+			
+			/*
+			 * Guests tab
+			 */
+			
+			try {
+				// add status categories and guests to a data structure
+				JSONObject statusList = result.getJSONObject("guests");
+				int[] statusID = {Guest.STATUS_ACCEPTED, Guest.STATUS_INVITED, Guest.STATUS_INVITED};
+				int[] statusLabels = {R.string.attending, R.string.invited, R.string.declined};
+				Map<String, List<Guest>> guestMap = new HashMap<String, List<Guest>>();
+				for (int i = 0; i < statusID.length; i++) {
+					List<Guest> guests = new ArrayList<Guest>();
+					JSONArray guestList = statusList.getJSONArray(Integer.toString(statusID[i]));
+					for (int j = 0; j < guestList.length(); j++) {
+						Guest guest = new Guest(guestList.getJSONObject(j));
+						guests.add(guest);
+					}
+					guestMap.put(getString(statusLabels[i]), guests);
+				}
+				
+				// populate guest list expandablelistview
+				ExpandableListView guestTabView = (ExpandableListView) findViewById(R.id.guests);
+				guestTabView.setAdapter(new GuestAdapter(EventDetailsActivity.this, guestMap, statusLabels));
+				guestTabView.expandGroup(0);
+				
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
+	}
+	
+	private class GuestAdapter extends BaseExpandableListAdapter {
+		
+		private Map<String, List<Guest>> data;
+		private int[] statusLabels;
+		private ImageLoader imageLoader;
+	    private DisplayImageOptions imageOptions;
+		
+		public GuestAdapter(Activity a, Map<String, List<Guest>> map, int[] labels) {
+			inflater = (LayoutInflater) a.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			data = map;
+			statusLabels = labels;
+			imageLoader = ImageLoader.getInstance();
+	        imageOptions = new DisplayImageOptions.Builder()
+	        	.showImageOnLoading(R.drawable.blank_profile)
+	        	.showImageForEmptyUri(R.drawable.blank_profile)
+	        	.showImageOnFail(R.drawable.blank_profile)
+	        	.cacheInMemory(true)
+	        	.cacheOnDisc(true)
+	        	.build();
+		}
+		
+		@Override
+		public int getGroupCount() {
+			return data.size();
+		}
+
+		@Override
+		public int getChildrenCount(int groupPosition) {
+			return data.get(getGroupKey(groupPosition)).size();
+		}
+		
+		public String getGroupKey(int pos) {
+			return getString(statusLabels[pos]);
+		}
+
+		@Override
+		public Object getGroup(int groupPosition) {
+			return data.get(getGroupKey(groupPosition));
+		}
+
+		@Override
+		public Object getChild(int groupPosition, int childPosition) {
+			return data.get(getString(statusLabels[groupPosition])).get(childPosition);
+		}
+
+		@Override
+		public long getGroupId(int groupPosition) {
+			return groupPosition;
+		}
+
+		@Override
+		public long getChildId(int groupPosition, int childPosition) {
+			return childPosition;
+		}
+
+		@Override
+		public boolean hasStableIds() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+			
+			View view = convertView;
+			if (convertView == null) {
+				view = inflater.inflate(R.layout.guest_status_group, parent, false);
+			}
+			
+			// set title
+	        TextView title = (TextView) view.findViewById(R.id.status);
+	        title.setText(getGroupKey(groupPosition) + " (" + getChildrenCount(groupPosition) + ")");
+			
+			return view;
+		}
+
+		@Override
+		public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+			
+			View view = convertView;
+			if (convertView == null) {
+				view = inflater.inflate(R.layout.user_item, parent, false);
+			}
+			
+			Guest guest = (Guest) getChild(groupPosition, childPosition);
+			
+			// set title
+	        TextView name = (TextView) view.findViewById(R.id.name);
+	        name.setText(guest.name);
+			
+			// set profile image
+	        ImageAware photo = new ImageViewAware((ImageView) view.findViewById(R.id.photo), false);
+	        imageLoader.displayImage(guest.photo, photo, imageOptions);
+	        
+	        return view;
+		}
+
+		@Override
+		public boolean isChildSelectable(int groupPosition, int childPosition) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
 	}
 	
 	private class RSVP extends AsyncTask<Void, Void, Void> {

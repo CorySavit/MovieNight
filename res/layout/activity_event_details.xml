@@ -22,19 +22,19 @@
 				android:layout_width="fill_parent"
 				android:layout_height="wrap_content"
 				android:background="@color/black" />
-				
-			<ScrollView
-			    android:layout_width="match_parent"
-			    android:layout_height="wrap_content" >
 			
-				<FrameLayout
-					android:id="@android:id/tabcontent"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content" >
-					
+			<FrameLayout
+				android:id="@android:id/tabcontent"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" >
+				
+			    <ScrollView
+				    android:layout_width="match_parent"
+				    android:layout_height="wrap_content" >
+				
 					<LinearLayout
 						android:layout_width="match_parent"
-						android:layout_height="match_parent"
+						android:layout_height="wrap_content"
 						android:orientation="vertical" >
 						
 					    <LinearLayout
@@ -179,19 +179,19 @@
 						
 					</LinearLayout>
 					
-					<TextView
-						android:text="Guests"
-						android:layout_width="match_parent"
-						android:layout_height="match_parent" />
-					
-					<TextView
-						android:text="Messaging"
-						android:layout_width="match_parent"
-						android:layout_height="match_parent" />
-					
-				</FrameLayout>
+				</ScrollView>
 				
-			</ScrollView>
+				<ExpandableListView
+				    android:id="@+id/guests"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent" />
+				
+				<TextView
+					android:text="Messaging"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent" />
+				
+			</FrameLayout>
 			
 		</LinearLayout>
 		
