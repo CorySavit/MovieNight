@@ -191,7 +191,7 @@ if ($request[0] == "movies") {
             join showtimes as s on showtime_id = s.id
             join theaters as t on s.theater_id = t.id
             join users as u on e.admin_id = u.id
-            join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
+            left join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
             where e.id = ".$request[1].";")->fetchAll(PDO::FETCH_ASSOC);
           
           echo json_encode($event[0]);
@@ -199,6 +199,38 @@ if ($request[0] == "movies") {
         } else {
           echo INVALID_REQUEST;
         }
+
+        break;
+
+      case 'POST':
+
+        // attach user to event
+        $id = $db->insert('users2events', array(
+          'user_id' => $_POST['user_id'],
+          'event_id' => $request[1],
+          'status' => $_POST['status']
+        ));
+
+        echo formatResponse(array(
+          'id' => $id
+        ));
+
+        break;
+
+      case 'PUT':
+
+        // attach user to event
+        parse_str(file_get_contents("php://input"), $_PUT);
+        $db->update('users2events', array(
+          'status' => $_PUT['status']
+        ), array(
+          'AND' => array(
+            'user_id' => $_PUT['user_id'],
+            'event_id' => $request[1]
+          )
+        ));
+
+        echo formatResponse();
 
         break;
 
@@ -342,7 +374,7 @@ function checkhashSSHA($salt, $password) {
 }
 
 // format a JSON response
-function formatResponse($array) {
+function formatResponse($array = array()) {
   global $db;
   $error = $db->error();
   $array['success'] = is_null($error[2]) ? 1 : 0;

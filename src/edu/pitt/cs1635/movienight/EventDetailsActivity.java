@@ -9,7 +9,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,16 +20,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
 
@@ -37,6 +33,8 @@ public class EventDetailsActivity extends Activity {
 	int eventID;
 	private Event event;
 	private Movie movie;
+	private AlertDialog.Builder statusBuilder;
+	private TextView statusView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +81,44 @@ public class EventDetailsActivity extends Activity {
 			tabContent.getChildAt(index).setVisibility(View.GONE);
 		}
 		
+		// create alert dialog for status RSVP
+		statusBuilder = new AlertDialog.Builder(EventDetailsActivity.this)
+			.setTitle(R.string.RSVP)
+	        .setItems(R.array.status_array, new DialogInterface.OnClickListener() {
+	            public void onClick(DialogInterface dialog, int which) {
+	            	int newStatus = 0;
+	            	switch (which) {
+	            	case 0:
+	            		newStatus = 2;
+	            		break;
+	            	case 1:
+	            		newStatus = 3;
+	            		break;
+	            	case 2:
+	            		newStatus = 4;
+	            		break;
+	            	}
+	            	
+	            	if (event.status == 0) {
+	        			new RSVP(newStatus).execute();
+	            	} else {
+	            		new UpdateRSVP(newStatus).execute();
+	            	}
+	            	setStatus(newStatus);
+	            }
+	        });
+		
+		// save reference to status view
+		statusView = (TextView) findViewById(R.id.status);
+		statusView.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				statusBuilder.create().show();
+			}
+
+		});
+		
 		new GetEventInfo().execute();
 	}
 
@@ -101,6 +137,24 @@ public class EventDetailsActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	private void setStatus(int status) {
+		event.status = status;
+		switch (status) {
+		case Guest.STATUS_ADMIN:
+			statusView.setText(R.string.administrator);
+			break;
+		case Guest.STATUS_ACCEPTED:
+			statusView.setText(R.string.attending);
+			break;
+		case Guest.STATUS_INVITED:
+			statusView.setText(R.string.maybe);
+			break;
+		case Guest.STATUS_DECLINED:
+			statusView.setText(R.string.declined);
+			break;
+		}
 	}
 	
 	private class GetEventInfo extends AsyncTask<Void, Void, JSONObject> {
@@ -150,10 +204,51 @@ public class EventDetailsActivity extends Activity {
 				e.printStackTrace();
 			}
 			
-			Spinner spinner = (Spinner) findViewById(R.id.status_spinner);
-			ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(EventDetailsActivity.this, R.array.status_array, android.R.layout.simple_spinner_item);
-			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			spinner.setAdapter(adapter);
+			// set status
+			setStatus(event.status);
+		}
+
+	}
+	
+	private class RSVP extends AsyncTask<Void, Void, Void> {
+		
+		private int status;
+		
+		public RSVP(int status) {
+			this.status = status;
+		}
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			// user has already RSVP; they are changing it
+    		// @todo change hardcoded user id
+    		List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", "1"));
+			params.add(new BasicNameValuePair("status", Integer.toString(status)));
+			API.getInstance().post("events/" + eventID, params);
+			return null;
+		}
+
+	}
+	
+	private class UpdateRSVP extends AsyncTask<Void, Void, Void> {
+		
+		private int status;
+		
+		public UpdateRSVP(int status) {
+			this.status = status;
+			Log.d("TEST", status + "");
+		}
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			// user has already RSVP; they are changing it
+    		// @todo change hardcoded user id
+    		List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", "1"));
+			params.add(new BasicNameValuePair("status", Integer.toString(status)));
+			API.getInstance().put("events/" + eventID, params);
+			return null;
 		}
 
 	}

@@ -12,6 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -21,6 +22,7 @@ public class ServiceHandler {
     static String response = null;
     public final static int GET = 1;
     public final static int POST = 2;
+    public final static int PUT = 3;
  
     public ServiceHandler() {
  
@@ -56,6 +58,12 @@ public class ServiceHandler {
                 HttpGet httpGet = new HttpGet(url);
  
                 httpResponse = httpClient.execute(httpGet);
+            } else if (method == PUT) {
+            	HttpPut httpPut = new HttpPut(url);
+            	if (params != null) {
+            		httpPut.setEntity(new UrlEncodedFormEntity(params));
+            	}
+            	httpResponse = httpClient.execute(httpPut);
             }
             httpEntity = httpResponse.getEntity();
             response = EntityUtils.toString(httpEntity);

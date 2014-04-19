@@ -68,10 +68,10 @@ class Showtime {
   }
 }
 
-define("STATUS_INVITED", 0);
-define("STATUS_ACCEPTED", 1);
-define("STATUS_DECLINED", -1);
-define("STATUS_ADMIN", 2);
+define("STATUS_ADMIN", 1);
+define("STATUS_ACCEPTED", 2);
+define("STATUS_INVITED", 3);
+define("STATUS_DECLINED", 4);
 
 class Event {
   public $id;
