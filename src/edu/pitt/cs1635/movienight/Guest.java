@@ -14,10 +14,10 @@ public class Guest extends User implements Serializable {
 	static final String STATUS = "status";
 	
 	// define status
-	static final int STATUS_INVITED = 0;
-	static final int STATUS_ACCEPTED = 1;
-	static final int STATUS_DECLINED = -1;
-	static final int STATUS_ADMIN = 2;
+	static final int STATUS_ADMIN = 1;
+	static final int STATUS_ACCEPTED = 2;
+	static final int STATUS_INVITED = 3;
+	static final int STATUS_DECLINED = 4;
 
 	// object variables
 	int status;

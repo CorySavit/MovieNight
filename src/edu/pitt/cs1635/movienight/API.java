@@ -40,4 +40,8 @@ public class API {
 	public String post(String method, List<NameValuePair> params) {
 		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.POST, params); 
 	}
+	
+	public String put(String method, List<NameValuePair> params) {
+		return sh.makeServiceCall(BASE_URL + method, ServiceHandler.PUT, params); 
+	}
 }

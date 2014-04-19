@@ -161,11 +161,19 @@
 								style="@style/Label"
 								android:text="@string/status" />
 							
-							<Spinner
-								android:id="@+id/status_spinner"
-								android:layout_width="0dp"
-								android:layout_height="wrap_content"
-								android:layout_weight=".8" />	
+							<FrameLayout
+							    android:layout_width="0dp"
+							    android:layout_height="wrap_content"
+							    android:layout_weight=".8" >
+								
+								<TextView
+									android:id="@+id/status"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									style="@style/YellowButton"
+									android:text="@string/RSVP" />
+									
+							</FrameLayout>
 						
 						</LinearLayout>
 						
