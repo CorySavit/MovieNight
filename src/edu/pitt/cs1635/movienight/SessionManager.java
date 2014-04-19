@@ -27,13 +27,14 @@ public class SessionManager {
         editor = pref.edit();
     }
     
-    public void createLoginSession(String firstName, String lastName, String email, String password){
+    public void createLoginSession(String firstName, String lastName, String email, String password, String id){
     	//probabably would be a good idea to connect with server and return the api key here.
         editor.putBoolean(IS_LOGIN, true);
         editor.putString(KEY_FIRSTNAME, firstName);
         editor.putString(KEY_LASTNAME, lastName);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASS, password);
+        editor.putString(KEY_API, id);
         
         editor.commit();
         

@@ -175,7 +175,7 @@ public class MainActivity extends Activity {
 					  })
 					.setNegativeButton("Sign Up",new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
-							Intent intent = new Intent(getApplicationContext(), ProfileEdit.class);
+							Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
 							startActivity(intent);
 
 						}
@@ -191,10 +191,6 @@ public class MainActivity extends Activity {
 			startActivity(profileView);
 			return true;
 			}
-		case R.id.action_map:
-			Intent mapView = new Intent(this, MapActivity.class);
-			startActivity(mapView);
-			return true;
 
 		default:
 			return super.onOptionsItemSelected(item);

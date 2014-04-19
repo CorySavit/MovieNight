@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ProfileEdit"
+    android:id="@+id/signup"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/profile_username_block"
+        android:id="@+id/signup_username_block"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="17dp"
@@ -18,7 +18,7 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/TextView01"
+            android:id="@+id/signup_firstname_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
@@ -27,14 +27,15 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/firstname_edit"
+            android:id="@+id/signup_firstname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:ems="10"
-            android:inputType="textPersonName" />
+            android:inputType="textCapSentences|textPersonName" />
 
         <TextView
-            android:id="@+id/lastname_title"
+            android:id="@+id/signup_lastname_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
@@ -43,7 +44,7 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/lastname_edit"
+            android:id="@+id/signup_lastname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName" >
@@ -53,17 +54,18 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/profile_email_block"
+        android:id="@+id/signup_email_block"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/profile_username_block"
+        android:layout_below="@id/signup_username_block"
+        android:layout_marginBottom="17dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
         android:background="@color/gray"
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/email_title"
+            android:id="@+id/signup_email_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
@@ -72,10 +74,54 @@
             android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/email_edit"
+            android:id="@+id/signup_email"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:inputType="textEmailAddress" />
+
+    </LinearLayout>
+
+     <LinearLayout
+         android:id="@+id/signup_password_block"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_below="@id/signup_email_block"
+         android:layout_marginLeft="17dp"
+         android:layout_marginRight="17dp"
+         android:background="@color/gray"
+         android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/password_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="Password:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/signup_password1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/confirm_password_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="2dp"
+            android:text="Confirm Password:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/signup_password2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+
     </LinearLayout>
 
     <Button
@@ -87,30 +133,6 @@
         android:layout_marginBottom="17dp"
         android:layout_marginLeft="17dp"
         android:layout_marginRight="17dp"
-        android:text="S U B M I T" />
-
-    <RadioGroup
-        android:id="@+id/radioGroup1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/profile_email_block"
-        android:layout_alignRight="@+id/profile_email_block"
-        android:layout_centerVertical="true"
-        android:orientation="horizontal" >
-
-        <RadioButton
-            android:id="@+id/radio0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="Sign In" />
-
-        <RadioButton
-            android:id="@+id/radio1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Sign Up" />
-
-    </RadioGroup>
+        android:text="S I G N  U P" />
 
 </RelativeLayout>

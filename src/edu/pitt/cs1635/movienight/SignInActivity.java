@@ -13,16 +13,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import edu.pitt.cs1635.movienight.SessionManager;
 
-public class ProfileEdit extends Activity {
+public class SignInActivity extends Activity {
 	SessionManager session;
-	HashMap<String, String> user;
 
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_profile_edit);
-		
-		
 		
 		Button editButton = (Button) findViewById(R.id.save_profile_btn);
 		editButton.setOnClickListener(new OnClickListener() {
