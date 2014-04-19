@@ -133,7 +133,7 @@ public class MovieDetailsActivity extends Activity {
 	}
 	
 	/*
-	 * Asynchronous background task that fetches a list of movies from the API 
+	 * Asynchronous background task that fetches movie details from the API 
 	 */
 	private class GetMovieInfo extends AsyncTask<Void, Void, Void> {
 
@@ -174,10 +174,9 @@ public class MovieDetailsActivity extends Activity {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					
 					Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
 					intent.putExtra("movie", movie);
-					intent.putExtra("event", movie.events.get(position));
+					intent.putExtra("eventID", movie.events.get(position).id);
 					startActivity(intent);
 				}
 				
@@ -384,7 +383,7 @@ public class MovieDetailsActivity extends Activity {
 			for (int i = 0; i < max; i++) {
 				FrameLayout myFrame = (FrameLayout) inflater.inflate(R.layout.profile_image, null);
 				ImageAware photo = new ImageViewAware((ImageView) myFrame.findViewById(R.id.photo), false);
-		        imageLoader.displayImage(event.guests.get(i).user.photo, photo, imageOptions);
+		        imageLoader.displayImage(event.guests.get(i).photo, photo, imageOptions);
 				viewHolder.guests.addView(myFrame);
 			}
 

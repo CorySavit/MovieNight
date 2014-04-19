@@ -44,8 +44,10 @@ public class Theater implements Serializable {
 		}
 	}
 	
-	public Theater(String name) {
+	public Theater(int id, String name, String address) {
+		this.id = id;
 		this.name = name;
+		this.address = address;
 	}
 	
 	public String toString() {

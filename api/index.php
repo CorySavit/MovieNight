@@ -73,12 +73,7 @@ if ($request[0] == "movies") {
       order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
     // add guest list
-    foreach ($movie['events'] as &$event) {
-      $event['guests'] = $db->query("select u.id, u.photo
-        from users2events
-        join users as u on user_id = u.id
-        where event_id = ".$event['id'].";")->fetchAll(PDO::FETCH_ASSOC);
-    }
+    get_guests($movie['events']);
 
     // get showtimes
     $theaters = $db->query("select s.id, time, flag, theater_id, name, address
@@ -138,7 +133,79 @@ if ($request[0] == "movies") {
 
 } else if ($request[0] == "events") {
 
-  print json_encode(getEvents());
+  if (sizeof($request) == 1) {
+    switch ($request_type) {
+      case 'GET':
+
+        if (array_key_exists('user_id', $_GET)) {
+          // get all of user's events
+          // @todo add "and time >= CURRENT_TIME" or maybe on a day level
+          $events = $db->query("select e.id, m.title, s.time, s.flag, u2e.status
+            from users2events as u2e
+            join events as e on event_id = e.id
+            join showtimes as s on e.showtime_id = s.id
+            join movies as m on movie_id = m.id
+            where user_id = ".$_GET['user_id'].";")->fetchAll(PDO::FETCH_ASSOC);
+
+          get_guests($events);
+
+          echo json_encode($events);
+
+        } else {
+          echo INVALID_REQUEST;
+        }
+        break;
+
+      case 'POST':
+
+        // create event
+        $id = $db->insert('events', array(
+          'showtime_id' => $_POST['showtime_id'],
+          'admin_id' => $_POST['user_id']
+        ));
+
+        // attach user to event as admin
+        $db->insert('users2events', array(
+          'user_id' => $_POST['user_id'],
+          'event_id' => $id,
+          'status' => 2
+        ));
+
+        echo formatResponse(array(
+          'id' => $id
+        ));
+
+        break;
+      default:
+        echo INVALID_REQUEST;
+    }
+
+  } else {
+    // assume event id is passed in
+    switch ($request_type) {
+      case 'GET':
+
+        if (array_key_exists('user_id', $_GET)) {
+          $event = $db->query("select e.id, s.time, s.flag, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
+            from events as e
+            join showtimes as s on showtime_id = s.id
+            join theaters as t on s.theater_id = t.id
+            join users as u on e.admin_id = u.id
+            join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
+            where e.id = ".$request[1].";")->fetchAll(PDO::FETCH_ASSOC);
+          
+          echo json_encode($event[0]);
+
+        } else {
+          echo INVALID_REQUEST;
+        }
+
+        break;
+
+      default:
+        echo INVALID_REQUEST;
+    }
+  }
 
 } else if ($request[0] == "user") {
 

@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <title>API Test</title>
+  </head>
+  <body>
+    login:
+    <form action="user/login" method="post">
+      <input type="text" name="email" placeholder="email" />
+      <input type="password" name="password" placeholder="password" />
+      <input type="submit" value="Submit" />
+    </form>
+    new user:
+    <form action="user" method="post">
+      <input type="text" name="first_name" placeholder="first name" />
+      <input type="text" name="last_name" placeholder="last name" />
+      <input type="text" name="email" placeholder="email" />
+      <input type="password" name="password" placeholder="password" />
+      <input type="submit" value="Submit" />
+    </form>
+    new event:
+    <form action="events" method="post">
+      <input type="text" name="showtime_id" placeholder="showtime id" />
+      <input type="text" name="admin_id" placeholder="admin id" />
+      <input type="submit" value="Submit" />
+    </form>
+  </body>
+</html>

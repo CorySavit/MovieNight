@@ -53,4 +53,10 @@ public class Event implements Serializable {
 		this.guests = new ArrayList<Guest>();
 	}
 	
+	public Event(JSONObject data, Showtime showtime) {
+		id = JSON.getInt(data, ID);
+		this.showtime = showtime;
+		
+	}
+	
 }

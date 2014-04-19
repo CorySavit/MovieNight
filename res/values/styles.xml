@@ -22,6 +22,7 @@
     <color name="black">#343434</color>
     <color name="green">#CADEAC</color>
     <color name="gray">#a6a6a6</color>
+    <color name="lightgray">#D1D1D1</color>
     
     <style name="TextShadow">
 		<item name="android:shadowColor">#000000</item>
@@ -46,6 +47,10 @@
     <style name="Heading">
         <item name="android:textSize">17sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    
+    <style name="SubHeading">
+        <item name="android:textSize">14sp</item>
     </style>
     
     <style name="YellowButton">

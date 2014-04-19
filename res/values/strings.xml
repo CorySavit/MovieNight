@@ -28,6 +28,16 @@
     <string name="location_icon">Location Icon</string>
     <string name="overview">Overview</string>
     <string name="cast_members">Cast Members</string>
+    <string name="time">Time</string>
+    <string name="location">Location</string>
+    <string name="host">Host</string>
+    <string name="status">Status</string>
+    
+    <string-array name="status_array">
+        <item>Attend</item>
+        <item>Maybe</item>
+        <item>Decline</item>
+    </string-array>
     
     <item type="id" name="TAG_VIEW_HOLDER"></item>
     <item type="id" name="TAG_EVENT"></item>

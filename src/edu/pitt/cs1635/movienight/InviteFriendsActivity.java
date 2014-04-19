@@ -86,7 +86,8 @@ public class InviteFriendsActivity extends Activity {
 			public void onClick(View v) {
 				for (User friend : originalFriendList) {
 					if (friend.selected) {
-						event.guests.add(new Guest(friend));
+						// @todo probably shouldn't be casting friend
+						event.guests.add((Guest) friend);
 					}
 				}
 				

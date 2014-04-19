@@ -10,7 +10,25 @@ Below are a list of methods supported by the API. The response for all methods i
 
 ### /events
 
-* **GET** — returns set of mock data at the moment
+* **GET** — returns all of user's current events
+
+	**Request** {`user_id`}
+	
+	**Response** {...}
+
+* **POST** — creates new (public) event with admin `user_id`
+
+	**Request** {`showtime_id`, `user_id`}
+
+	**Response** {`id`}
+
+### /events/{id}
+
+* **GET** — returns information about a specific event
+
+	**Request** {`user_id`}
+	
+	**Response** {...}
 
 ### /friends
 
