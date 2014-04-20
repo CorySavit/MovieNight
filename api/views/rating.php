@@ -18,7 +18,10 @@ $rating = $db->query("select mn_rating as mn, mn_rating_count as mn_count
   ) as r on movie_id = id
   where id = ".$_GET['movie_id'].";")->fetch(PDO::FETCH_ASSOC);
 
-$percent = $rating['mn'] / $rating['mn_count'];
+$percent = 0;
+if ($rating['mn_count'] != 0) {
+  $percent = $rating['mn'] / $rating['mn_count'];
+}
 ?><!doctype html>
 <html>
   <head>
@@ -45,15 +48,17 @@ $percent = $rating['mn'] / $rating['mn_count'];
     var $percent = $('#percent');
 
     function fillMeter() {
-      $fill.animate({
-        'text-indent': rotate
-      }, {
-        duration: 1500,
-        step: function(now) {
-          $fill.css('-webkit-transform', 'rotate(' + now + 'deg)');
-          $percent.text(parseInt(((now + 180) / (rotate + 180)) * percent * 100) + '%');
-        }
-      });
+      if (percent > 0) {
+        $fill.animate({
+          'text-indent': rotate
+        }, {
+          duration: 1500,
+          step: function(now) {
+            $fill.css('-webkit-transform', 'rotate(' + now + 'deg)');
+            $percent.text(parseInt(((now + 180) / (rotate + 180)) * percent * 100) + '%');
+          }
+        });
+      }
     }
   </script>
 </html>
