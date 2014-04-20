@@ -57,8 +57,9 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		session = new SessionManager(getApplicationContext());
-		//get preferences
+		//get session instance
+		session = SessionManager.getInstance(getApplicationContext());
+		//get preferences (Location)
 		settings = getPreferences(MODE_PRIVATE);
 		
 		
@@ -173,9 +174,8 @@ public class MainActivity extends Activity {
 							// if this button is clicked, close
 							// current activity
 							Log.d("SignInClicked", "True");
-							
 							dialog.cancel();
-							AlertDialog alert = loginDialog(MainActivity.this, "Enter you email and password");
+							AlertDialog alert = session.loginDialog(MainActivity.this);
 							alert.show();
 						}
 					  })
@@ -355,35 +355,7 @@ public class MainActivity extends Activity {
 	    
 	}
 	
-	public AlertDialog loginDialog(Context c, String message) {
-		Log.d("Made it to LoginDialog", "True");
-	    LayoutInflater factory = LayoutInflater.from(c);           
-	    final View textEntryView = factory.inflate(R.layout.activity_signin, null);
-	    final AlertDialog.Builder failAlert = new AlertDialog.Builder(c);
-	    failAlert.setTitle("Login Failed");
-	    failAlert.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
-	            // Cancelled
-	        }
-	    });
-	    AlertDialog.Builder alert = new AlertDialog.Builder(c);
-	    alert.setTitle("Login");
-	    alert.setMessage(message);
-	    alert.setView(textEntryView);
-	    alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
-	                final EditText emailInput = (EditText) textEntryView.findViewById(R.id.email_login);
-	                final EditText passwordInput = (EditText) textEntryView.findViewById(R.id.password_login);
-	                session.login(emailInput.getText().toString(), passwordInput.getText().toString());
-	        }
-	    });
-	    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	        public void onClick(DialogInterface dialog, int whichButton) {
-	            // Canceled.
-	        }
-	    });
-	    return alert.create();
-	}
+	
 	
 
 
