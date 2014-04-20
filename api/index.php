@@ -17,8 +17,9 @@ if ($request[0] == "movies") {
       case 'GET': # /movies
 
         // get movies playing near current location
-        $movies = $db->query("SELECT movies.id, movies.title, movies.poster
-          FROM showtimes JOIN movies ON (movie_id = movies.id)
+        $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime
+          from showtimes as s
+          join movies as m on (movie_id = m.id)
           WHERE DATE(time) = DATE(".$db->quote($date).") AND theater_id IN (
             SELECT id
             FROM theaters
@@ -36,6 +37,7 @@ if ($request[0] == "movies") {
         // @todo incorporate actual ratings
         foreach ($movies as &$movie) {
           $movie['mn_rating'] = rand(-1,1) * rand(1,10);
+          $movie['genres'] = get_genres($movie['id']);
         }
 
         print json_encode($movies);
@@ -60,9 +62,7 @@ if ($request[0] == "movies") {
     ), array('id' => $request[1]));
 
     // get genres
-    $movie['genres'] = $db->query("select g.name
-      from movies2genres join genres as g on genre_id = g.id
-      where movie_id = 1;")->fetchAll(PDO::FETCH_COLUMN);
+    $movie['genres'] = get_genres($request[1]);
 
     // get featured events
     // @todo add "and time > CURRENT_TIME"
@@ -112,22 +112,7 @@ if ($request[0] == "movies") {
     print json_encode($movie);
 
   }
-
-
-  /*
-  // parse runtime "PT02H14M" --> "2 hr 14 min"
-  preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
-  $movie->runtime = '';
-  $hours = intval($runtime[1]);
-  if ($hours !== 0) {
-    // don't include hours if they are 0
-    $movie->runtime .= $hours.' hr ';
-  }
-  $movie->runtime .= intval($runtime[2]).' min';
-  */
   
-  
-
 } else if ($request[0] == "friends") {
 
   print json_encode(getUsers());

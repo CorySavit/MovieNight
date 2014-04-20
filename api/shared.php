@@ -63,6 +63,14 @@ function get_guests(&$event, $attending = false) {
   }
 }
 
+function get_genres($id) {
+  global $db;
+  
+  return $db->query("select g.name
+    from movies2genres join genres as g on genre_id = g.id
+    where movie_id = ".$id.";")->fetchAll(PDO::FETCH_COLUMN);
+}
+
 // format a JSON response
 function formatResponse($array = array()) {
   global $db;

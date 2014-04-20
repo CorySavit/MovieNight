@@ -57,7 +57,7 @@ public class Movie implements Serializable {
 		description = JSON.getString(data, DESCRIPTION);
 		mpaaRating = JSON.getString(data, MPAA_RATING);
 		poster = JSON.getString(data, POSTER);
-		runtime = JSON.getString(data, RUNTIME);
+		runtime = formatRuntime(JSON.getInt(data, RUNTIME));
 		mnRating = JSON.getInt(data, MN_RATING);
 
 		genres = new ArrayList<String>();
@@ -92,6 +92,12 @@ public class Movie implements Serializable {
 			}
 		}
 		
+	}
+	
+	private String formatRuntime(int time) {
+		int hours = time / 60;
+		int minutes = time % 60;
+		return (hours > 0 ? hours + " hr " : "") + minutes + " min";
 	}
 	
 	/**
