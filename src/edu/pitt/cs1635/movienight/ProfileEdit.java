@@ -37,7 +37,7 @@ public class ProfileEdit extends Activity {
 				EditText lastname = (EditText) findViewById(R.id.lastname_edit);
 				EditText email = (EditText) findViewById(R.id.email_edit);
 				
-				session.createLoginSession(firstname.getText().toString(), lastname.getText().toString(), email.getText().toString(), "password", "id");
+				session.createLoginSession(firstname.getText().toString(), lastname.getText().toString(), email.getText().toString(), "password", -1);
 				finish();
 				
 			}

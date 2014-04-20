@@ -190,8 +190,8 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						loginDialog.dismiss();
-						Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-						startActivity(intent);
+						AlertDialog alert = session.signupDialog(MainActivity.this);
+						alert.show();
 					}
 			    	
 			    });

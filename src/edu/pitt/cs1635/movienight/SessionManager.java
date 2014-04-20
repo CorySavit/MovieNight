@@ -9,9 +9,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -30,7 +32,9 @@ public class SessionManager {
     Context _context;
     int PRIVATE_MODE = 0;
     AlertDialog loginDialog;
+    AlertDialog signupDialog;
     AlertDialog.Builder alert;
+    ArrayList<NameValuePair> userdetails;
     private static SessionManager instance = null;
      
     private static final String PREF_NAME = "MovieNightPrefs";
@@ -60,14 +64,14 @@ public class SessionManager {
      *******************/
     
     //Login (after signup)
-    public void createLoginSession(String firstName, String lastName, String email, String password, String id){
+    public void createLoginSession(String firstName, String lastName, String email, String password, Integer id){
     	//probabably would be a good idea to connect with server and return the api key here.
         editor.putBoolean(IS_LOGIN, true);
         editor.putString(KEY_FIRSTNAME, firstName);
         editor.putString(KEY_LASTNAME, lastName);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASS, password);
-        editor.putString(KEY_API, id);
+        editor.putInt(KEY_API, id);
         editor.commit();
     }
     
@@ -135,7 +139,7 @@ public class SessionManager {
   						editor.putString(KEY_FIRSTNAME, login.getString("first_name"));
   						editor.putString(KEY_LASTNAME, login.getString("last_name"));
   						editor.putString(KEY_EMAIL, login.getString("email"));
-  						editor.putString(KEY_API, "id");
+  						editor.putInt(KEY_API, login.getInt("id"));
   						editor.commit();
   					}
   				} catch (JSONException e) {
@@ -148,9 +152,6 @@ public class SessionManager {
 
   			return loginTrue;
   		}
-
-
-
 
   		@Override
   		protected void onPostExecute(Boolean result) {
@@ -172,13 +173,128 @@ public class SessionManager {
   		}
 
   	}
+      
+      
+      
+      public AlertDialog signupDialog(Context context) {
+    		Log.d("Made it to SignupDialog", "True");
+    	    LayoutInflater factory = LayoutInflater.from(context);           
+    	    final View textEntryView = factory.inflate(R.layout.activity_signup, null);
+    	    
+    	    alert = new AlertDialog.Builder(context);
+    	    alert.setView(textEntryView);
+    	    Button signupSubmit = (Button) textEntryView.findViewById(R.id.save_profile_btn);
+    	    signupDialog = alert.create();
+    	    
+    	    signupSubmit.setOnClickListener(new OnClickListener(){
+
+	  			@Override
+	  			public void onClick(View v) {
+	  				EditText f = (EditText) textEntryView.findViewById(R.id.signup_firstname);
+					EditText l = (EditText) textEntryView.findViewById(R.id.signup_lastname);
+					EditText e = (EditText) textEntryView.findViewById(R.id.signup_email);
+					EditText p1 = (EditText) textEntryView.findViewById(R.id.signup_password1);
+					EditText p2 = (EditText) textEntryView.findViewById(R.id.signup_password2);
+					
+					String firstname = f.getText().toString();
+					String lastname = l.getText().toString();
+					String email = e.getText().toString();
+					String password1 = p1.getText().toString();
+					String password2 = p2.getText().toString();
+					
+					//if "Password" and "Confirm Password" fields do not match,
+					//display error message via Toast and halt submition
+					if (!password1.equals(password2)){
+			    		CharSequence text = "Passwords Do Not Match!";
+			    		int duration = Toast.LENGTH_SHORT;
+	
+		    			Toast toast = Toast.makeText(_context, text, duration);
+		    			toast.show();
+					} else {
+						//otherwise add sign up information to userdetails to prep for POST
+						userdetails = new ArrayList<NameValuePair>();
+						userdetails.add(new BasicNameValuePair("first_name", firstname));
+						userdetails.add(new BasicNameValuePair("last_name", lastname));
+						userdetails.add(new BasicNameValuePair("email", email));
+						userdetails.add(new BasicNameValuePair("password", password1));
+								
+						new PostSignup().execute(firstname, lastname, email, password1);
+					}
+	  			}
+    	});
+    	    return signupDialog;
+    	    
+    	    
+    	}
+      
+      private class PostSignup extends AsyncTask<String, Void, Boolean> {
+  		JSONObject login = null;
+  		Boolean signupTrue = false;
+  		@Override
+  		protected Boolean doInBackground(String... arg0) {
+  			
+  			// make call to API
+  			String str = API.getInstance().post("user", userdetails);
+
+  			if (str != null) {
+  				try {
+  					login = new JSONObject(str);
+	  				try {
+	  					signupTrue = true;
+		  				editor.putBoolean(IS_LOGIN, true);
+						editor.putString(KEY_FIRSTNAME, arg0[0]);
+						editor.putString(KEY_LASTNAME, arg0[1]);
+						editor.putString(KEY_EMAIL, arg0[2]);
+						editor.putInt(KEY_API, login.getInt("id"));
+						editor.commit();
+	  				} catch (JSONException e) {
+	  					// TODO Auto-generated catch block
+	  					e.printStackTrace();
+	  				}
+  				} catch (JSONException e) {
+  					// TODO Auto-generated catch block
+  					e.printStackTrace();
+  				}
+  				
+  				
+  			} else {
+  				Log.e("ServiceHandler", "Failed to receive data from URL");
+  			}
+
+  			return signupTrue;
+  		}
+
+  		@Override
+  		protected void onPostExecute(Boolean result) {
+  			super.onPostExecute(result);
+  			if (result){
+  				CharSequence text = "You have Signed Up and are now Logged In!";
+  	    		int duration = Toast.LENGTH_SHORT;
+      			Toast toast = Toast.makeText(_context, text, duration);
+      			toast.show();
+      			signupDialog.dismiss();
+  			}
+  			else if (!result){
+  	    		CharSequence text = "Sign Up Failure!";
+  	    		int duration = Toast.LENGTH_SHORT;
+      			Toast toast = Toast.makeText(_context, text, duration);
+      			toast.show();
+  			}
+  		}
+
+
+
+  	}
+      
+      
+    
     
     public void logout(){
 
         editor.putBoolean(IS_LOGIN, false);
-        editor.putString(KEY_FIRSTNAME, "");
-        editor.putString(KEY_LASTNAME, "");
-        editor.putString(KEY_EMAIL, "");  
+        editor.remove(KEY_FIRSTNAME);
+        editor.remove(KEY_LASTNAME);
+        editor.remove(KEY_EMAIL);  
         editor.commit();
         
        
@@ -201,7 +317,7 @@ public class SessionManager {
     }
     
     public int getUserKey(){
-    	return pref.getInt(KEY_API, 0);
+    	return pref.getInt(KEY_API, -1);
     }
     
   

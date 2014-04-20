@@ -123,7 +123,7 @@ public class SignUpActivity extends Activity {
 			super.onPostExecute(result);
 			if(login != null ){
 				try {
-					String id = login.getString("id");
+					Integer id = login.getInt("id");
 					session.createLoginSession(firstname, lastname, email, password1, id);
 					Intent profile = new Intent(getApplicationContext(), Profile.class);
 					finish();
