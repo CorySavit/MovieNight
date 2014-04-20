@@ -85,5 +85,32 @@
         <item name="android:textColor">@color/gray</item>
         <item name="android:paddingBottom">3dp</item>
     </style>
+    
+   	<style name="RedButton">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:background">@color/red</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+   	<style name="GreenButton">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:background">@color/green</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+   	<style name="BlueButton">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingRight">2dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:paddingLeft">2dp</item>
+        <item name="android:background">@color/blue</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
 </resources>

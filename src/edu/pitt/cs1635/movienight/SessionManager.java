@@ -111,19 +111,6 @@ public class SessionManager {
 	    	
 	    });
   	    
-
-  	    
-  	    /*alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
-  	        public void onClick(DialogInterface dialog, int whichButton) {
-  	                final EditText emailInput = (EditText) textEntryView.findViewById(R.id.email_login);
-  	                final EditText passwordInput = (EditText) textEntryView.findViewById(R.id.password_login);
-  	                login(emailInput.getText().toString(), passwordInput.getText().toString());
-  	        }
-  	    });
-  	    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-  	        public void onClick(DialogInterface dialog, int whichButton) {
-  	        }
-  	    });*/
   	    return loginDialog;
   	}
       
