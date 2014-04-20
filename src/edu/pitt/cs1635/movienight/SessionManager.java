@@ -18,6 +18,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
  
@@ -27,6 +29,8 @@ public class SessionManager {
     Editor editor;
     Context _context;
     int PRIVATE_MODE = 0;
+    AlertDialog loginDialog;
+    AlertDialog.Builder alert;
     private static SessionManager instance = null;
      
     private static final String PREF_NAME = "MovieNightPrefs";
@@ -80,18 +84,36 @@ public class SessionManager {
   		Log.d("Made it to LoginDialog", "True");
   	    LayoutInflater factory = LayoutInflater.from(context);           
   	    final View textEntryView = factory.inflate(R.layout.activity_signin, null);
-  	    final AlertDialog.Builder failAlert = new AlertDialog.Builder(context);
-  	    failAlert.setTitle("Login Failed");
-  	    failAlert.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-  	        public void onClick(DialogInterface dialog, int whichButton) {
-  	            // Cancelled
-  	        }
-  	    });
-  	    AlertDialog.Builder alert = new AlertDialog.Builder(context);
-  	    alert.setTitle("Login");
+  	    
+  	    alert = new AlertDialog.Builder(context);
   	    alert.setView(textEntryView);
+  	    Button cancel = (Button) textEntryView.findViewById(R.id.cancel_btn);
+  	    Button loginSubmit = (Button) textEntryView.findViewById(R.id.login_btn);
+  	    loginDialog = alert.create();
+  	    
+  	    loginSubmit.setOnClickListener(new OnClickListener(){
 
-  	    alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				final EditText emailInput = (EditText) textEntryView.findViewById(R.id.email_login);
+				final EditText passwordInput = (EditText) textEntryView.findViewById(R.id.password_login);
+	            login(emailInput.getText().toString(), passwordInput.getText().toString());
+			}
+  	    	
+  	    });
+  	    
+  	  cancel.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				loginDialog.dismiss();
+			}
+	    	
+	    });
+  	    
+
+  	    
+  	    /*alert.setPositiveButton("Login", new DialogInterface.OnClickListener() {
   	        public void onClick(DialogInterface dialog, int whichButton) {
   	                final EditText emailInput = (EditText) textEntryView.findViewById(R.id.email_login);
   	                final EditText passwordInput = (EditText) textEntryView.findViewById(R.id.password_login);
@@ -101,8 +123,8 @@ public class SessionManager {
   	    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
   	        public void onClick(DialogInterface dialog, int whichButton) {
   	        }
-  	    });
-  	    return alert.create();
+  	    });*/
+  	    return loginDialog;
   	}
       
       private class PostLogin extends AsyncTask<ArrayList<NameValuePair>, Void, Boolean> {
@@ -151,6 +173,7 @@ public class SessionManager {
   	    		int duration = Toast.LENGTH_SHORT;
       			Toast toast = Toast.makeText(_context, text, duration);
       			toast.show();
+      			loginDialog.dismiss();
   			}
   			else if (!result){
   	    		CharSequence text = "Login Failure!";

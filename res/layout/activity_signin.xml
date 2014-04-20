@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/profile_email_block"
+    android:id="@+id/login_dialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray"
     android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:paddingBottom="8dp"
+        android:paddingLeft="8dp"
+        android:paddingTop="8dp"
+        android:text="LOG IN"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/email_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
+        android:paddingTop="10dp"
         android:text="Email:"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold" />
@@ -27,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
+        android:paddingTop="10dp"
         android:text="Password:"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold" />
@@ -38,4 +53,34 @@
         android:layout_marginLeft="18dp"
         android:layout_marginRight="18dp"
         android:inputType="textPassword" />
+
+    <LinearLayout
+        android:id="@+id/LinearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:paddingTop="10dp" >
+
+        <Button
+            android:id="@+id/cancel_btn"
+            style="@style/LogoutButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="50"
+            android:text="Cancel"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/login_btn"
+            style="@style/YellowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="50"
+            android:text="Log In" />
+
+    </LinearLayout>
+
 </LinearLayout>
