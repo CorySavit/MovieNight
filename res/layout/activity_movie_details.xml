@@ -51,11 +51,17 @@
 					
 				</ScrollView>
 				
-				<TextView
-				    android:id="@+id/rating"
+				<LinearLayout
 					android:layout_width="fill_parent"
-					android:layout_height="fill_parent"
-					android:padding="@dimen/global_padding" />
+					android:layout_height="fill_parent" >
+					
+				    <WebView 
+				        android:id="@+id/rating_meter"
+				        android:layout_width="fill_parent"
+				        android:layout_height="160dp"
+				        android:layout_margin="@dimen/global_padding" />
+					
+				</LinearLayout>
 				
 			</FrameLayout>
 			

@@ -22,9 +22,11 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
@@ -32,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
@@ -45,6 +48,7 @@ public class MovieDetailsActivity extends Activity {
 	private Movie movie;
 	private Theater myTheater;
 	private Showtime myShowtime;
+	private WebView ratingMeter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,8 +95,19 @@ public class MovieDetailsActivity extends Activity {
 		 * Setup tabs
 		 */
 
-		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+		final TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup();
+		tabHost.setOnTabChangedListener(new OnTabChangeListener() {
+
+			@Override
+			public void onTabChanged(String tabId) {
+				
+				if (tabId == "ratings") {
+					ratingMeter.loadUrl("javascript:fillMeter()");
+				}
+			 
+			}
+		});
 		
 		final FrameLayout tabContent = tabHost.getTabContentView();
 		
@@ -209,9 +224,10 @@ public class MovieDetailsActivity extends Activity {
 			}
 			
 			// ratings
-			// @todo actually implement this
-			TextView rating = (TextView) findViewById(R.id.rating);
-			rating.setText("This movie has an aggregate MovieNight rating of " + movie.mnRating + ".");
+			ratingMeter = (WebView) findViewById(R.id.rating_meter);
+			ratingMeter.setBackgroundColor(0x00000000);
+			ratingMeter.getSettings().setJavaScriptEnabled(true);
+			ratingMeter.loadUrl(API.BASE_URL + "views/rating.php?movie_id=" + movie.id);
 		}
 
 	}

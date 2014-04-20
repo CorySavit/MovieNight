@@ -44,6 +44,13 @@ Below are a list of methods supported by the API. The response for all methods i
 
 * **GET** — returns information for a specific movie
 
+### /movies/{id}/rating
+
+* **POST** — rates a movie
+
+	**Request** {`user_id`, `movie_id`, `rating`}
+	
+	**Response** {`id`}
 
 ### /user
 

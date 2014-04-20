@@ -49,6 +49,7 @@ public class EventDetailsActivity extends Activity {
 	private TextView statusAdminView;
 	private TextView statusGuestView;
 	private TextView changeHost;
+	private SessionManager session;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class EventDetailsActivity extends Activity {
 		setContentView(R.layout.activity_event_details);
 		
 		inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		session = SessionManager.getInstance(getApplicationContext());
 		
 		// getting intent data
 		Intent intent = getIntent();
@@ -188,9 +190,8 @@ public class EventDetailsActivity extends Activity {
 		protected JSONObject doInBackground(Void... arg0) {
 			
 			// make call to API
-			// @todo this is just using static user_id = 1 right now
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("user_id", "1"));
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
 			String str = API.getInstance().get("events/" + eventID, params);
 
 			if (str != null) {
@@ -228,9 +229,8 @@ public class EventDetailsActivity extends Activity {
 			
 			// host
 			try {
-				// @todo getting status admin id at the moment
 				TextView host = (TextView) findViewById(R.id.host);
-				if (result.getInt("admin_id") == 1) {
+				if (result.getInt("admin_id") == session.getId()) {
 					// current user is the admin
 					host.setText("Me");
 				} else {
@@ -393,9 +393,8 @@ public class EventDetailsActivity extends Activity {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			// user has already RSVP; they are changing it
-    		// @todo change hardcoded user id
     		List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("user_id", "1"));
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
 			params.add(new BasicNameValuePair("status", Integer.toString(status)));
 			API.getInstance().post("events/" + eventID, params);
 			return null;
@@ -415,9 +414,8 @@ public class EventDetailsActivity extends Activity {
 		@Override
 		protected Void doInBackground(Void... arg0) {
 			// user has already RSVP; they are changing it
-    		// @todo change hardcoded user id
     		List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("user_id", "1"));
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
 			params.add(new BasicNameValuePair("status", Integer.toString(status)));
 			API.getInstance().put("events/" + eventID, params);
 			return null;

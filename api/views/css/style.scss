@@ -1,0 +1,71 @@
+$meter_size: 120px;
+$meter_border: 12px;
+
+html {
+  margin: 10px;
+}
+
+* {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+#meter {
+  $radius: $meter_size + $meter_border;
+  border-bottom: 1px solid gray;
+  height: $radius;
+  left: 50%;
+  margin-left: -1 * $radius;
+  position: absolute;
+  width: $radius * 2;
+  overflow: hidden;
+
+  div {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+
+  .circle {
+    height: $radius * 2;
+    width: $radius * 2;
+
+    &:before {
+      border: $meter_border solid lightgray;
+      border-bottom: none;
+      border-radius: $radius $radius 0 0;
+      content: '';
+      display: block;
+      height: $meter_size;
+      width: $meter_size * 2;
+    }
+
+    &.fill {
+      text-indent: -180px;
+      -webkit-transform: rotate(-180deg);
+      //transition: all 2s;
+      &:before {
+        border-color: green;
+      }
+    }
+  }
+
+  .metric {
+    $percent: 45px;
+    $label: 14px;
+    $total: $percent + $label;
+
+    text-align: center;
+    top: ($radius - $total) / 2;
+
+    .percent {
+      font-size: $percent;
+    }
+
+    .label {
+      font-size: $label;
+      text-transform: uppercase;
+    }
+  }
+}

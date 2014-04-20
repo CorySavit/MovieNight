@@ -39,11 +39,11 @@ public class SessionManager {
      
     private static final String PREF_NAME = "MovieNightPrefs";
     private static final String IS_LOGIN = "IsLoggedIn";
+    public static final String KEY_ID = "id";
+    public static final String KEY_EMAIL = "email";
     public static final String KEY_FIRSTNAME = "firstName";
     public static final String KEY_LASTNAME = "lastName";
-    public static final String KEY_EMAIL = "email";
     public static final String KEY_PASS = "password";
-    public static final String KEY_API = "api_key";
      
     // Constructor
     protected SessionManager(Context context){
@@ -71,7 +71,7 @@ public class SessionManager {
         editor.putString(KEY_LASTNAME, lastName);
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASS, password);
-        editor.putInt(KEY_API, id);
+        editor.putInt(KEY_ID, id);
         editor.commit();
     }
     
@@ -139,7 +139,7 @@ public class SessionManager {
   						editor.putString(KEY_FIRSTNAME, login.getString("first_name"));
   						editor.putString(KEY_LASTNAME, login.getString("last_name"));
   						editor.putString(KEY_EMAIL, login.getString("email"));
-  						editor.putInt(KEY_API, login.getInt("id"));
+  						editor.putInt(KEY_ID, login.getInt("id"));
   						editor.commit();
   					}
   				} catch (JSONException e) {
@@ -245,7 +245,7 @@ public class SessionManager {
 						editor.putString(KEY_FIRSTNAME, arg0[0]);
 						editor.putString(KEY_LASTNAME, arg0[1]);
 						editor.putString(KEY_EMAIL, arg0[2]);
-						editor.putInt(KEY_API, login.getInt("id"));
+						editor.putInt(KEY_ID, login.getInt("id"));
 						editor.commit();
 	  				} catch (JSONException e) {
 	  					// TODO Auto-generated catch block
@@ -316,8 +316,8 @@ public class SessionManager {
     	return pref.getBoolean(IS_LOGIN, false);
     }
     
-    public int getUserKey(){
-    	return pref.getInt(KEY_API, -1);
+    public int getId(){
+    	return pref.getInt(KEY_ID, -1);
     }
     
   

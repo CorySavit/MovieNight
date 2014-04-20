@@ -17,9 +17,14 @@ if ($request[0] == "movies") {
       case 'GET': # /movies
 
         // get movies playing near current location
-        $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime
+        $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime, mn_rating
           from showtimes as s
-          join movies as m on (movie_id = m.id)
+          join movies as m on (s.movie_id = m.id)
+          left join (
+            select movie_id, sum(rating) as mn_rating
+            from ratings
+            group by movie_id
+          ) as r on r.movie_id = s.movie_id
           WHERE DATE(time) = DATE(".$db->quote($date).") AND theater_id IN (
             SELECT id
             FROM theaters
@@ -32,11 +37,11 @@ if ($request[0] == "movies") {
                   * sin(radians(lat))
                 )
             ) <= 31
-          ) GROUP BY movie_id;")->fetchAll(PDO::FETCH_ASSOC);
+          ) GROUP BY s.movie_id;")->fetchAll(PDO::FETCH_ASSOC);
 
         // @todo incorporate actual ratings
         foreach ($movies as &$movie) {
-          $movie['mn_rating'] = rand(-1,1) * rand(1,10);
+          //$movie['mn_rating'] = rand(-1,1) * rand(1,10);
           $movie['genres'] = get_genres($movie['id']);
         }
 
@@ -47,19 +52,18 @@ if ($request[0] == "movies") {
         echo INVALID_REQUEST;
     }
 
-  } else { # /movies/{id}
+  } else if (sizeof($request) == 2 && $request_type == 'GET') { # /movies/{id}
     // assume second parameter is id
 
     // get movie information
-    $movie = $db->get('movies', array(
-      'id',
-      'tmdb_id',
-      'title',
-      'description',
-      'mpaa_rating',
-      'poster',
-      'runtime'
-    ), array('id' => $request[1]));
+    $movie = $db->query("select id, tmdb_id, title, description, mpaa_rating, poster, runtime, mn_rating, mn_rating_count
+      from movies
+      left join (
+        select movie_id, sum(rating) as mn_rating, count(movie_id) as mn_rating_count
+        from ratings
+        group by movie_id
+      ) as r on movie_id = id
+      where id = ".$request[1].";")->fetch(PDO::FETCH_ASSOC);
 
     // get genres
     $movie['genres'] = get_genres($request[1]);
@@ -111,6 +115,26 @@ if ($request[0] == "movies") {
 
     print json_encode($movie);
 
+  } else if ($request[2] == 'rating') {
+
+    if (array_key_exists('user_id', $_POST) && array_key_exists('rating', $_POST)) {
+
+      $id = $db->insert('ratings', array(
+        'user_id' => $_POST['user_id'],
+        'movie_id' => $request[1],
+        'rating' => $_POST['rating']
+      ));
+
+      echo formatResponse(array(
+        'id' => $id
+      ));
+
+    } else {
+      echo INVALID_REQUEST;
+    }
+
+  } else {
+    echo INVALID_REQUEST;
   }
   
 } else if ($request[0] == "friends") {
