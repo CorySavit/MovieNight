@@ -38,6 +38,7 @@
     <string name="declined">Declined</string>
     <string name="administrator">Administrator</string>
     <string name="invited">Invited</string>
+    <string name="change">Change</string>
     
     <string-array name="status_array">
         <item>@string/attending</item>

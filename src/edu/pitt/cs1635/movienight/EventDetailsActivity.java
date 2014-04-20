@@ -46,7 +46,9 @@ public class EventDetailsActivity extends Activity {
 	private Event event;
 	private Movie movie;
 	private AlertDialog.Builder statusBuilder;
-	private TextView statusView;
+	private TextView statusAdminView;
+	private TextView statusGuestView;
+	private TextView changeHost;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,8 +123,10 @@ public class EventDetailsActivity extends Activity {
 	        });
 		
 		// save reference to status view
-		statusView = (TextView) findViewById(R.id.status);
-		statusView.setOnClickListener(new OnClickListener() {
+		changeHost = (TextView) findViewById(R.id.change_host);
+		statusAdminView = (TextView) findViewById(R.id.status_admin);
+		statusGuestView = (TextView) findViewById(R.id.status_guest);
+		statusGuestView.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -153,19 +157,28 @@ public class EventDetailsActivity extends Activity {
 	
 	private void setStatus(int status) {
 		event.status = status;
+		
 		switch (status) {
-		case Guest.STATUS_ADMIN:
-			statusView.setText(R.string.administrator);
-			break;
 		case Guest.STATUS_ACCEPTED:
-			statusView.setText(R.string.attending);
+			statusGuestView.setText(R.string.attending);
 			break;
 		case Guest.STATUS_INVITED:
-			statusView.setText(R.string.maybe);
+			statusGuestView.setText(R.string.maybe);
 			break;
 		case Guest.STATUS_DECLINED:
-			statusView.setText(R.string.declined);
+			statusGuestView.setText(R.string.declined);
 			break;
+		}
+		
+		// show "Administrator" text or RSVP button accordingly
+		if (status == Guest.STATUS_ADMIN && statusAdminView.getVisibility() == View.INVISIBLE) {
+			statusGuestView.setVisibility(View.INVISIBLE);
+			changeHost.setVisibility(View.VISIBLE);
+			statusAdminView.setVisibility(View.VISIBLE);
+		} else if (statusGuestView.getVisibility() == View.INVISIBLE) {
+			statusAdminView.setVisibility(View.INVISIBLE);
+			changeHost.setVisibility(View.INVISIBLE);
+			statusGuestView.setVisibility(View.VISIBLE);
 		}
 	}
 	
@@ -215,7 +228,15 @@ public class EventDetailsActivity extends Activity {
 			
 			// host
 			try {
-				((TextView) findViewById(R.id.host)).setText(result.getString("admin_name"));
+				// @todo getting status admin id at the moment
+				TextView host = (TextView) findViewById(R.id.host);
+				if (result.getInt("admin_id") == 1) {
+					// current user is the admin
+					host.setText("Me");
+				} else {
+					// somebody else is the admin
+					host.setText(result.getString("admin_name"));
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

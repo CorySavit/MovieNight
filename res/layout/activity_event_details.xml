@@ -132,13 +132,30 @@
 								android:layout_gravity="center_vertical"
 								style="@style/Label"
 								android:text="@string/host" />
-								
-						    <TextView
-								android:id="@+id/host"
-								android:layout_width="0dp"
-								android:layout_height="wrap_content"
-								android:layout_weight=".8"
-								style="@style/Heading" />
+							
+							<RelativeLayout 
+							    android:layout_width="0dp"
+							    android:layout_height="wrap_content"
+							    android:layout_weight=".8" >
+							    
+							    <TextView
+									android:id="@+id/host"
+									android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_gravity="center_vertical"
+									style="@style/Heading" />
+							    
+							    <TextView
+							        android:id="@+id/change_host"
+							        android:layout_width="wrap_content"
+									android:layout_height="wrap_content"
+									android:layout_toRightOf="@+id/host"
+									android:layout_marginLeft="12dp"
+									style="@style/GrayButton"
+									android:text="@string/change"
+									android:visibility="invisible" />
+							    
+							</RelativeLayout>
 						
 						</LinearLayout>
 						
@@ -167,11 +184,21 @@
 							    android:layout_weight=".8" >
 								
 								<TextView
-									android:id="@+id/status"
+									android:id="@+id/status_guest"
 									android:layout_width="wrap_content"
 									android:layout_height="wrap_content"
 									style="@style/YellowButton"
-									android:text="@string/RSVP" />
+									android:text="@string/RSVP"
+									android:visibility="invisible" />
+								
+								<TextView 
+								    android:id="@+id/status_admin"
+								    android:layout_width="wrap_content"
+								    android:layout_height="wrap_content"
+								    android:layout_gravity="center_vertical"
+								    android:text="@string/administrator"
+								    style="@style/Heading"
+								    android:visibility="invisible" />
 									
 							</FrameLayout>
 						
