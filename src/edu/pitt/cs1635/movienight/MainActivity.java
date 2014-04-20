@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -163,12 +164,47 @@ public class MainActivity extends Activity {
 			
 			
 			if(!session.isLoggedIn()){
+				
+				LayoutInflater factory = LayoutInflater.from(this);           
+		  	    final View signInOutView = factory.inflate(R.layout.dialog_signin_signout, null);
+		  	    
+		  	    AlertDialog.Builder alert = new AlertDialog.Builder(this);
+		  	    alert.setView(signInOutView);
+		  	    Button login = (Button) signInOutView.findViewById(R.id.login_btn);
+		  	    Button signup = (Button) signInOutView.findViewById(R.id.signup_btn);
+		  	    final AlertDialog loginDialog = alert.create();
+		  	    
+		  	    login.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						loginDialog.dismiss();
+						AlertDialog alert = session.loginDialog(MainActivity.this);
+						alert.show();
+					}
+		  	    	
+		  	    });
+		  	    
+		  	  signup.setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						loginDialog.dismiss();
+						Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
+						startActivity(intent);
+					}
+			    	
+			    });
+		  	  
+		  	  loginDialog.show();
+/*
+				
 				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 				alertDialogBuilder.setTitle("Sign In / Sign Out");
 	 
 				// set dialog message
 				alertDialogBuilder
-					.setCancelable(false)
+				
 					.setPositiveButton("Sign In",new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,int id) {
 							// if this button is clicked, close
@@ -192,6 +228,7 @@ public class MainActivity extends Activity {
 	 
 					// show it
 					alertDialog.show();
+			*/
 			} else {
 			Intent profileView = new Intent(this, Profile.class);
 			startActivity(profileView);
