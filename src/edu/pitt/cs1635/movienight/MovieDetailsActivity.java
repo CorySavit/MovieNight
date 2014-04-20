@@ -77,6 +77,9 @@ public class MovieDetailsActivity extends Activity {
 		// getting intent data
 		Intent intent = getIntent();
 		movie = (Movie) intent.getSerializableExtra("data");
+		
+		// set header content
+		movie.setHeader(this);
 
 		// these will be set when user makes a choice
 		myTheater = null;
@@ -157,9 +160,6 @@ public class MovieDetailsActivity extends Activity {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			
-			// set header content
-			movie.setHeader(MovieDetailsActivity.this);
 			
 			/*
 			 * Populate tab content
