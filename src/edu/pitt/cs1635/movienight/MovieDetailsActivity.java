@@ -22,7 +22,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -228,6 +227,31 @@ public class MovieDetailsActivity extends Activity {
 			ratingMeter.setBackgroundColor(0x00000000);
 			ratingMeter.getSettings().setJavaScriptEnabled(true);
 			ratingMeter.loadUrl(API.BASE_URL + "views/rating.php?movie_id=" + movie.id);
+			
+			LinearLayout externalRatings = (LinearLayout) findViewById(R.id.external_ratings);
+			int[] ratings = {R.string.rotten_critic, R.string.rotten_audience, R.string.tmdb};
+			for (int i = 0; i < ratings.length; i++) {
+				LinearLayout rating = (LinearLayout) inflater.inflate(R.layout.rating_item, externalRatings, false);
+				
+				// set percentage
+				TextView percent = (TextView) rating.findViewById(R.id.percent);
+				switch (ratings[i]) {
+				case R.string.rotten_critic:
+					percent.setText(movie.rottenCritic + "%");
+					break;
+				case R.string.rotten_audience:
+					percent.setText(movie.rottenAudience + "%");
+					break;
+				case R.string.tmdb:
+					break;
+				}
+				
+				// set label
+				((TextView) rating.findViewById(R.id.label)).setText(getString(ratings[i]).toUpperCase());
+				
+				// add rating to parent view
+				externalRatings.addView(rating);
+			}
 		}
 
 	}

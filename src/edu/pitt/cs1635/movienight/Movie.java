@@ -2,7 +2,6 @@ package edu.pitt.cs1635.movienight;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -32,6 +31,7 @@ public class Movie implements Serializable {
 	static final String EVENTS = "events";
 	static final String THEATERS = "theaters";
 	static final String CAST = "cast";
+	static final String ROTTEN_RATING = "rotten_rating";
 
 	int id;
 	int tmdbid;
@@ -41,6 +41,8 @@ public class Movie implements Serializable {
 	String poster;
 	String runtime;
 	int mnRating;
+	int rottenCritic;
+	int rottenAudience;
 	List<String> genres;
 	List<Event> events;
 	List<Theater> theaters;
@@ -59,6 +61,12 @@ public class Movie implements Serializable {
 		poster = JSON.getString(data, POSTER);
 		runtime = formatRuntime(JSON.getInt(data, RUNTIME));
 		mnRating = JSON.getInt(data, MN_RATING);
+		
+		JSONObject rottenRatings = JSON.getJSONObject(data, ROTTEN_RATING);
+		if (rottenRatings != null) {
+			rottenCritic = JSON.getInt(rottenRatings, "critics");
+			rottenAudience = JSON.getInt(rottenRatings, "audience");
+		}
 
 		genres = new ArrayList<String>();
 		JSONArray myGenres = JSON.getJSONArray(data, GENRES);

@@ -15,6 +15,7 @@ foreach ($result as $data) {
   // see if movie already exists in database
   $movie = $db->get('movies', array(
     'id',
+    'rotten_id',
     'start_date',
     'end_date'
   ), array('tms_id' => $data->rootId));
@@ -23,6 +24,10 @@ foreach ($result as $data) {
     // movie does not already exist in database
 
     $tmdb = new TMDB($data->title, $data->releaseYear);
+    $rotten = new RottenTomatoes($data->title, array(
+      'imdb_id' => $tmdb->getIMDBId(),
+      'year' => $data->releaseYear
+    ));
 
     // try to get runtime from tmdb first
     $myRuntime = $tmdb->getRuntime();
@@ -37,6 +42,7 @@ foreach ($result as $data) {
       'tms_id' => $data->rootId,
       'tmdb_id' => $tmdb->getTMDBId(),
       'imdb_id' => $tmdb->getIMDBId(),
+      'rotten_id' => $rotten->getID(),
       'title' => $data->title,
       'description' => is_null($tmdb->getOverview()) ? $data->description : $tmdb->getOverview(),
       'mpaa_rating' => $data->ratings[0]->code,

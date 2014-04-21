@@ -1,6 +1,7 @@
 <?php
 require_once 'auth.php';
 require_once 'tmdb.php';
+require_once 'rottentomatoes.php';
 require_once 'models.php';
 require_once 'medoo.php';
 

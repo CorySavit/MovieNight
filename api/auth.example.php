@@ -14,3 +14,6 @@ define("DB_PASSWORD", "###");
 
 // location stuff
 define("PLACES_KEY", "###");
+
+// http://developer.rottentomatoes.com/docs/read/json/v10
+define("ROTTEN_KEY", "###");

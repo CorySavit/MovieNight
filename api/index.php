@@ -56,7 +56,7 @@ if ($request[0] == "movies") {
     // assume second parameter is id
 
     // get movie information
-    $movie = $db->query("select id, tmdb_id, title, description, mpaa_rating, poster, runtime, mn_rating, mn_rating_count
+    $movie = $db->query("select id, tmdb_id, rotten_id, title, description, mpaa_rating, poster, runtime, mn_rating, mn_rating_count
       from movies
       left join (
         select movie_id, sum(rating) as mn_rating, count(movie_id) as mn_rating_count
@@ -112,6 +112,13 @@ if ($request[0] == "movies") {
         'photo' => $tmdb->getProfileURL($member['profile_path'])
       ));
     }
+
+    // get rotten tomatoes rating
+    $rotten = new RottenTomatoes($movie['rotten_id']);
+    $movie['rotten_rating'] = array(
+      'critics' => $rotten->getCriticsRating(),
+      'audience' => $rotten->getAudienceRating()
+    );
 
     print json_encode($movie);
 

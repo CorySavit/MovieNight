@@ -39,6 +39,9 @@
     <string name="administrator">Administrator</string>
     <string name="invited">Invited</string>
     <string name="change">Change</string>
+    <string name="rotten_critic">Critics Tomatometer</string>
+    <string name="rotten_audience">Rotten Tomatoes Audience</string>
+    <string name="tmdb">The Movie Database</string>
     
     <string-array name="status_array">
         <item>@string/attending</item>
