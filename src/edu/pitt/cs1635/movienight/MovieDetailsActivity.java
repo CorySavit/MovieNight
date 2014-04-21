@@ -243,6 +243,7 @@ public class MovieDetailsActivity extends Activity {
 					percent.setText(movie.rottenAudience + "%");
 					break;
 				case R.string.tmdb:
+					percent.setText((long) Math.round(movie.tmdbRating * 10) + "%");
 					break;
 				}
 				

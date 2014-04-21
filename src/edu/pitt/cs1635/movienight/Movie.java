@@ -32,6 +32,7 @@ public class Movie implements Serializable {
 	static final String THEATERS = "theaters";
 	static final String CAST = "cast";
 	static final String ROTTEN_RATING = "rotten_rating";
+	static final String TMDB_RATING = "tmdb_rating";
 
 	int id;
 	int tmdbid;
@@ -43,6 +44,7 @@ public class Movie implements Serializable {
 	int mnRating;
 	int rottenCritic;
 	int rottenAudience;
+	double tmdbRating;
 	List<String> genres;
 	List<Event> events;
 	List<Theater> theaters;
@@ -61,6 +63,7 @@ public class Movie implements Serializable {
 		poster = JSON.getString(data, POSTER);
 		runtime = formatRuntime(JSON.getInt(data, RUNTIME));
 		mnRating = JSON.getInt(data, MN_RATING);
+		tmdbRating = JSON.getDouble(data, TMDB_RATING);
 		
 		JSONObject rottenRatings = JSON.getJSONObject(data, ROTTEN_RATING);
 		if (rottenRatings != null) {

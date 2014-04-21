@@ -51,6 +51,21 @@ public class JSON {
 		return 0;
 	}
 	
+	/*
+	 * getDouble
+	 */
+	
+	public static double getDouble(JSONObject data, String key) {
+		try {
+			if (data.has(key) && !data.isNull(key)) {
+				return data.getDouble(key);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+	
 	
 	/*
 	 * getJSONArray

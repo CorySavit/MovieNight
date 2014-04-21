@@ -102,8 +102,8 @@ if ($request[0] == "movies") {
     $movie['theaters'] = array_values($movie['theaters']);
 
     // get cast from TMDB
-    $tmdb = new TMDB();
-    $cast = $tmdb->getCast($movie['tmdb_id']);
+    $tmdb = new TMDB($movie['tmdb_id']);
+    $cast = $tmdb->getCast();
     $movie['cast'] = array();
     foreach ($cast as $member) {
       array_push($movie['cast'], array(
@@ -119,6 +119,9 @@ if ($request[0] == "movies") {
       'critics' => $rotten->getCriticsRating(),
       'audience' => $rotten->getAudienceRating()
     );
+
+    // get TMDB rating
+    $movie['tmdb_rating'] = $tmdb->getRating();
 
     print json_encode($movie);
 

@@ -19,14 +19,19 @@ class TMDB {
 			}
 
 			// if query and year are passed in
-			if (!is_null($query) && !is_null($year)) {
-				// search for movie based on query string and year
-				$result = $this->_call("search/movie", "query=".urlencode($query));
-				if (sizeof($result['results'])) {
-					$this->_movie = $this->_call("movie/".$result['results'][0]['id']);
+			if (!is_null($query)) {
+				if (!is_null($year)) {
+					// search for movie based on query string and year
+					$result = $this->_call("search/movie", "query=".urlencode($query));
+					if (sizeof($result['results'])) {
+						$this->_movie = $this->_call("movie/".$result['results'][0]['id']);
+					} else {
+						//echo "Unable to find movie.";
+						$this->_movie = null;
+					}
 				} else {
-					//echo "Unable to find movie.";
-					$this->_movie = null;
+					// if $year isn't passed in, $query is actualy ID
+					$this->_movie = $this->_call("movie/".$query);
 				}
 			}
 
@@ -111,7 +116,7 @@ class TMDB {
 
 		private function getCredits($id = null) {
 			if (!is_null($id) || $this->isMovieSet()) {
-				$id = !is_null($id) ? $id : $this->isMovieSet();
+				$id = is_null($id) ? $this->getTMDBId() : $id;
 				return $this->_call("movie/".$id."/credits");
 			}
 		}
