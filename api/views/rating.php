@@ -31,10 +31,11 @@ if ($rating['mn_count'] != 0) {
   <body>
     <div id="meter">
       <div class="circle"></div>
+      <div id="red" class="circle red"></div>
       <div id="fill" class="circle fill"></div>
       <div class="metric">
         <p id="percent" class="percent">0%</p>
-        <p class="label">friend rating</p>
+        <p class="label">from <?php echo ($rating['mn_count'] ? $rating['mn_count'] : '0').($rating['mn_count'] == 1 ? ' friend' : ' friends'); ?></p>
       </div>
     </div>
   </body>
@@ -46,6 +47,7 @@ if ($rating['mn_count'] != 0) {
     var rotate = <?php echo -1 * (1 - $percent) * 180; ?>;
     var $fill = $('#fill');
     var $percent = $('#percent');
+    var $redFill = $('#red');
 
     function fillMeter() {
       if (percent > 0) {
@@ -58,7 +60,10 @@ if ($rating['mn_count'] != 0) {
             $percent.text(parseInt(((now + 180) / (rotate + 180)) * percent * 100) + '%');
           }
         });
+
+        $redFill.fadeIn(1500);
       }
     }
+
   </script>
 </html>

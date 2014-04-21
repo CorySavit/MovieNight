@@ -41,10 +41,16 @@ html {
       width: $meter_size * 2;
     }
 
+    &.red {
+      display: none;
+      &:before {
+        border-color: #AD0000;
+      }
+    }
+
     &.fill {
       text-indent: -180px;
       -webkit-transform: rotate(-180deg);
-      //transition: all 2s;
       &:before {
         border-color: green;
       }

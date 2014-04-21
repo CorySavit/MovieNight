@@ -28,3 +28,6 @@ res/values/keys.xml
 
 # Project Properties
 project.properties
+
+# Compiled CSS Files
+views/css/*.css
