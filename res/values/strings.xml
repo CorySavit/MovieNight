@@ -42,6 +42,7 @@
     <string name="rotten_critic">Critics Tomatometer</string>
     <string name="rotten_audience">Rotten Tomatoes Audience</string>
     <string name="tmdb">The Movie Database</string>
+    <string name="no_public_events">No upcoming public events...</string>
     
     <string-array name="status_array">
         <item>@string/attending</item>

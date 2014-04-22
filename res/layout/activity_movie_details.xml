@@ -28,10 +28,44 @@
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent">
 				
-				<ListView
-			        android:id="@+id/events"
-			        android:layout_width="match_parent"
-			        android:layout_height="wrap_content" />
+				<LinearLayout
+				    android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:orientation="vertical" >
+				
+					<ListView
+				        android:id="@+id/events"
+				        android:layout_width="match_parent"
+				        android:layout_height="wrap_content" />
+					
+					<LinearLayout
+					    android:id="@+id/create_event_wrap"
+					    android:layout_width="match_parent"
+			        	android:layout_height="match_parent"
+			        	android:orientation="vertical"
+			        	android:gravity="center"
+			        	android:padding="@dimen/global_padding"
+			        	android:visibility="invisible" >
+			        	
+					    <TextView
+						    android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        style="@style/SubHeading"
+					        android:text="@string/no_public_events"
+					        android:textColor="@color/gray" />
+			        	
+					    <TextView
+						    android:id="@+id/create_event_button"
+						    android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:gravity="center_horizontal"
+					        style="@style/YellowButton"
+					        android:text="@string/create_event"
+					        android:layout_marginTop="@dimen/global_padding_small" />
+					    
+					</LinearLayout>
+					
+				</LinearLayout>
 				
 				<RelativeLayout 
 				    android:layout_width="match_parent"

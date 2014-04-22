@@ -70,9 +70,9 @@ public class MovieDetailsActivity extends Activity {
 
 		// create alert dialog
 		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
-		.setTitle(R.string.event_summary)
-		.setNegativeButton(R.string.cancel, null)
-		.setPositiveButton(R.string.create_event, new DialogInterface.OnClickListener() {
+			.setTitle(R.string.event_summary)
+			.setNegativeButton(R.string.cancel, null)
+			.setPositiveButton(R.string.create_event, new DialogInterface.OnClickListener() {
 
 			@Override
 			// called when user select 'Create Event'
@@ -142,6 +142,17 @@ public class MovieDetailsActivity extends Activity {
 		for (int index = 1; index < tabContent.getChildCount(); index++) {
 			tabContent.getChildAt(index).setVisibility(View.GONE);
 		}
+		
+		// listen for create event button clicks (when there are no featured events)
+		((TextView) findViewById(R.id.create_event_button)).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// switch to theaters tab
+				tabHost.setCurrentTab(1);
+			}
+
+		});
 
 		// create date picker dialog
 		Calendar c = Calendar.getInstance();
@@ -235,18 +246,25 @@ public class MovieDetailsActivity extends Activity {
 
 			// populate feature events listview
 			ListView events = (ListView) findViewById(R.id.events);
-			events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, movie.events));
-			events.setOnItemClickListener(new OnItemClickListener() {
+			if (movie.events.size() > 0) {
+				
+				events.setAdapter(new EventsAdapter(MovieDetailsActivity.this, movie.events));
+				events.setOnItemClickListener(new OnItemClickListener() {
 
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
-					intent.putExtra("movie", movie);
-					intent.putExtra("eventID", movie.events.get(position).id);
-					startActivity(intent);
-				}
+					@Override
+					public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+						Intent intent = new Intent(getApplicationContext(), EventDetailsActivity.class);
+						intent.putExtra("movie", movie);
+						intent.putExtra("eventID", movie.events.get(position).id);
+						startActivity(intent);
+					}
 
-			});
+				});
+				
+			} else {
+				// if there are no events, show "create events" button
+				findViewById(R.id.create_event_wrap).setVisibility(View.VISIBLE);
+			}
 
 			// populate theater listview
 			ListView theaters = (ListView) findViewById(R.id.theaters);
