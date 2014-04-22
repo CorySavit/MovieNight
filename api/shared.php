@@ -72,6 +72,31 @@ function get_genres($id) {
     where movie_id = ".$id.";")->fetchAll(PDO::FETCH_COLUMN);
 }
 
+function get_showtimes($id, $date = null) {
+  global $db;
+  $date = is_null($date) ? date("Y-m-d") : $date;
+
+  $theaters = $db->query("select s.id, time, flag, theater_id, name, address
+      from showtimes as s join theaters as t on theater_id = t.id
+      where movie_id = ".$id." and date(time) = date(".$db->quote($date).")
+      order by time asc;")->fetchAll(PDO::FETCH_ASSOC);
+
+  $result = array();
+  foreach ($theaters as $theater) {
+    if (array_key_exists($theater['theater_id'], $result)) {
+      array_push($result[$theater['theater_id']]['showtimes'], new Showtime($theater));
+    } else {
+      $result[$theater['theater_id']] = array(
+        'id' => $theater['theater_id'],
+        'name' => $theater['name'],
+        'address' => $theater['address'],
+        'showtimes' => array(new Showtime($theater))
+      );
+    }
+  }
+  return array_values($result);
+}
+
 // format a JSON response
 function formatResponse($array = array()) {
   global $db;

@@ -87,13 +87,7 @@ public class Movie implements Serializable {
 			}
 		}
 
-		theaters = new ArrayList<Theater>();
-		JSONArray myTheaters = JSON.getJSONArray(data, THEATERS);
-		if (myTheaters != null) {
-			for (int i = 0; i < myTheaters.length(); i++) {
-				theaters.add(new Theater(JSON.getJSONObject(myTheaters, i)));
-			}
-		}
+		setTheaters(JSON.getJSONArray(data, THEATERS));
 		
 		events = new ArrayList<Event>();
 		JSONArray myEvents = JSON.getJSONArray(data, EVENTS);
@@ -109,6 +103,15 @@ public class Movie implements Serializable {
 		int hours = time / 60;
 		int minutes = time % 60;
 		return (hours > 0 ? hours + " hr " : "") + minutes + " min";
+	}
+	
+	public void setTheaters(JSONArray myTheaters) {
+		this.theaters = new ArrayList<Theater>();
+		if (myTheaters != null) {
+			for (int i = 0; i < myTheaters.length(); i++) {
+				this.theaters.add(new Theater(JSON.getJSONObject(myTheaters, i)));
+			}
+		}
 	}
 	
 	/**

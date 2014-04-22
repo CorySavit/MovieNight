@@ -52,6 +52,12 @@ Below are a list of methods supported by the API. The response for all methods i
 	
 	**Response** {`id`}
 
+### /movies/{id}/showtimes
+
+* **GET** — returns list of showtimes for a given movie
+
+	**Request** {`date`} (defaults to today)
+
 ### /user
 
 * **POST** — create new user

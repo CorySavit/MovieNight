@@ -12,7 +12,15 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/global_padding"
         style="@style/Heading"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="4dp" />
+    
+    <TextView
+        android:id="@+id/address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/global_padding"
+        style="@style/SubHeading"
+        android:layout_marginBottom="12dp" />
     
     <HorizontalScrollView
         android:layout_width="wrap_content"

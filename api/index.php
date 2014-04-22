@@ -81,25 +81,8 @@ if ($request[0] == "movies") {
     get_guests($movie['events'], true);
 
     // get showtimes
-    $theaters = $db->query("select s.id, time, flag, theater_id, name, address
-      from showtimes as s join theaters as t on theater_id = t.id
-      where movie_id = ".$movie['id']." and date(time) = date(".$db->quote($date).")
-      order by time asc;")->fetchAll(PDO::FETCH_ASSOC);
-
-    $movie['theaters'] = array();
-    foreach ($theaters as $theater) {
-      if (array_key_exists($theater['theater_id'], $movie['theaters'])) {
-        array_push($movie['theaters'][$theater['theater_id']]['showtimes'], new Showtime($theater));
-      } else {
-        $movie['theaters'][$theater['theater_id']] = array(
-          'id' => $theater['theater_id'],
-          'name' => $theater['name'],
-          'address' => $theater['address'],
-          'showtimes' => array(new Showtime($theater))
-        );
-      }
-    }
-    $movie['theaters'] = array_values($movie['theaters']);
+    // @todo remove static date
+    $movie['theaters'] = get_showtimes($movie['id'], $date);
 
     // get cast from TMDB
     $tmdb = new TMDB($movie['tmdb_id']);
@@ -125,7 +108,7 @@ if ($request[0] == "movies") {
 
     print json_encode($movie);
 
-  } else if ($request[2] == 'rating') {
+  } else if ($request[2] == 'rating') { # /movies/{id}/rating
 
     if (array_key_exists('user_id', $_POST) && array_key_exists('rating', $_POST)) {
 
@@ -142,6 +125,12 @@ if ($request[0] == "movies") {
     } else {
       echo INVALID_REQUEST;
     }
+
+  } else if ($request[2] == 'showtimes') { # /movies/{id}/showtimes
+
+    // @todo change static date to date("Y-m-d")
+    $my_date = array_key_exists('date', $_GET) ? $_GET['date'] : $date;
+    echo json_encode(get_showtimes($request[1], $my_date));
 
   } else {
     echo INVALID_REQUEST;
