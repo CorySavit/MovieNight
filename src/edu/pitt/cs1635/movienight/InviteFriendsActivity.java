@@ -1,9 +1,13 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -24,28 +28,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class InviteFriendsActivity extends Activity {
 	
 	private Event event;
-	private ArrayList<User> originalFriendList;
-	private ArrayList<User> workingFriendList;
-	
+	private ArrayList<SelectableUser> originalFriendList;
+	private ArrayList<SelectableUser> workingFriendList;
 	private ListView friendView;
 	private EditText search;
 	private FriendAdapter friendAdapter;
+	private SessionManager session;
 	
 	// update friendList based on queried filter 
 	private void filter(String query) {
 		String q = query.toLowerCase();
 		workingFriendList.clear();
-		for (User friend : originalFriendList) {
+		for (SelectableUser friend : originalFriendList) {
 			if (query.length() == 0 || friend.name.toLowerCase().contains(q)) {
 				workingFriendList.add(friend);
 			}
@@ -57,21 +62,23 @@ public class InviteFriendsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_invite_friends);
 		
+		session = new SessionManager(this);
+		
 		// get intent data
 		Intent intent = getIntent();
 		event = (Event) intent.getSerializableExtra("data");
 		
 		// set listview and initialize data structures
 		friendView = (ListView) findViewById(R.id.users);
-		originalFriendList = new ArrayList<User>();
-		workingFriendList = new ArrayList<User>();
+		originalFriendList = new ArrayList<SelectableUser>();
+		workingFriendList = new ArrayList<SelectableUser>();
 		
 		// listen for list item clicks
 		friendView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				User selected = originalFriendList.get(position);
+				SelectableUser selected = originalFriendList.get(((SelectableUser) view.getTag()).order);
 				toggleUserItem(view, !selected.selected);
 				selected.toggle();
 			}
@@ -84,10 +91,9 @@ public class InviteFriendsActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				for (User friend : originalFriendList) {
+				for (SelectableUser friend : originalFriendList) {
 					if (friend.selected) {
-						// @todo probably shouldn't be casting friend
-						event.guests.add((Guest) friend);
+						event.guests.add(friend);
 					}
 				}
 				
@@ -121,8 +127,52 @@ public class InviteFriendsActivity extends Activity {
 			
 		});
 		
+		// create event
+		new CreateEvent().execute();
+		
 		// get our friends from the server
 		new GetFriends().execute();
+	}
+	
+	private class CreateEvent extends AsyncTask<Void, Void, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+		}
+
+		@Override
+		protected Integer doInBackground(Void... arg0) {
+			
+			// make call to API
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("showtime_id", Integer.toString(event.showtime.id)));
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String str = API.getInstance().post("events", params);
+
+			if (str != null) {
+				try {
+					JSONObject result = new JSONObject(str);
+					return result.getInt("success");
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL");
+			}
+
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Integer result) {
+			super.onPostExecute(result);
+			
+			// check for error?
+			
+  			Toast.makeText(InviteFriendsActivity.this, "Created event!", Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 	
 	/*
@@ -139,7 +189,9 @@ public class InviteFriendsActivity extends Activity {
 		protected Void doInBackground(Void... arg0) {
 			
 			// make call to API
-			String str = API.getInstance().get("friends");
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String str = API.getInstance().get("friends", params);
 
 			if (str != null) {
 				try {
@@ -148,7 +200,7 @@ public class InviteFriendsActivity extends Activity {
 
 					// loop through friends
 					for (int i = 0; i < friends.length(); i++) {
-						User user = new User(friends.getJSONObject(i));
+						SelectableUser user = new SelectableUser(friends.getJSONObject(i), i);
 						workingFriendList.add(user);
 					}
 					
@@ -166,8 +218,8 @@ public class InviteFriendsActivity extends Activity {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			
-			originalFriendList = (ArrayList<User>) workingFriendList.clone();
-			friendAdapter = new FriendAdapter(InviteFriendsActivity.this, R.id.users, workingFriendList);
+			originalFriendList = (ArrayList<SelectableUser>) workingFriendList.clone();
+			friendAdapter = new FriendAdapter(InviteFriendsActivity.this, workingFriendList);
 			friendView.setAdapter(friendAdapter);
 		}
 		
@@ -176,15 +228,14 @@ public class InviteFriendsActivity extends Activity {
 	/*
 	 * Used to populate the ListView of friends
 	 */
-	private class FriendAdapter extends ArrayAdapter<User> {
+	private class FriendAdapter extends BaseAdapter {
 		
-		private ArrayList<User> friends;
+		private List<SelectableUser> friends;
 	    private LayoutInflater inflater = null;
 	    private ImageLoader imageLoader;
 	    private DisplayImageOptions imageOptions;
 	    
-	    public FriendAdapter(Context context, int textViewResourceId, ArrayList<User> friends) {
-			super(context, textViewResourceId, friends);
+	    public FriendAdapter(Context context, List<SelectableUser> friends) {
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			this.friends = friends;
 			imageLoader = ImageLoader.getInstance();
@@ -196,6 +247,21 @@ public class InviteFriendsActivity extends Activity {
 	        	.cacheOnDisc(true)
 	        	.build();
 		}
+	    
+	    @Override
+		public int getCount() {
+			return friends.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return friends.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
 	 
 	    // this method is called for every item in the listview
 	    public View getView(int position, View convertView, ViewGroup parent) {
@@ -206,7 +272,7 @@ public class InviteFriendsActivity extends Activity {
 	        	view = inflater.inflate(R.layout.user_item, null);
 	        }
 	        
-	        User friend = friends.get(position);
+	        SelectableUser friend = friends.get(position);
 	        
 	        // set title
 	        TextView name = (TextView) view.findViewById(R.id.name);
@@ -243,7 +309,6 @@ public class InviteFriendsActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.invite_friends, menu);
 		return true;
 	}

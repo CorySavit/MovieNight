@@ -30,4 +30,4 @@ res/values/keys.xml
 project.properties
 
 # Compiled CSS Files
-views/css/*.css
+api/views/css/*.css

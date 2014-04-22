@@ -48,6 +48,7 @@ public class MovieDetailsActivity extends Activity {
 	private Theater myTheater;
 	private Showtime myShowtime;
 	private WebView ratingMeter;
+	private SessionManager session;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class MovieDetailsActivity extends Activity {
 		setContentView(R.layout.activity_movie_details);
 		
 		inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		session = new SessionManager(this);
 
 		// create alert dialog
 		confirmBuilder = new AlertDialog.Builder(MovieDetailsActivity.this)
@@ -328,11 +330,15 @@ public class MovieDetailsActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
-						// @todo this is most likely not how you do this
-						myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag(R.id.TAG_THEATER));
-						myShowtime = (Showtime) v.getTag();
-						Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
-						confirmBuilder.setMessage(message).create().show();
+						if (session.isLoggedIn()) {
+							// @todo this is most likely not how you do this
+							myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag(R.id.TAG_THEATER));
+							myShowtime = (Showtime) v.getTag();
+							Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
+							confirmBuilder.setMessage(message).create().show();
+						} else {
+							session.showLoginSignupDialog();
+						}
 					}
 
 				});

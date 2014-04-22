@@ -12,10 +12,8 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -28,15 +26,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
@@ -59,7 +53,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		//get session instance
-		session = SessionManager.getInstance(getApplicationContext());
+		session = new SessionManager(this);
 		//get preferences (Location)
 		settings = getPreferences(MODE_PRIVATE);
 		
@@ -162,77 +156,12 @@ public class MainActivity extends Activity {
 		switch (item.getItemId()) {
 		case R.id.action_profile:
 			
-			
-			if(!session.isLoggedIn()){
-				
-				LayoutInflater factory = LayoutInflater.from(this);           
-		  	    final View signInOutView = factory.inflate(R.layout.dialog_signin_signout, null);
-		  	    
-		  	    AlertDialog.Builder alert = new AlertDialog.Builder(this);
-		  	    alert.setView(signInOutView);
-		  	    Button login = (Button) signInOutView.findViewById(R.id.login_btn);
-		  	    Button signup = (Button) signInOutView.findViewById(R.id.signup_btn);
-		  	    final AlertDialog loginDialog = alert.create();
-		  	    
-		  	    login.setOnClickListener(new OnClickListener(){
-
-					@Override
-					public void onClick(View v) {
-						loginDialog.dismiss();
-						AlertDialog alert = session.loginDialog(MainActivity.this);
-						alert.show();
-					}
-		  	    	
-		  	    });
-		  	    
-		  	  signup.setOnClickListener(new OnClickListener(){
-
-					@Override
-					public void onClick(View v) {
-						loginDialog.dismiss();
-						AlertDialog alert = session.signupDialog(MainActivity.this);
-						alert.show();
-					}
-			    	
-			    });
-		  	  
-		  	  loginDialog.show();
-/*
-				
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-				alertDialogBuilder.setTitle("Sign In / Sign Out");
-	 
-				// set dialog message
-				alertDialogBuilder
-				
-					.setPositiveButton("Sign In",new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,int id) {
-							// if this button is clicked, close
-							// current activity
-							Log.d("SignInClicked", "True");
-							dialog.cancel();
-							AlertDialog alert = session.loginDialog(MainActivity.this);
-							alert.show();
-						}
-					  })
-					.setNegativeButton("Sign Up",new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,int id) {
-							Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
-							startActivity(intent);
-
-						}
-					});
-	 
-					// create alert dialog
-					AlertDialog alertDialog = alertDialogBuilder.create();
-	 
-					// show it
-					alertDialog.show();
-			*/
+			if (!session.isLoggedIn()){
+				session.showLoginSignupDialog();
 			} else {
-			Intent profileView = new Intent(this, Profile.class);
-			startActivity(profileView);
-			return true;
+				Intent profileView = new Intent(this, Profile.class);
+				startActivity(profileView);
+				return true;
 			}
 
 		default:

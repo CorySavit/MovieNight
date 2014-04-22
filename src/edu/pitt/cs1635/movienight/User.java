@@ -6,13 +6,19 @@ import org.json.JSONObject;
 
 public class User extends Person implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
+	static final int STATUS_ADMIN = 1;
+	static final int STATUS_ACCEPTED = 2;
+	static final int STATUS_INVITED = 3;
+	static final int STATUS_DECLINED = 4;
 
 	// JSON keys
 	static final String EMAIL = "email";
+	static final String STATUS = "status";
 
 	// object variables
 	String email;
-	boolean selected;
+	int status;
 
 	public User(JSONObject data) {
 		super(data);
@@ -21,17 +27,7 @@ public class User extends Person implements Serializable {
 		if (data == null) {return;}
 				
 		email = JSON.getString(data, EMAIL);
-		selected = false;
+		status = JSON.getInt(data, STATUS);
 	}
-	
-	// toggle selected state
-	public void toggle() {
-		if (selected) {
-			selected = false;
-		} else {
-			selected = true;
-		}
-	}
-
 }
 

@@ -28,7 +28,7 @@ public class Event implements Serializable {
 	Showtime showtime;
 	User admin;
 	int status;
-	List<Guest> guests;
+	List<User> guests;
 
 	public Event(JSONObject data) {
 		id = JSON.getInt(data, ID);
@@ -36,7 +36,7 @@ public class Event implements Serializable {
 		admin = new User(JSON.getJSONObject(data, ADMIN));
 		status = JSON.getInt(data, STATUS);
 		
-		guests = new ArrayList<Guest>();
+		guests = new ArrayList<User>();
 		JSONArray myGuests = JSON.getJSONArray(data, GUESTS);
 		if (myGuests != null) {
 			for (int i = 0; i < myGuests.length(); i++) {
@@ -50,7 +50,7 @@ public class Event implements Serializable {
 		this.showtime = showtime;
 		admin = null; // @todo pass in or get current user
 		status = STATUS_ADMIN; // @todo revisit this default value
-		this.guests = new ArrayList<Guest>();
+		this.guests = new ArrayList<User>();
 	}
 	
 	public Event(JSONObject data, Showtime showtime) {

@@ -57,7 +57,7 @@ public class EventDetailsActivity extends Activity {
 		setContentView(R.layout.activity_event_details);
 		
 		inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		session = SessionManager.getInstance(getApplicationContext());
+		session = new SessionManager(this);
 		
 		// getting intent data
 		Intent intent = getIntent();
@@ -132,7 +132,12 @@ public class EventDetailsActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				statusBuilder.create().show();
+				if (session.isLoggedIn()) {
+					statusBuilder.create().show();
+				} else {
+					// @todo after logging in, the activity should ideally refresh
+					session.showLoginSignupDialog();
+				}
 			}
 
 		});

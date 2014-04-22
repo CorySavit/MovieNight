@@ -149,7 +149,24 @@ if ($request[0] == "movies") {
   
 } else if ($request[0] == "friends") {
 
-  print json_encode(getUsers());
+  if (array_key_exists('user_id', $_GET)) {
+
+    echo json_encode($db->query("select friend_id as id, concat(u.first_name, ' ', u.last_name) as name, u.photo
+      from (
+        select friend_id
+        from friends
+        where user_id = ".$_GET['user_id']."
+        union
+        select user_id
+        from friends
+        where friend_id = ".$_GET['user_id']."
+      ) as f
+      join users as u on f.friend_id = u.id
+      order by u.first_name;")->fetchAll(PDO::FETCH_ASSOC));
+
+  } else {
+    echo INVALID_REQUEST;
+  }
 
 } else if ($request[0] == "events") {
 

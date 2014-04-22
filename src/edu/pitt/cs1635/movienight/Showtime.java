@@ -8,8 +8,6 @@ import java.util.Locale;
 
 import org.json.JSONObject;
 
-import android.util.Log;
-
 public class Showtime implements Serializable {
 	private static final long serialVersionUID = 1L;
 
