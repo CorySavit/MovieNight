@@ -34,7 +34,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class InviteFriendsActivity extends Activity {
 	
@@ -153,7 +152,7 @@ public class InviteFriendsActivity extends Activity {
 			if (str != null) {
 				try {
 					JSONObject result = new JSONObject(str);
-					return result.getInt("success");
+					return result.getInt("id");
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -165,12 +164,9 @@ public class InviteFriendsActivity extends Activity {
 		}
 		
 		@Override
-		protected void onPostExecute(Integer result) {
-			super.onPostExecute(result);
-			
-			// check for error?
-			
-  			Toast.makeText(InviteFriendsActivity.this, "Created event!", Toast.LENGTH_SHORT).show();
+		protected void onPostExecute(Integer id) {
+			super.onPostExecute(id);
+			event.id = id;
 		}
 		
 	}

@@ -45,8 +45,7 @@ public class Event implements Serializable {
 		}
 	}
 	
-	public Event(Movie movie, Theater theater, Showtime showtime) {
-		id = 0; // get next ID from server
+	public Event(Showtime showtime) {
 		this.showtime = showtime;
 		admin = null; // @todo pass in or get current user
 		status = STATUS_ADMIN; // @todo revisit this default value

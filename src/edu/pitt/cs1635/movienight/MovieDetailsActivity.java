@@ -45,7 +45,6 @@ public class MovieDetailsActivity extends Activity {
 	private ImageLoader imageLoader;
 	private AlertDialog.Builder confirmBuilder;
 	private Movie movie;
-	private Theater myTheater;
 	private Showtime myShowtime;
 	private WebView ratingMeter;
 	private SessionManager session;
@@ -71,7 +70,7 @@ public class MovieDetailsActivity extends Activity {
 					Intent intent = new Intent(getApplicationContext(), InviteFriendsActivity.class);
 	
 					// keep track of what the user has selected
-					intent.putExtra("data", new Event(movie, myTheater, myShowtime));
+					intent.putExtra("data", new Event(myShowtime));
 	
 					// start invite friends activity
 					startActivity(intent);
@@ -86,8 +85,7 @@ public class MovieDetailsActivity extends Activity {
 		// set header content
 		movie.setHeader(this);
 
-		// these will be set when user makes a choice
-		myTheater = null;
+		// this will be set when user makes a choice
 		myShowtime = null;
 		
 		imageLoader = ImageLoader.getInstance();
@@ -332,8 +330,10 @@ public class MovieDetailsActivity extends Activity {
 					public void onClick(View v) {
 						if (session.isLoggedIn()) {
 							// @todo this is most likely not how you do this
-							myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag(R.id.TAG_THEATER));
+							Theater myTheater = ((Theater) ((LinearLayout) v.getParent().getParent().getParent().getParent()).getTag(R.id.TAG_THEATER));
 							myShowtime = (Showtime) v.getTag();
+							myShowtime.movie = movie;
+							myShowtime.theater = myTheater;
 							Spanned message = Html.fromHtml("You are about to create a MovieNight for <b>" + movie.title + "</b> at <b>" + myTheater.name + "</b> on <b>" + myShowtime.getDate() + "</b> at <b>" + myShowtime + ".");
 							confirmBuilder.setMessage(message).create().show();
 						} else {

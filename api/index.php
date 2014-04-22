@@ -182,7 +182,8 @@ if ($request[0] == "movies") {
             join events as e on event_id = e.id
             join showtimes as s on e.showtime_id = s.id
             join movies as m on movie_id = m.id
-            where user_id = ".$_GET['user_id'].";")->fetchAll(PDO::FETCH_ASSOC);
+            where user_id = ".$_GET['user_id']."
+            order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
           // get guests who are attending
           get_guests($events, true);
@@ -206,7 +207,7 @@ if ($request[0] == "movies") {
         $db->insert('users2events', array(
           'user_id' => $_POST['user_id'],
           'event_id' => $id,
-          'status' => 2
+          'status' => STATUS_ADMIN
         ));
 
         echo formatResponse(array(
@@ -225,13 +226,22 @@ if ($request[0] == "movies") {
       case 'GET': # /events/{id}
 
         if (array_key_exists('user_id', $_GET)) {
-          $event = $db->query("select e.id, s.time, s.flag, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
+          $event = $db->query("select e.id, s.time, s.flag, s.movie_id, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
             from events as e
             join showtimes as s on showtime_id = s.id
             join theaters as t on s.theater_id = t.id
             join users as u on e.admin_id = u.id
             left join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
             where e.id = ".$request[1].";")->fetch(PDO::FETCH_ASSOC);
+
+          // get movie information (for header)
+          $event['movie'] = $db->get('movies', array(
+            'title',
+            'mpaa_rating',
+            'runtime',
+            'poster'
+          ), array('id' => $event['movie_id']));
+          $event['movie']['genres'] = get_genres($event['movie_id']);
 
           // get all guests
           $guests = get_guests($event);
@@ -263,7 +273,7 @@ if ($request[0] == "movies") {
         $id = $db->insert('users2events', array(
           'user_id' => $_POST['user_id'],
           'event_id' => $request[1],
-          'status' => $_POST['status']
+          'status' => (array_key_exists('status', $_POST) ? $_POST['status'] : 0)
         ));
 
         echo formatResponse(array(

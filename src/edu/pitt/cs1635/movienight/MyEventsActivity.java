@@ -1,9 +1,14 @@
 package edu.pitt.cs1635.movienight;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,7 +21,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,28 +30,31 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class MyEventsActivity extends Activity {
 	
-	private ArrayList<Event> events;
+	private Event newEvent;
 	private EventAdapter eventAdapter;
 	private ListView eventsView;
+	private SessionManager session;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my_events);
 		
-		// get intent data
-		Intent intent = getIntent();
-		events = new ArrayList<Event>();
+		session = new SessionManager(this);
 		
-		// @todo we will eventually need to post this to the server as well
-		// @todo we need to make sure we are sorting these events by date (this might not be the next event)
-		events.add((Event) intent.getSerializableExtra("data"));
-		
-		// display toast notification
-		Toast.makeText(getApplicationContext(), "Created " + events.get(0).showtime.movie.title + " MovieNight!", Toast.LENGTH_LONG).show();
-		
-		// get the rest of my events
 		new GetEvents().execute();
+		
+		// check to see if we are adding event
+		Intent intent = getIntent();
+		newEvent = (Event) intent.getSerializableExtra("data");
+		if (newEvent != null) {
+			Toast.makeText(getApplicationContext(), "Created " + newEvent.showtime.movie.title + " MovieNight!", Toast.LENGTH_LONG).show();
+			User[] guests = new User[newEvent.guests.size()];
+			for (int i = 0; i < newEvent.guests.size(); i++) {
+				guests[i] = newEvent.guests.get(i);
+			}
+			new AddGuests().execute(guests);
+		}
 	}
 
 	@Override
@@ -60,7 +68,7 @@ public class MyEventsActivity extends Activity {
 	/*
 	 * Asynchronous background task that fetches a list of my events from the API 
 	 */
-	private class GetEvents extends AsyncTask<Void, Void, Void> {
+	private class GetEvents extends AsyncTask<Void, Void, JSONArray> {
 
 		@Override
 		protected void onPreExecute() {
@@ -68,22 +76,17 @@ public class MyEventsActivity extends Activity {
 		}
 
 		@Override
-		protected Void doInBackground(Void... arg0) {
+		protected JSONArray doInBackground(Void... arg0) {
 			
 			// make call to API
-			String str = API.getInstance().get("events");
-			System.out.println(str);
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String str = API.getInstance().get("events", params);
 
 			if (str != null) {
 				try {
 					// parse result to a JSON Array
-					JSONArray data = new JSONArray(str);
-
-					// loop through friends
-					for (int i = 0; i < data.length(); i++) {
-						Event event = new Event(data.getJSONObject(i));
-						events.add(event);
-					}
+					return new JSONArray(str);
 					
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -96,20 +99,20 @@ public class MyEventsActivity extends Activity {
 		}
 		
 		@Override
-		protected void onPostExecute(Void result) {
+		protected void onPostExecute(JSONArray result) {
 			super.onPostExecute(result);
 			
 			eventsView = (ListView) findViewById(R.id.events);
-			eventAdapter = new EventAdapter(MyEventsActivity.this, R.layout.event_item, events);
+			eventAdapter = new EventAdapter(MyEventsActivity.this, result);
 			eventsView.setAdapter(eventAdapter);
 			
 			eventsView.setOnItemClickListener(new OnItemClickListener() {
 
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					//Intent intent = new Intent(view.getContext(), EventDetailsActivity.class);
-					//intent.putExtra("data", events.get(position));
-					//startActivity(intent);
+					Intent intent = new Intent(view.getContext(), EventDetailsActivity.class);
+					intent.putExtra("eventID", (Integer) view.getTag());
+					startActivity(intent);
 				}
 				
 			});
@@ -117,19 +120,55 @@ public class MyEventsActivity extends Activity {
 		
 	}
 	
+	private class AddGuests extends AsyncTask<User, Void, Void> {
+
+		@Override
+		protected Void doInBackground(User... users) {
+			
+			for (int i = 0; i < users.length; i++) {
+				List<NameValuePair> params = new ArrayList<NameValuePair>();
+				params.add(new BasicNameValuePair("user_id", Integer.toString(users[i].id)));
+				params.add(new BasicNameValuePair("status", Integer.toString(Guest.STATUS_INVITED)));
+				API.getInstance().post("events/" + newEvent.id, params);
+				// @todo catch error?
+			}
+			return null;
+			
+		}
+		
+	}
+	
 	/*
 	 * Used to populate the ListView of friends
 	 */
-	private class EventAdapter extends ArrayAdapter<Event> {
+	private class EventAdapter extends BaseAdapter {
 		
-		private ArrayList<Event> events;
+		private JSONArray events;
 	    private LayoutInflater inflater = null;
 	    
-	    public EventAdapter(Context context, int textViewResourceId, ArrayList<Event> list) {
-			super(context, textViewResourceId, list);
+	    public EventAdapter(Context context, JSONArray events) {
 			inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			// @todo we could probably just use the class-scope events list
-			events = list;
+			this.events = events;
+		}
+	    
+	    @Override
+		public int getCount() {
+			return events.length();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			try {
+				return events.getJSONObject(position);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
 		}
 	 
 	    // this method is called for every item in the listview
@@ -141,35 +180,43 @@ public class MyEventsActivity extends Activity {
 	        	view = inflater.inflate(R.layout.event_item, null);
 	        }
 	        
-	        Event event = events.get(position);
+	        JSONObject event = (JSONObject) getItem(position);
 	        
-	        // set title
-	        TextView title = (TextView) view.findViewById(R.id.title);
-	        title.setText(event.showtime.movie.title);
+	        try {
 	        
-	        // set subtitle
-	        TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
-	        int num = event.guests.size();
-	        subtitle.setText("with " + event.guests.size() + " friend" + (num == 1 ? "" : "s") + " on " + event.showtime.getDate() + " at " + event.showtime);
-	        
-	        // set status icon
-	        ImageView status = (ImageView) view.findViewById(R.id.status);
-	        switch(event.status) {
-	        	case Event.STATUS_DECLINED:
-	        		status.setImageResource(R.drawable.status_declined);
-	        		title.setTextColor(getResources().getColor(R.color.gray));
-	        		subtitle.setTextColor(getResources().getColor(R.color.gray));
-	        		break;
-	        	case Event.STATUS_INVITED:
-	        		status.setImageResource(R.drawable.status_invited);
-	        		break;
-	        	default:
-	        		status.setImageResource(R.drawable.status_accepted);
-	        		break;
-	        }
-	        
-	        // set this view's tag to the entire data object
-	        view.setTag(event);
+		        // set title
+		        TextView title = (TextView) view.findViewById(R.id.title);
+		        title.setText(event.getString(Movie.TITLE));
+		        
+		        // set subtitle
+		        TextView subtitle = (TextView) view.findViewById(R.id.subtitle);
+		        JSONArray guests = event.getJSONArray(Event.GUESTS);
+		        int num = guests.length();
+		        Date time = Showtime.parseDate(event.getString(Showtime.TIME));
+		        subtitle.setText("with " + num + " friend" + (num == 1 ? "" : "s") + " on " + Showtime.getDate(time) + " at " + Showtime.getTime(time));
+		        
+		        // set status icon
+		        ImageView status = (ImageView) view.findViewById(R.id.status);
+		        switch(event.getInt(Event.STATUS)) {
+		        	case Event.STATUS_DECLINED:
+		        		status.setImageResource(R.drawable.status_declined);
+		        		title.setTextColor(getResources().getColor(R.color.gray));
+		        		subtitle.setTextColor(getResources().getColor(R.color.gray));
+		        		break;
+		        	case Event.STATUS_INVITED:
+		        		status.setImageResource(R.drawable.status_invited);
+		        		break;
+		        	default:
+		        		status.setImageResource(R.drawable.status_accepted);
+		        		break;
+		        }
+		        
+		        // set this view's tag to the entire data object
+		        view.setTag(event.getInt(Event.ID));
+		        
+	        } catch (JSONException e) {
+				e.printStackTrace();
+			}
 	        
 	        return view;
 	    }

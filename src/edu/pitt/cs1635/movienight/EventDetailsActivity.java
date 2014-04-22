@@ -65,7 +65,9 @@ public class EventDetailsActivity extends Activity {
 		eventID = intent.getIntExtra("eventID", -1);
 		
 		// set header content
-		movie.setHeader(this);
+		if (movie != null) {
+			movie.setHeader(this);
+		}
 		
 		/*
 		 * Setup tabs
@@ -219,6 +221,15 @@ public class EventDetailsActivity extends Activity {
 			super.onPostExecute(result);
 			
 			/*
+			 * Move header
+			 */
+			
+			if (movie == null) {
+				movie = new Movie(JSON.getJSONObject(result, "movie"));
+				movie.setHeader(EventDetailsActivity.this);
+			}
+			
+			/*
 			 * Event information tab
 			 */
 			
@@ -256,7 +267,7 @@ public class EventDetailsActivity extends Activity {
 			try {
 				// add status categories and guests to a data structure
 				JSONObject statusList = result.getJSONObject("guests");
-				int[] statusID = {Guest.STATUS_ACCEPTED, Guest.STATUS_INVITED, Guest.STATUS_INVITED};
+				int[] statusID = {Guest.STATUS_ACCEPTED, Guest.STATUS_INVITED, Guest.STATUS_DECLINED};
 				int[] statusLabels = {R.string.attending, R.string.invited, R.string.declined};
 				Map<String, List<Guest>> guestMap = new HashMap<String, List<Guest>>();
 				for (int i = 0; i < statusID.length; i++) {

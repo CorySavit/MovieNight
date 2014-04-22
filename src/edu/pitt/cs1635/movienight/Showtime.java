@@ -32,34 +32,50 @@ public class Showtime implements Serializable {
 	int flag;
 	String ticketURL;
 
-	private SimpleDateFormat inputFormat;
+	private static SimpleDateFormat inputFormat;
 
 	public Showtime(JSONObject data) {
+		// parse time
+		inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
+		time = parseDate(JSON.getString(data, TIME));
+		
+		id = JSON.getInt(data, ID);
+		flag = JSON.getInt(data, FLAG);
+		ticketURL = JSON.getString(data, TICKET_URL);
+		
+		// @todo this is tailored for movie/event details featured events tab right now
+		theater = new Theater(JSON.getInt(data, THEATER_ID), JSON.getString(data, THEATER_NAME), JSON.getString(data, THEATER_ADDRESS));
+	}
+	
+	public static Date parseDate(String date) {
 		try {
-			// parse time
-			inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
-			time = inputFormat.parse(JSON.getString(data, TIME));
-			
-			id = JSON.getInt(data, ID);
-			flag = JSON.getInt(data, FLAG);
-			ticketURL = JSON.getString(data, TICKET_URL);
-			
-			// @todo this is tailored for movie/event details featured events tab right now
-			theater = new Theater(JSON.getInt(data, THEATER_ID), JSON.getString(data, THEATER_NAME), JSON.getString(data, THEATER_ADDRESS));
-
+			return inputFormat.parse(date);
 		} catch (ParseException e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
 	
 	public String getDate() {
+		return getDate(time);
+	}
+	
+	public static String getDate(Date time) {
 		SimpleDateFormat fmt = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
 		return fmt.format(time);
 	}
 	
-	public String toString() {
+	public String getTime() {
+		return getTime(time);
+	}
+	
+	public static String getTime(Date time) {
 		SimpleDateFormat fmt = new SimpleDateFormat("h:mm a", Locale.US);
-		String result = fmt.format(time);
+		return fmt.format(time);
+	}
+	
+	public String toString() {
+		String result = getTime();
 		switch(flag) {
 			case FLAG_3D:
 				result += " (3D)";
