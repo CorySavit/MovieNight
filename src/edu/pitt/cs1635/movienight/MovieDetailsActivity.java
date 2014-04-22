@@ -22,6 +22,7 @@ import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -59,6 +60,7 @@ public class MovieDetailsActivity extends Activity {
 	private WebView ratingMeter;
 	private SessionManager session;
 	private DatePickerDialog datePickerDialog;
+	private ProgressDialog progressDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -216,6 +218,16 @@ public class MovieDetailsActivity extends Activity {
 	 * Asynchronous background task that fetches movie details from the API 
 	 */
 	private class GetMovieInfo extends AsyncTask<Void, Void, Void> {
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			progressDialog = new ProgressDialog(MovieDetailsActivity.this);
+			progressDialog.setMessage("Popping popcorn...");
+			progressDialog.setCancelable(false);
+			progressDialog.show();
+		}
 
 		@Override
 		protected Void doInBackground(Void... arg0) {
@@ -324,6 +336,9 @@ public class MovieDetailsActivity extends Activity {
 
 				// add rating to parent view
 				externalRatings.addView(rating);
+				
+				// dismiss loading dialog
+				progressDialog.dismiss();
 			}
 		}
 
