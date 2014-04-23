@@ -43,15 +43,17 @@
     <string name="rotten_audience">Rotten Tomatoes Audience</string>
     <string name="tmdb">The Movie Database</string>
     <string name="no_public_events">No upcoming public events...</string>
-    
+    <string name="search">Search</string>
+    <string name="search_users">Search Users</string>
+
     <string-array name="status_array">
         <item>@string/attending</item>
         <item>@string/maybe</item>
         <item>@string/declined</item>
     </string-array>
-    
-    <item type="id" name="TAG_VIEW_HOLDER"></item>
-    <item type="id" name="TAG_EVENT"></item>
-    <item type="id" name="TAG_THEATER"></item>
+
+    <item name="TAG_VIEW_HOLDER" type="id"></item>
+    <item name="TAG_EVENT" type="id"></item>
+    <item name="TAG_THEATER" type="id"></item>
 
 </resources>

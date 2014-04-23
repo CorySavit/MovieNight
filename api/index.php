@@ -394,7 +394,37 @@ if ($request[0] == "movies") {
       default:
         echo INVALID_REQUEST;
     }
-  } else  {
+  } else if ($request[1] == 'search') {
+
+    switch ($request_type) {
+      case 'GET': # /user/search
+
+        if (array_key_exists('user_id', $_GET)) {
+
+          $where = '';
+          if (array_key_exists('q', $_GET) && $_GET['q'] != '') {
+            $where = " and (first_name like ".$db->quote($_GET['q'].'%')." or last_name like ".$db->quote($_GET['q'].'%').")";
+          }
+
+          // search for users
+          $data = $db->query("select id, concat(first_name, ' ', last_name) as name, photo
+            from users
+            where id <> ".$_GET['user_id'].$where.";")->fetchAll(PDO::FETCH_ASSOC);
+          
+          echo json_encode($data);
+
+        } else {
+          echo INVALID_REQUEST;
+        }
+
+        break;
+
+        default:
+          echo INVALID_REQUEST;
+
+    }
+
+  } else {
     // otherwise assume $request[1] is user id
 
     switch ($request_type) {
