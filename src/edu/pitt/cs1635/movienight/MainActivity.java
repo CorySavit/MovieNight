@@ -176,13 +176,14 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onStop(){
 		super.onStop();
-		
 		// save location when the app stops
-		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(SessionManager.LOCATION, locationString);
-		editor.putFloat(SessionManager.LAT, new Float(latitude));
-		editor.putFloat(SessionManager.LNG, new Float(longitude));
-		editor.commit();
+		if (latitude != null && longitude != null) {
+			SharedPreferences.Editor editor = settings.edit();
+			editor.putString(SessionManager.LOCATION, locationString);
+			editor.putFloat(SessionManager.LAT, new Float(latitude));
+			editor.putFloat(SessionManager.LNG, new Float(longitude));
+			editor.commit();
+		}
 	}
 
 	@Override
