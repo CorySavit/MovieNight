@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	
+	<item android:id="@+id/action_friend"
+	    android:icon="@drawable/ic_action_add_person"
+		android:title="@string/unfriend"
+		android:showAsAction="always"
+		android:visible="false" />
+	
+	<item android:id="@+id/action_unfriend"
+		android:title="@string/unfriend"
+		android:showAsAction="never"
+		android:visible="false" />
+	
+	<item android:id="@+id/action_edit_profile"
+		android:title="@string/edit_profile"
+		android:showAsAction="never"
+		android:visible="false" />
+	
+	<item android:id="@+id/action_logout"
+		android:title="@string/logout"
+		android:showAsAction="never"
+		android:visible="false" />
+	
+</menu>

@@ -494,12 +494,12 @@ public class MovieDetailsActivity extends Activity {
 			events = data;
 			inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			imageOptions = new DisplayImageOptions.Builder()
-			.showImageOnLoading(R.drawable.blank_profile)
-			.showImageForEmptyUri(R.drawable.blank_profile)
-			.showImageOnFail(R.drawable.blank_profile)
-			.cacheInMemory(true)
-			.cacheOnDisc(true)
-			.build();
+				.showImageOnLoading(R.drawable.blank_profile)
+				.showImageForEmptyUri(R.drawable.blank_profile)
+				.showImageOnFail(R.drawable.blank_profile)
+				.cacheInMemory(true)
+				.cacheOnDisc(true)
+				.build();
 		}
 
 		@Override

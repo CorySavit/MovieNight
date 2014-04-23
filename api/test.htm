@@ -65,12 +65,20 @@
       <input type="hidden" name="user_id" value="1"/>
       <input type="submit" value="Submit"/>
     </form>
-
     testrating 
     <form action="movies/1/rating" method="post">
       <input type="text" name="user_id" placeholder="user_id" />
       <input type="text" name="rating" placeholder="rating" />
       <input type="submit" value="Submit" />
+    friend
+    <form action="user/1/friend" method="post">
+      <input type="text" name="user_id" placeholder="user id" />
+      <input type="submit" value="Submit"/>
+    </form>
+    unfriend
+    <form action="user/1/unfriend" method="post">
+      <input type="text" name="user_id" placeholder="user id" />
+      <input type="submit" value="Submit"/>
     </form>
   </body>
 </html>

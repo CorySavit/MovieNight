@@ -15,6 +15,7 @@ import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -54,7 +55,9 @@ public class SearchActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				// open profile
+				Intent intent = new Intent(getApplicationContext(), Profile.class);
+				intent.putExtra(Profile.USER_ID, ((User) view.getTag()).id);
+				startActivity(intent);
 			}
 			
 		});
