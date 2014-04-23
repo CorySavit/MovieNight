@@ -66,6 +66,7 @@ public class EventDetailsActivity extends Activity {
 		Intent intent = getIntent();
 		movie = (Movie) intent.getSerializableExtra("movie");
 		eventID = intent.getIntExtra("eventID", -1);
+		messages = new ArrayList<Message>();
 		
 		// set header content
 		if (movie != null) {
@@ -328,14 +329,14 @@ public class EventDetailsActivity extends Activity {
 					
 
 					// loop through movies
-					for (int i = 0; i < result.length()-1; i++) {					
+					for (int i = 0; i < result.length(); i++) {					
 						// create messages object from JSON data and add to list
 						if (result.get(i) instanceof JSONObject) {
 							
 							Message temp = new Message(result.getJSONObject(i));
 							Log.d("WHATEVER", temp.toString());
-							//RIGHT HERE !! NULL POINTER! WHY?!
 							messages.add(temp);
+							
 						}
 					}
 					
