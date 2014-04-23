@@ -128,7 +128,6 @@ public class MyEventsActivity extends Activity {
 			for (int i = 0; i < users.length; i++) {
 				List<NameValuePair> params = new ArrayList<NameValuePair>();
 				params.add(new BasicNameValuePair("user_id", Integer.toString(users[i].id)));
-				params.add(new BasicNameValuePair("status", Integer.toString(Guest.STATUS_INVITED)));
 				API.getInstance().post("events/" + newEvent.id, params);
 				// @todo catch error?
 			}

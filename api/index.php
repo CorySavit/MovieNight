@@ -290,7 +290,7 @@ if ($request[0] == "movies") {
               STATUS_DECLINED => array(),
             );
             foreach ($guests as $guest) {
-              $index = $guest['status'];
+              $index = $guest['status'] == 0 ? STATUS_INVITED : $guest['status'];
               if ($guest['status'] == STATUS_ADMIN) {
                 $index = STATUS_ACCEPTED;
               }
