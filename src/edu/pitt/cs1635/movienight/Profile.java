@@ -33,6 +33,7 @@ public class Profile extends Activity {
 	private SessionManager session;
 	private String name;
 	private String photo;
+	private int userId;
 	private Intent intent;
 	private DisplayImageOptions imageOptions;
 	private ImageLoader imageLoader;
@@ -64,7 +65,8 @@ public class Profile extends Activity {
         // if user_id isn't passed in, just fallback on current user
         // @todo we probably don't need to do an API call for the current user; we could get from shared prefs
 		intent = getIntent();
-		new GetUserInfo().execute(intent.getIntExtra(USER_ID, session.getId()));
+		userId = intent.getIntExtra(USER_ID, session.getId());
+		new GetUserInfo().execute(userId);
 	}
 
 	@Override
@@ -85,11 +87,11 @@ public class Profile extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_friend:
-			//new ToggleFriendshipTask().execute(true);
+			new FriendUser().execute(true);
 			showFriendMenuItem(false);
 			return true;
 		case R.id.action_unfriend:
-			//new ToggleFriendshipTask().execute(false);
+			new FriendUser().execute(false);
 			showFriendMenuItem(true);
 			return true;
 		case R.id.action_edit_profile:
@@ -159,6 +161,27 @@ public class Profile extends Activity {
 				// if user is logged in and not on their own profile page
 				showFriendMenuItem(!friend);
 			}
+		}
+
+	}
+	
+	private class FriendUser extends AsyncTask<Boolean, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Boolean... bool) {
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String friend = bool[0] ? "friend" : "unfriend";
+			String str = API.getInstance().post("user/" + userId + "/" + friend, params);
+			Log.d("TEST", str);
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			showFriendMenuItem(friend);
+			friend = friend ? false : true;
 		}
 
 	}
