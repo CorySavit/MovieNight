@@ -402,7 +402,7 @@ public class MainActivity extends Activity {
 		}
 
 		@Override
-		protected void onPostExecute(JSONObject result) {
+		protected void onPostExecute(final JSONObject result) {
 			super.onPostExecute(result);
 			if (result != null){
 				LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
@@ -426,6 +426,18 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
+						// Submit Rating
+						try {
+							new SubmitRating().execute(Integer.toString(session.getId()), result.getString("movie_id"), result.getString("event_id"), "1");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+						
+						
+						
+						// Update Users2Events
 						rating.dismiss();
 
 					}
@@ -436,8 +448,9 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
+						// Submit Rating
+						// Update Users2Events
 						rating.dismiss();
-
 					}
 					
 
@@ -446,9 +459,50 @@ public class MainActivity extends Activity {
 			}
 		
 		}
+		
+		
 
 	}
 	
+private class SubmitRating extends AsyncTask<String, Void, Void> {
+		@Override
+		protected Void doInBackground(String... args) {
+			
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", args[0]));
+			params.add(new BasicNameValuePair("rating", args[3]));
+			
+			String submitRating = API.getInstance().post("movies/"+args[1]+"/ratings", params);
+			if (submitRating != null) {
+				try {
+					JSONObject result = new JSONObject(submitRating);
+					if(result.getInt("success") == 1){
+						List<NameValuePair> params2 = new ArrayList<NameValuePair>();
+						params2.add(new BasicNameValuePair("user_id", args[0]));
+						params2.add(new BasicNameValuePair("event_id", args[2]));
+						API.getInstance().put("events/past", params2);
+						
+					} else {
+						//error submitting rating
+					}
+					
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+				
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL for events");
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+		}
+}
 	
 	
 

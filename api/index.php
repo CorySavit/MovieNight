@@ -229,6 +229,7 @@ if ($request[0] == "movies") {
             join movies as m on movie_id = m.id
             where user_id = ".$_GET['user_id']."
             AND (u2e.status = 1 OR u2e.status = 2)
+            AND u2e.rated = 0
             AND s.time >= DATE_SUB(NOW(), INTERVAL 20 DAY)
             order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -239,26 +240,22 @@ if ($request[0] == "movies") {
         }
         break;
 
-      case 'POST': # /events
+      case 'PUT': # /events/past
 
-        // create event
-        $id = $db->insert('events', array(
-          'showtime_id' => $_POST['showtime_id'],
-          'admin_id' => $_POST['user_id']
-        ));
+         // attach user to event
+          parse_str(file_get_contents("php://input"), $_PUT);
+          $db->update('users2events', array(
+            'status' => 1
+          ), array(
+            'AND' => array(
+              'user_id' => $_PUT['user_id'],
+              'event_id' => $_PUT['user_id']
+            )
+          ));
 
-        // attach user to event as admin
-        $db->insert('users2events', array(
-          'user_id' => $_POST['user_id'],
-          'event_id' => $id,
-          'status' => STATUS_ADMIN
-        ));
+          echo formatResponse();
 
-        echo formatResponse(array(
-          'id' => $id
-        ));
-
-        break;
+          break;
       default:
         echo INVALID_REQUEST;
       } 
