@@ -45,6 +45,9 @@
     <string name="no_public_events">No upcoming public events...</string>
     <string name="search">Search</string>
     <string name="search_users">Search Users</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="unfriend">Unfriend</string>
+    <string name="logout">Logout</string>
 
     <string-array name="status_array">
         <item>@string/attending</item>

@@ -475,75 +475,76 @@ if ($request[0] == "movies") {
   } else {
     // otherwise assume $request[1] is user id
 
-    switch ($request_type) {
-      case 'GET': # /user/{id}
+    if (sizeof($request) == 2) {
 
-        // get user information
-        $data = $db->get('users', array(
-          'id',
-          'email',
-          'first_name',
-          'last_name',
-          'created_at'
-        ), array('id' => $request[1]));
-        echo formatResponse($data);
+      switch ($request_type) {
+        case 'GET': # /user/{id}
 
-        break;
-      case 'PUT':
-        // @todo update user information
-        echo INVALID_REQUEST;
+          if (array_key_exists('friend_id', $_GET)) {
 
-        break;
-      default:
-        echo INVALID_REQUEST;
+            // if a friend_id is passed in
+            $data = $db->query("select u.id, email, first_name, last_name, photo, created_at, count(f.user_id) as friend
+              from users as u
+              left join (
+                select user_id
+                from friends
+                where user_id = ".$request[1]." and friend_id = ".$_GET['friend_id']."
+                union
+                select friend_id
+                from friends
+                where user_id = ".$_GET['friend_id']." and friend_id = ".$request[1]."
+              ) as f on u.id = f.user_id
+              where u.id = ".$request[1])->fetch(PDO::FETCH_ASSOC);
+
+          } else {
+
+            // otherwise, a friend_id is not passed in
+            $data = $db->get('users', array(
+              'id',
+              'email',
+              'first_name',
+              'last_name',
+              'photo',
+              'created_at'
+            ), array('id' => $request[1]));
+
+          }
+          
+          echo formatResponse($data);
+
+          break;
+        case 'PUT':
+          // @todo update user information
+          echo INVALID_REQUEST;
+
+          break;
+        default:
+          echo INVALID_REQUEST;
+      }
+
+    } else if ($request_type == 'POST' && array_key_exists('user_id', $_POST)) {
+
+      if ($request[2] == 'friend') { // POST user/{id}/friend
+
+        echo $db->insert('friends', array(
+          'user_id' => $_POST['user_id'],
+          'friend_id' => $request[1]
+        ));
+
+      } else if ($request[2] == 'unfriend') { // POST user/{id}/unfriend
+
+        $result = $db->query("delete from friends
+          where (user_id = ".$_POST['user_id']." and friend_id = ".$request[1].") or
+          (friend_id = ".$_POST['user_id']." and user_id = ".$request[1].")")->fetch();
+        
+      }
+
+    } else {
+      echo INVALID_REQUEST;
     }
+    
   }
 
 } else {
   echo INVALID_REQUEST;
-}
-
-function getUsers($guest = false) {
-  $friends = array();
-  $data = explode("\n", file_get_contents('mock/data/users.dat'));
-  foreach ($data as $line) {
-    $line = explode("\t", $line);
-    if ($guest) {
-      $friend = new Guest(new User($line[0], $line[1]));
-      $friend->user->photo = $line[2];
-    } else {
-      $friend = new User($line[0], $line[1]);
-      $friend->photo = $line[2];
-    }
-    array_push($friends, $friend);
-  }
-  return $friends;
-}
-
-function getEvents() {
-
-  $events = array();
-  $friends = getUsers(true);
-  $data = explode("\n", file_get_contents('mock/data/events.dat'));
-  foreach ($data as $line) {
-    $line = explode("\t", $line);
-    $event = new Event($line[0]);
-    $event->movie = stripObject(new Movie($line[1]));
-    $event->showtime = new Showtime($line[2]);
-    $event->status = $line[3];
-    $event->theater = new Theater(0, $line[5]);
-
-    $friend_list = explode(",", $line[4]);
-    foreach ($friend_list as $i) {
-      array_push($event->guests, $friends[$i % sizeof($friends)]);
-    }
-    array_push($events, $event);
-  }
-  return $events;
-
-}
-
-// strips simple object of null properties
-function stripObject($obj) {
-  return (object) array_filter((array) $obj);
 }
