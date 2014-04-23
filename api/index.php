@@ -16,6 +16,12 @@ if ($request[0] == "movies") {
     switch ($request_type) {
       case 'GET': # /movies
 
+        // @todo this is just useing static lat/lng at the moment
+        $lat = STATIC_LAT;
+        $lng = STATIC_LNG;
+        //$lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
+        //$lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
+
         // get movies playing near current location
         $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime, mn_rating
           from showtimes as s
@@ -30,10 +36,10 @@ if ($request[0] == "movies") {
             FROM theaters
             WHERE (
                 3959 * acos(
-                  cos(radians(".STATIC_LAT."))
+                  cos(radians(".$lat."))
                   * cos(radians(lat))
-                  * cos(radians(lng) - radians(".STATIC_LNG."))
-                  + sin(radians(".STATIC_LAT."))
+                  * cos(radians(lng) - radians(".$lng."))
+                  + sin(radians(".$lat."))
                   * sin(radians(lat))
                 )
             ) <= 31

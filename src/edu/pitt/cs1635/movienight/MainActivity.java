@@ -31,6 +31,8 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.*;
 
 import com.nostra13.universalimageloader.core.*;
@@ -43,10 +45,13 @@ public class MainActivity extends Activity {
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
 	private List<Movie> movieList;
-	private String zipCode;
-	
+	private String locationString;
+	private Double latitude;
+	private Double longitude;
 	public SharedPreferences settings;
-	public static final String ZIP_CODE = "zipCode";
+	private TextView locationTextView;
+	
+	static final int SET_LOCATION = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,10 @@ public class MainActivity extends Activity {
 		//get preferences (Location)
 		settings = getPreferences(MODE_PRIVATE);
 		
+		// create progress dialog
+		pDialog = new ProgressDialog(MainActivity.this);
+		pDialog.setMessage("Popping popcorn...");
+		pDialog.setCancelable(false);
 		
 		// create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
@@ -95,7 +104,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
-				startActivity(mapIntent);
+				startActivityForResult(mapIntent, SET_LOCATION);
 			}
 			
 		});
@@ -104,50 +113,75 @@ public class MainActivity extends Activity {
 		LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
 		Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		
+		locationTextView = (TextView) findViewById(R.id.loc_display);
+		
+		latitude = null;
+		longitude = null;
+		locationString = null;
+		
 		if (location != null) {
-			double longitude = location.getLongitude();
-			double latitude = location.getLatitude(); 
-			Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+			longitude = location.getLongitude();
+			latitude = location.getLatitude(); 
 			
 			// get location every time the app opens
-			try {
-				List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-
-				if (addresses != null) {
-					Address returnedAddress = addresses.get(0);
-					zipCode = returnedAddress.getPostalCode();
-					/*
-						StringBuilder strReturnedAddress = new StringBuilder();
-						for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
-							strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-						}
-					*/
-				}
-				else{
-					// if we can't get address, try to get last saved address
-					zipCode = settings.getString(ZIP_CODE, getString(R.string.unknown_location));
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				// if we can't get address, try to get last saved address
-				zipCode = settings.getString(ZIP_CODE, getString(R.string.unknown_location));
-			}
-			TextView text = (TextView) findViewById(R.id.loc_display);
-			text.setText(zipCode);
+			locationString = formatAddress(location.getLatitude(), location.getLongitude());
 			
+			// if we can't get address, try to get last saved address
+			locationString = (locationString == null) ? settings.getString(SessionManager.LOCATION, getString(R.string.unknown_location)) : locationString;
+			latitude = (Double) ((latitude == null) ? settings.getFloat(SessionManager.LAT, 0) : latitude);
+			longitude = (Double) ((longitude == null) ? settings.getFloat(SessionManager.LNG, 0) : longitude);
+			locationTextView.setText(locationString);
 		}
-
+		
 		// fetch our movies
-		new GetMovies().execute();
+		new GetMovies().execute(latitude, longitude);
+		
 	}
 	
+	public String formatAddress(double lat, double lng) {
+		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
+		try {
+			List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+			return addresses != null ? formatAddress(addresses.get(0)) : null;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public String formatAddress(Address address) {
+		String result = address.getLocality();
+		if (result != null) {
+			// append state abbreviation if locality exists
+			result += ", " + address.getAdminArea();
+		} else {
+			// fallback on zip code
+			result = address.getPostalCode();
+		}
+		return result;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+		if (requestCode == SET_LOCATION && resultCode == RESULT_OK) {
+			latitude = data.getDoubleExtra(SessionManager.LAT, 0);
+			longitude = data.getDoubleExtra(SessionManager.LNG, 0);
+			new GetMovies().execute(latitude, longitude);
+			locationTextView.setText(formatAddress(latitude, longitude));
+		}
+		
+	}
+
 	@Override
 	protected void onStop(){
 		super.onStop();
 		
 		// save location when the app stops
 		SharedPreferences.Editor editor = settings.edit();
-		editor.putString(ZIP_CODE, zipCode);
+		editor.putString(SessionManager.LOCATION, locationString);
+		editor.putFloat(SessionManager.LAT, new Float(latitude));
+		editor.putFloat(SessionManager.LNG, new Float(longitude));
 		editor.commit();
 	}
 
@@ -177,26 +211,29 @@ public class MainActivity extends Activity {
 	}
 	
 	/*
-	 * Asynchronous background task that fetches a list of movies from the API 
+	 * Asynchronous background task that fetches a list of movies from the API
+	 * Note that execute should be passed two parameters: a lat and lng respectively
 	 */
-	private class GetMovies extends AsyncTask<Void, Void, Void> {
+	private class GetMovies extends AsyncTask<Double, Void, Void> {
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			
 			// show progress dialog
-			pDialog = new ProgressDialog(MainActivity.this);
-			pDialog.setMessage("Popping popcorn...");
-			pDialog.setCancelable(false);
 			pDialog.show();
 		}
 
 		@Override
-		protected Void doInBackground(Void... arg0) {
+		protected Void doInBackground(Double... geo) {
 			
 			// make call to API
-			String str = API.getInstance().get("movies");
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			if (geo.length == 2 && geo[0] != null && geo[1] != null) {
+				params.add(new BasicNameValuePair("lat", Double.toString(geo[0])));
+				params.add(new BasicNameValuePair("lng", Double.toString(geo[1])));
+			}
+			String str = API.getInstance().get("movies", params);
 
 			if (str != null) {
 				try {
