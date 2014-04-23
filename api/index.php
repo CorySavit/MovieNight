@@ -215,60 +215,43 @@ if ($request[0] == "movies") {
     }
 
   } else if (sizeof($request) == 2){
-    // assume event id is passed in
-
-    switch ($request_type) {
-      case 'GET': # /events/{id}
+    if($request[1] == "past"){
+      switch ($request_type) {
+      case 'GET': # /events/past
 
         if (array_key_exists('user_id', $_GET)) {
-          $event = $db->query("select e.id, s.time, s.flag, s.movie_id, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
-            from events as e
-            join showtimes as s on showtime_id = s.id
-            join theaters as t on s.theater_id = t.id
-            join users as u on e.admin_id = u.id
-            left join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
-            where e.id = ".$request[1].";")->fetch(PDO::FETCH_ASSOC);
+          // get all of user's events
+          // @todo add "and time >= CURRENT_TIME" or maybe on a day level
+          $events = $db->query("select e.id as event_id, m.id as movie_id, m.title, s.time, s.flag, u2e.status
+            from users2events as u2e
+            join events as e on event_id = e.id
+            join showtimes as s on e.showtime_id = s.id
+            join movies as m on movie_id = m.id
+            where user_id = ".$_GET['user_id']."
+            AND (u2e.status = 1 OR u2e.status = 2)
+            AND s.time >= DATE_SUB(NOW(), INTERVAL 20 DAY)
+            order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
-          // get movie information (for header)
-          $event['movie'] = $db->get('movies', array(
-            'title',
-            'mpaa_rating',
-            'runtime',
-            'poster'
-          ), array('id' => $event['movie_id']));
-          $event['movie']['genres'] = get_genres($event['movie_id']);
-
-          // get all guests
-          $guests = get_guests($event);
-          $group = array(
-            STATUS_ACCEPTED => array(),
-            STATUS_INVITED => array(),
-            STATUS_DECLINED => array(),
-          );
-          foreach ($guests as $guest) {
-            $index = $guest['status'];
-            if ($guest['status'] == STATUS_ADMIN) {
-              $index = STATUS_ACCEPTED;
-            }
-            array_push($group[$index], $guest);
-          }
-          $event['guests'] = $group;
-          
-          echo json_encode($event);
+          echo json_encode($events);
 
         } else {
           echo INVALID_REQUEST;
         }
-
         break;
 
-      case 'POST': # /events/{id}
+      case 'POST': # /events
 
-        // attach user to event
-        $id = $db->insert('users2events', array(
+        // create event
+        $id = $db->insert('events', array(
+          'showtime_id' => $_POST['showtime_id'],
+          'admin_id' => $_POST['user_id']
+        ));
+
+        // attach user to event as admin
+        $db->insert('users2events', array(
           'user_id' => $_POST['user_id'],
-          'event_id' => $request[1],
-          'status' => (array_key_exists('status', $_POST) ? $_POST['status'] : 0)
+          'event_id' => $id,
+          'status' => STATUS_ADMIN
         ));
 
         echo formatResponse(array(
@@ -276,26 +259,91 @@ if ($request[0] == "movies") {
         ));
 
         break;
-
-      case 'PUT': # /events/{id}
-
-        // attach user to event
-        parse_str(file_get_contents("php://input"), $_PUT);
-        $db->update('users2events', array(
-          'status' => $_PUT['status']
-        ), array(
-          'AND' => array(
-            'user_id' => $_PUT['user_id'],
-            'event_id' => $request[1]
-          )
-        ));
-
-        echo formatResponse();
-
-        break;
-
       default:
         echo INVALID_REQUEST;
+      } 
+    } else {
+      // assume event id is passed in
+      switch ($request_type) {
+        case 'GET': # /events/{id}
+
+          if (array_key_exists('user_id', $_GET)) {
+            $event = $db->query("select e.id, s.time, s.flag, s.movie_id, t.id as theater_id, t.name as theater_name, t.address, e.admin_id, concat(u.first_name, ' ', u.last_name) as admin_name, u2e.status
+              from events as e
+              join showtimes as s on showtime_id = s.id
+              join theaters as t on s.theater_id = t.id
+              join users as u on e.admin_id = u.id
+              left join users2events as u2e on u2e.user_id = ".$_GET['user_id']." and event_id = ".$request[1]."
+              where e.id = ".$request[1].";")->fetch(PDO::FETCH_ASSOC);
+
+            // get movie information (for header)
+            $event['movie'] = $db->get('movies', array(
+              'title',
+              'mpaa_rating',
+              'runtime',
+              'poster'
+            ), array('id' => $event['movie_id']));
+            $event['movie']['genres'] = get_genres($event['movie_id']);
+
+            // get all guests
+            $guests = get_guests($event);
+            $group = array(
+              STATUS_ACCEPTED => array(),
+              STATUS_INVITED => array(),
+              STATUS_DECLINED => array(),
+            );
+            foreach ($guests as $guest) {
+              $index = $guest['status'];
+              if ($guest['status'] == STATUS_ADMIN) {
+                $index = STATUS_ACCEPTED;
+              }
+              array_push($group[$index], $guest);
+            }
+            $event['guests'] = $group;
+            
+            echo json_encode($event);
+
+          } else {
+            echo INVALID_REQUEST;
+          }
+
+          break;
+
+        case 'POST': # /events/{id}
+
+          // attach user to event
+          $id = $db->insert('users2events', array(
+            'user_id' => $_POST['user_id'],
+            'event_id' => $request[1],
+            'status' => (array_key_exists('status', $_POST) ? $_POST['status'] : 0)
+          ));
+
+          echo formatResponse(array(
+            'id' => $id
+          ));
+
+          break;
+
+        case 'PUT': # /events/{id}
+
+          // attach user to event
+          parse_str(file_get_contents("php://input"), $_PUT);
+          $db->update('users2events', array(
+            'status' => $_PUT['status']
+          ), array(
+            'AND' => array(
+              'user_id' => $_PUT['user_id'],
+              'event_id' => $request[1]
+            )
+          ));
+
+          echo formatResponse();
+
+          break;
+
+        default:
+          echo INVALID_REQUEST;
+      }
     }
   } else {
     //events/{event id}/messages

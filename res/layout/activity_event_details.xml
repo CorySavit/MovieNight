@@ -211,7 +211,8 @@
 				<ExpandableListView
 				    android:id="@+id/guests"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent" />
+					android:layout_height="match_parent"
+					android:background="@color/gray" />
 				<RelativeLayout 
 				    android:layout_width="match_parent"
 					android:layout_height="wrap_content" 
@@ -224,7 +225,9 @@
 					    android:id="@+id/new_message"
 					    android:layout_width="match_parent"
 					    android:layout_height="wrap_content"
-					    android:layout_below="@+id/messages"/>
+					    android:background="@color/gray"
+					    android:text="@color/white"
+					    android:layout_alignParentBottom="true"/>
 				</RelativeLayout>
 				
 			</FrameLayout>

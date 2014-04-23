@@ -31,6 +31,16 @@
       <input type="text" name="status" placeholder="status" />
       <input type="submit" value="Submit" />
     </form>
+    get events
+    <form action="events" method="get">
+      <input type="text" name="user_id" placeholder="userid"/>
+      <input type="submit" value="Submit"/>
+    </form>
+    get past events
+    <form action="events/past" method="get">
+      <input type="text" name="user_id" placeholder="userid"/>
+      <input type="submit" value="Submit"/>
+    </form>
     update rsvp
     <form action="events/1" method="put">
       <input type="text" name="user_id" placeholder="user_id" />
@@ -44,6 +54,7 @@
       <input type="text" name="rating" placeholder="rating" />
       <input type="submit" value="Submit" />
     </form>
+    Post a Messge
     <form action="events/1/messages" method="post">
       <input type="text" name="user_id" placeholder="user_id" />
       <input type="text" name="message" placeholder="message" />

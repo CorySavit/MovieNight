@@ -12,6 +12,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -26,7 +27,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -135,6 +138,9 @@ public class MainActivity extends Activity {
 		
 		// fetch our movies
 		new GetMovies().execute(latitude, longitude);
+		if (session.isLoggedIn()){
+			new GetPastMovies().execute();
+		}
 		
 	}
 	
@@ -363,6 +369,84 @@ public class MainActivity extends Activity {
 	    
 	    
 	    
+	}
+	
+	private class GetPastMovies extends AsyncTask<Void, Void, JSONObject> {
+
+		
+
+		@Override
+		protected JSONObject doInBackground(Void... args) {
+			
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String pastMovies = API.getInstance().get("events/past", params);
+			if (pastMovies != null) {
+				try {
+					JSONArray result = new JSONArray(pastMovies);
+					if(result.get(0) instanceof JSONObject){
+						JSONObject temp = result.getJSONObject(0);
+						return temp;
+					}
+					
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+				
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL for events");
+			}
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(JSONObject result) {
+			super.onPostExecute(result);
+			if (result != null){
+				LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+				final View ratingView =  inflater.inflate(R.layout.dialog_rating, null);
+
+				final AlertDialog rating = new AlertDialog.Builder(MainActivity.this)
+					.setView(ratingView)
+					.create();
+				TextView title = (TextView) ratingView.findViewById(R.id.ratingMovieTitle);
+				String setTitle;
+				try {
+					setTitle = result.getString("title");
+					title.setText(setTitle);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+				((ImageButton) ratingView.findViewById(R.id.thumbsup)).setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						rating.dismiss();
+
+					}
+
+				});
+
+				((ImageButton) ratingView.findViewById(R.id.thumbsdown)).setOnClickListener(new OnClickListener(){
+
+					@Override
+					public void onClick(View v) {
+						rating.dismiss();
+
+					}
+					
+
+				});
+				rating.show();
+			}
+		
+		}
+
 	}
 	
 	
