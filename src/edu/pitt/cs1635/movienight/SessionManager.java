@@ -40,6 +40,9 @@ public class SessionManager {
 	public static final String KEY_EMAIL = "email";
 	public static final String KEY_FIRSTNAME = "firstName";
 	public static final String KEY_LASTNAME = "lastName";
+	public static final String LAT = "lat";
+	public static final String LNG = "lng";
+	public static final String LOCATION = "location";
 
 	protected SessionManager(Context c) {
 		this.context = c;

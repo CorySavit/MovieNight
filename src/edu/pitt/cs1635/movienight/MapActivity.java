@@ -10,7 +10,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 import org.json.JSONObject;
 
@@ -22,27 +21,23 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -55,7 +50,6 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	 private LocationManager locationManager;
 	 private static final long MIN_TIME = 400;
 	 private static final float MIN_DISTANCE = 1000;
-	 private SharedPreferences prefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +59,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 
 	    if (mMap == null) {
 	        // Try to obtain the map from the SupportMapFragment.
-	        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
-	                .getMap();
+	        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
 	        // Check if we were successful in obtaining the map.
 
 	    }
@@ -273,21 +266,12 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 
 	@Override
 	public void onMapLongClick(LatLng point) {
-		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		Geocoder geocoder = new Geocoder(this, Locale.ENGLISH);
 		
-		List<Address> addresses;
-		try {
-			addresses = geocoder.getFromLocation(point.latitude, point.longitude, 1);
-			Address returnedAddress = addresses.get(0);
-			String zip = returnedAddress.getPostalCode();
-			prefs.edit().putString("zip", zip);
-			Log.d("prefs in map", prefs.getString("zip", "nothing there"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		Intent resultIntent = new Intent();
+		resultIntent.putExtra(SessionManager.LAT, point.latitude);
+		resultIntent.putExtra(SessionManager.LNG, point.longitude);
+		setResult(Activity.RESULT_OK, resultIntent);
 		finish();
+		
 	}
 }
