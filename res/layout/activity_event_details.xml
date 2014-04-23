@@ -220,14 +220,17 @@
 					<ListView
 						android:id="@+id/messages"
 						android:layout_width="match_parent"
-						android:layout_height="wrap_content" />
+						android:layout_height="wrap_content"
+						android:padding="5dp" />
 					<EditText 
 					    android:id="@+id/new_message"
 					    android:layout_width="match_parent"
-					    android:layout_height="wrap_content"
+					    android:layout_height="30dp"
 					    android:background="@color/gray"
-					    android:text="@color/white"
-					    android:layout_alignParentBottom="true"/>
+					    android:textColor="@color/white"
+					    android:layout_alignParentBottom="true"
+					    android:textSize="16sp"
+					   />
 				</RelativeLayout>
 				
 			</FrameLayout>
