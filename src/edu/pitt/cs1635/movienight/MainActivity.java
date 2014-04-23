@@ -198,10 +198,16 @@ public class MainActivity extends Activity {
 				startActivity(profileView);
 				return true;
 			}
-
-		default:
-			return super.onOptionsItemSelected(item);
+			break;
+			
+		case R.id.action_search:
+			
+			Intent intent = new Intent(this, SearchActivity.class);
+			startActivity(intent);
+			return true;
 		}
+		
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

@@ -72,6 +72,12 @@ Below are a list of methods supported by the API. The response for all methods i
 	
 	**Response** {`id`, `email`, `first_name`, `last_name`, `created_at`}
 
+### /user/search
+
+* **GET** — search through all users; returns all users if query is not specified
+
+	**Request** {`q`}
+
 ### /user/login
 
 * **POST** — logs user in
