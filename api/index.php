@@ -208,7 +208,7 @@ if ($request[0] == "movies") {
         echo INVALID_REQUEST;
     }
 
-  } else {
+  } else if (sizeof($request) == 2){
     // assume event id is passed in
 
     switch ($request_type) {
@@ -285,6 +285,47 @@ if ($request[0] == "movies") {
         ));
 
         echo formatResponse();
+
+        break;
+
+      default:
+        echo INVALID_REQUEST;
+    }
+  } else {
+    //events/{event id}/messages
+    switch ($request_type) {
+      case 'GET': # /events/{id}/messages
+
+        if (array_key_exists('user_id', $_GET)) {
+          $messages = $db->query("select concat(u.first_name, ' ', u.last_name) as author, m.message, m.time
+            from messages as m 
+            join users as u on m.user_id = u.id
+            where m.event_id = ".$request[1]."
+            order by m.time desc;")->fetchAll(PDO::FETCH_ASSOC);
+
+          echo json_encode($messages);
+          break;
+
+        } else {
+          echo INVALID_REQUEST;
+        }
+
+        break;
+
+      case 'POST': # /events/{id}/messages
+      $id = $db->insert('messages', array(
+          'event_id' => $request[1],
+          'message' => $_POST['message'],
+          'user_id' => $_POST['user_id']
+        ));
+
+      echo formatResponse(array(
+          'id' => $id
+        ));
+
+        break;
+
+      case 'PUT': # /events/{id}
 
         break;
 

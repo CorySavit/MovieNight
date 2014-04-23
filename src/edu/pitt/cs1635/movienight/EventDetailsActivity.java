@@ -15,7 +15,6 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.imageaware.ImageAware;
 import com.nostra13.universalimageloader.core.imageaware.ImageViewAware;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,10 +29,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabContentFactory;
@@ -45,6 +47,7 @@ public class EventDetailsActivity extends Activity {
 	int eventID;
 	private Event event;
 	private Movie movie;
+	List<Message> messages;
 	private AlertDialog.Builder statusBuilder;
 	private TextView statusAdminView;
 	private TextView statusGuestView;
@@ -145,6 +148,7 @@ public class EventDetailsActivity extends Activity {
 		});
 		
 		new GetEventInfo().execute();
+		new GetEventMessages().execute();
 	}
 
 	@Override
@@ -191,6 +195,8 @@ public class EventDetailsActivity extends Activity {
 		}
 	}
 	
+	
+	
 	private class GetEventInfo extends AsyncTask<Void, Void, JSONObject> {
 
 		@Override
@@ -209,9 +215,13 @@ public class EventDetailsActivity extends Activity {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				
+				
 			} else {
-				Log.e("ServiceHandler", "Failed to receive data from URL");
+				Log.e("ServiceHandler", "Failed to receive data from URL for events");
 			}
+			
+			
 
 			return null;
 		}
@@ -289,8 +299,115 @@ public class EventDetailsActivity extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			try{
+		
+			} finally {
+				
+			}
+		
 		}
 
+	}
+	
+	private class GetEventMessages extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... arg0) {
+			
+			// make call to API
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			String mess = API.getInstance().get("events/" + eventID +"/messages", params);
+			
+			if (mess != null){
+				try {
+					// parse result to a JSON Object
+					JSONArray result = new JSONArray(mess);
+					
+					
+
+					// loop through movies
+					for (int i = 0; i < result.length()-1; i++) {					
+						// create messages object from JSON data and add to list
+						if (result.get(i) instanceof JSONObject) {
+							
+							Message temp = new Message(result.getJSONObject(i));
+							Log.d("WHATEVER", temp.toString());
+							//RIGHT HERE !! NULL POINTER! WHY?!
+							messages.add(temp);
+						}
+					}
+					
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			} else {
+				Log.e("ServiceHandler", "Failed to receive data from URL");
+		}
+		
+		return null;
+	}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			ListView messagesView = (ListView) findViewById(R.id.messages);
+			ListAdapter messageAdapter = new MessageAdapter(EventDetailsActivity.this, messages);
+			messagesView.setAdapter(messageAdapter);
+		
+		}
+
+	}
+	
+	private class MessageAdapter extends BaseAdapter{
+		 private List<Message> messageses;
+		 private LayoutInflater inflater = null;
+		 
+		 private MessageAdapter(Activity a, List<Message> d) {
+			 inflater = (LayoutInflater) a.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			 messageses = d;
+			 
+		 }
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return messageses.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			// TODO Auto-generated method stub
+			return messageses.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			// TODO Auto-generated method stub
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			// TODO Auto-generated method stub
+			View view = convertView;
+	        if (convertView == null) {
+	        	view = inflater.inflate(R.layout.message, null);
+	        }
+	        
+	        Message message = messageses.get(position);
+	        
+	        TextView author = (TextView) view.findViewById(R.id.author);
+	        TextView text = (TextView) view.findViewById(R.id.message);
+	        TextView time = (TextView) view.findViewById(R.id.message_time);
+	        author.setText(message.author);
+	        text.setText(message.message);
+	        time.setText(message.time);
+	        
+			return view;
+		}
+		
 	}
 	
 	private class GuestAdapter extends BaseExpandableListAdapter {
