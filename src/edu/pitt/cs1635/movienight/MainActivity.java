@@ -450,7 +450,7 @@ public class MainActivity extends Activity {
 					@Override
 					public void onClick(View v) {
 						try {
-							new SubmitRating().execute(Integer.toString(session.getId()), result.getString("movie_id"), result.getString("event_id"), "1");
+							new SubmitRating().execute(Integer.toString(session.getId()), result.getString("movie_id"), result.getString("event_id"), "0");
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
