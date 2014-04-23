@@ -245,11 +245,11 @@ if ($request[0] == "movies") {
          // attach user to event
           parse_str(file_get_contents("php://input"), $_PUT);
           $db->update('users2events', array(
-            'status' => 1
+            'rated' => 1
           ), array(
             'AND' => array(
               'user_id' => $_PUT['user_id'],
-              'event_id' => $_PUT['user_id']
+              'event_id' => $_PUT['event_id']
             )
           ));
 

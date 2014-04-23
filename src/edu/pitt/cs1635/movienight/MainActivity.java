@@ -411,6 +411,7 @@ public class MainActivity extends Activity {
 				final AlertDialog rating = new AlertDialog.Builder(MainActivity.this)
 					.setView(ratingView)
 					.create();
+				rating.setCancelable(false);
 				TextView title = (TextView) ratingView.findViewById(R.id.ratingMovieTitle);
 				String setTitle;
 				try {
@@ -448,8 +449,12 @@ public class MainActivity extends Activity {
 
 					@Override
 					public void onClick(View v) {
-						// Submit Rating
-						// Update Users2Events
+						try {
+							new SubmitRating().execute(Integer.toString(session.getId()), result.getString("movie_id"), result.getString("event_id"), "1");
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						rating.dismiss();
 					}
 					
@@ -472,10 +477,12 @@ private class SubmitRating extends AsyncTask<String, Void, Void> {
 			params.add(new BasicNameValuePair("user_id", args[0]));
 			params.add(new BasicNameValuePair("rating", args[3]));
 			
-			String submitRating = API.getInstance().post("movies/"+args[1]+"/ratings", params);
+			String submitRating = API.getInstance().post("movies/"+args[1]+"/rating", params);
 			if (submitRating != null) {
 				try {
+					Log.d("SOMETHING", submitRating);
 					JSONObject result = new JSONObject(submitRating);
+					Log.d("SOMETHING", result.getString("success"));
 					if(result.getInt("success") == 1){
 						List<NameValuePair> params2 = new ArrayList<NameValuePair>();
 						params2.add(new BasicNameValuePair("user_id", args[0]));
