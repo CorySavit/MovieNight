@@ -20,17 +20,21 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -40,6 +44,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView.OnEditorActionListener;
 
 public class EventDetailsActivity extends Activity {
 	
@@ -47,11 +52,13 @@ public class EventDetailsActivity extends Activity {
 	int eventID;
 	private Event event;
 	private Movie movie;
-	List<Message> messages;
+	private ListAdapter messageAdapter;
+	ArrayList<Message> messages;
 	private AlertDialog.Builder statusBuilder;
 	private TextView statusAdminView;
 	private TextView statusGuestView;
 	private TextView changeHost;
+	private EditText newMessageEdit;
 	private SessionManager session;
 
 	@Override
@@ -146,6 +153,18 @@ public class EventDetailsActivity extends Activity {
 				}
 			}
 
+		});
+		newMessageEdit = (EditText) findViewById(R.id.new_message);
+		newMessageEdit.setOnEditorActionListener(new OnEditorActionListener() {
+		
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					new PostMessage().execute();
+		        }
+		        return false;
+			}
 		});
 		
 		new GetEventInfo().execute();
@@ -313,6 +332,25 @@ public class EventDetailsActivity extends Activity {
 
 	}
 	
+private class PostMessage extends AsyncTask<Void, Void, Void> {
+		
+		protected Void doInBackground(Void... arg0) {
+			// user has already RSVP; they are changing it
+			String outMessage = newMessageEdit.getText().toString();
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
+			params.add(new BasicNameValuePair("message", outMessage));
+            API.getInstance().post("events/"+eventID+"/messages", params);
+            
+			return null;
+		}
+		
+		protected void onPostExecute(Void result){
+			newMessageEdit.setText("");
+		}
+
+	}
+	
 	private class GetEventMessages extends AsyncTask<Void, Void, Void> {
 
 		@Override
@@ -356,7 +394,7 @@ public class EventDetailsActivity extends Activity {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			ListView messagesView = (ListView) findViewById(R.id.messages);
-			ListAdapter messageAdapter = new MessageAdapter(EventDetailsActivity.this, messages);
+			messageAdapter = new MessageAdapter(EventDetailsActivity.this, messages);
 			messagesView.setAdapter(messageAdapter);
 		
 		}
@@ -364,14 +402,20 @@ public class EventDetailsActivity extends Activity {
 	}
 	
 	private class MessageAdapter extends BaseAdapter{
-		 private List<Message> messageses;
+		 private ArrayList<Message> messageses;
 		 private LayoutInflater inflater = null;
 		 
-		 private MessageAdapter(Activity a, List<Message> d) {
+		 private MessageAdapter(Activity a, ArrayList<Message> d) {
 			 inflater = (LayoutInflater) a.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			 messageses = d;
 			 
 		 }
+
+		@Override
+		public void notifyDataSetChanged() {
+			// TODO Auto-generated method stub
+			super.notifyDataSetChanged();
+		}
 
 		@Override
 		public int getCount() {
