@@ -256,7 +256,7 @@ public class SessionManager {
 
 			String message;
 			if (result){
-				loginDialog.dismiss();
+				signupDialog.dismiss();
 				message = "Welcome to MovieNight, " + getFirstName() + "!"; 
 			} else {
 				message = "Error signing up.";
