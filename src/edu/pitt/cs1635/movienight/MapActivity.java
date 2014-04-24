@@ -19,7 +19,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,21 +34,27 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TextView.OnEditorActionListener;
 
 
 
 public class MapActivity extends FragmentActivity implements LocationListener, OnMapLongClickListener{
 
-	 private ImageButton mBtnFind;
+	 private Button mBtnFind;
 	 EditText etPlace;
 	 private GoogleMap mMap;
+	 private Marker marker;
 	 private LocationManager locationManager;
 	 private static final long MIN_TIME = 400;
 	 private static final float MIN_DISTANCE = 1000;
@@ -69,38 +77,54 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); 
 	    
-	    mBtnFind = (ImageButton) findViewById(R.id.location_submit);
-	    etPlace = (EditText) findViewById(R.id.location);
 	    
+	    etPlace = (EditText) findViewById(R.id.location);
+	    etPlace.setOnEditorActionListener(new OnEditorActionListener() {
+		
+			@Override
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					String location = etPlace.getText().toString();
+					
+					if(location == null || location.equals("")){
+						Toast.makeText(getBaseContext(), "No Location Entered", Toast.LENGTH_SHORT).show();
+						return false;
+					}
+					
+					String url = "https://maps.googleapis.com/maps/api/geocode/json?";
+					
+					try {
+						location = URLEncoder.encode(location, "utf-8");
+					} catch (UnsupportedEncodingException e){
+						e.printStackTrace();
+					}
+					
+					String address = "address=" + location;
+					String sensor = "sensor=false";
+					
+					//url where geocoding data is fetched
+					url = url + address + "&" + sensor;
+					
+					DownloadTask downloadTask = new DownloadTask();
+					
+					downloadTask.execute(url);
+		        }
+		        return false;
+			}
+		});
+	    
+	    mBtnFind = (Button) findViewById(R.id.location_submit);
 	    mBtnFind.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				
-				String location = etPlace.getText().toString();
-				
-				if(location == null || location.equals("")){
-					Toast.makeText(getBaseContext(), "No Location Entered", Toast.LENGTH_SHORT).show();
-					return;
-				}
-				
-				String url = "https://maps.googleapis.com/maps/api/geocode/json?";
-				
-				try {
-					location = URLEncoder.encode(location, "utf-8");
-				} catch (UnsupportedEncodingException e){
-					e.printStackTrace();
-				}
-				
-				String address = "address=" + location;
-				String sensor = "sensor=false";
-				
-				//url where geocoding data is fetched
-				url = url + address + "&" + sensor;
-				
-				DownloadTask downloadTask = new DownloadTask();
-				
-				downloadTask.execute(url);
+				Intent resultIntent = new Intent();
+				resultIntent.putExtra(SessionManager.LAT, marker.getPosition().latitude);
+				resultIntent.putExtra(SessionManager.LNG, marker.getPosition().longitude);
+				setResult(Activity.RESULT_OK, resultIntent);
+				finish();
 				
 				
 			}
@@ -203,7 +227,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 				markerOptions.position(latLng);
 				markerOptions.title(name);
 				
-				mMap.addMarker(markerOptions);
+				marker = mMap.addMarker(markerOptions);
 				
 				if(i==0){
 					mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -263,9 +287,21 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	    // TODO Auto-generated method stub
 
 	}
-
 	@Override
+    public void onMapLongClick(LatLng arg0) {
+        if (marker != null) {
+            marker.remove();
+        }
+        marker = mMap.addMarker(new MarkerOptions()
+                .position(
+                        new LatLng(arg0.latitude,
+                                arg0.longitude))
+                .draggable(true).visible(true));
+
+    }
+	/*@Override
 	public void onMapLongClick(LatLng point) {
+		
 		
 		Intent resultIntent = new Intent();
 		resultIntent.putExtra(SessionManager.LAT, point.latitude);
@@ -273,5 +309,5 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 		setResult(Activity.RESULT_OK, resultIntent);
 		finish();
 		
-	}
+	}*/
 }
