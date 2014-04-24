@@ -5,34 +5,24 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity" >
 
-    <RelativeLayout
-        android:id="@+id/location_bar"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/location"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black" >
-
-        <EditText
-            android:id="@+id/location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:ems="10"
-            android:hint="@string/enterLocation"
-            android:inputType="textPostalAddress"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="18sp" >
-
-        </EditText>
-
-    </RelativeLayout>
+        android:layout_alignParentTop="true"
+        android:ems="10"
+        android:hint="@string/enterLocation"
+        android:inputType="textPostalAddress"
+        android:singleLine="true"
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/location_bar"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/location_submit"
+        android:layout_below="@id/location"
         class="com.google.android.gms.maps.MapFragment" />
 
     <Button

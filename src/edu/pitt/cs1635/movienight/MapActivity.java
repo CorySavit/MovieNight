@@ -67,7 +67,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 
 	    if (mMap == null) {
 	        // Try to obtain the map from the SupportMapFragment.
-	        mMap = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
+	    	MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+	        mMap = mapFrag.getMap();
 	        // Check if we were successful in obtaining the map.
 
 	    }
