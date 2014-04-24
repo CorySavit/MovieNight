@@ -19,7 +19,7 @@ public class Theater implements Serializable {
 	static final String SHOWTIMES = "showtimes";
 
 	// object variables
-	int id;
+	Integer id;
 	String name;
 	String address;
 	List<Showtime> showtimes;
@@ -44,7 +44,7 @@ public class Theater implements Serializable {
 		}
 	}
 	
-	public Theater(int id, String name, String address) {
+	public Theater(Integer id, String name, String address) {
 		this.id = id;
 		this.name = name;
 		this.address = address;

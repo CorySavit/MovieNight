@@ -11,7 +11,7 @@ public class Genre implements Serializable {
 	static final String NAME = "name";
 	
 	// object variables
-	int id;
+	Integer id;
 	String name;
 	
 	public Genre(JSONObject data) {

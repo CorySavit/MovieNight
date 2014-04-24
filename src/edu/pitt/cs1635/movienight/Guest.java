@@ -20,7 +20,7 @@ public class Guest extends User implements Serializable {
 	static final int STATUS_DECLINED = 4;
 
 	// object variables
-	int status;
+	Integer status;
 
 	public Guest(JSONObject data) {
 		super(data);

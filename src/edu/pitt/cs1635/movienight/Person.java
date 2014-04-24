@@ -12,7 +12,7 @@ public class Person implements Serializable {
 	static final String NAME = "name";
 	static final String PHOTO = "photo";
 	
-	int id;
+	Integer id;
 	String name;
 	String photo;
 	

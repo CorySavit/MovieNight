@@ -25,11 +25,11 @@ public class Showtime implements Serializable {
 	static final int FLAG_IMAX = 2;
 
 	// object variables
-	int id;
+	Integer id;
 	Movie movie;
 	Theater theater;
 	Date time;
-	int flag;
+	Integer flag;
 	String ticketURL;
 
 	private static SimpleDateFormat inputFormat;

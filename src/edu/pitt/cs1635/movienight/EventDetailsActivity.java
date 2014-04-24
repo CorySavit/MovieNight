@@ -121,7 +121,7 @@ public class EventDetailsActivity extends Activity {
 	            		break;
 	            	}
 	            	
-	            	if (event.status == 0) {
+	            	if (event.status == null) {
 	        			new RSVP(newStatus).execute();
 	            	} else {
 	            		new UpdateRSVP(newStatus).execute();
@@ -169,23 +169,25 @@ public class EventDetailsActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	private void setStatus(int status) {
+	private void setStatus(Integer status) {
 		event.status = status;
 		
-		switch (status) {
-		case Guest.STATUS_ACCEPTED:
-			statusGuestView.setText(R.string.attending);
-			break;
-		case Guest.STATUS_INVITED:
-			statusGuestView.setText(R.string.maybe);
-			break;
-		case Guest.STATUS_DECLINED:
-			statusGuestView.setText(R.string.declined);
-			break;
+		if (status != null) {
+			switch (status) {
+			case Guest.STATUS_ACCEPTED:
+				statusGuestView.setText(R.string.attending);
+				break;
+			case Guest.STATUS_INVITED:
+				statusGuestView.setText(R.string.maybe);
+				break;
+			case Guest.STATUS_DECLINED:
+				statusGuestView.setText(R.string.declined);
+				break;
+			}
 		}
 		
 		// show "Administrator" text or RSVP button accordingly
-		if (status == Guest.STATUS_ADMIN && statusAdminView.getVisibility() == View.INVISIBLE) {
+		if (status != null && status == Guest.STATUS_ADMIN && statusAdminView.getVisibility() == View.INVISIBLE) {
 			statusGuestView.setVisibility(View.INVISIBLE);
 			changeHost.setVisibility(View.VISIBLE);
 			statusAdminView.setVisibility(View.VISIBLE);
@@ -518,9 +520,9 @@ public class EventDetailsActivity extends Activity {
 	
 	private class RSVP extends AsyncTask<Void, Void, Void> {
 		
-		private int status;
+		private Integer status;
 		
-		public RSVP(int status) {
+		public RSVP(Integer status) {
 			this.status = status;
 		}
 
@@ -538,9 +540,9 @@ public class EventDetailsActivity extends Activity {
 	
 	private class UpdateRSVP extends AsyncTask<Void, Void, Void> {
 		
-		private int status;
+		private Integer status;
 		
-		public UpdateRSVP(int status) {
+		public UpdateRSVP(Integer status) {
 			this.status = status;
 			Log.d("TEST", status + "");
 		}
@@ -551,7 +553,8 @@ public class EventDetailsActivity extends Activity {
     		List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
 			params.add(new BasicNameValuePair("status", Integer.toString(status)));
-			API.getInstance().put("events/" + eventID, params);
+			String str = API.getInstance().put("events/" + eventID, params);
+			Log.d("TEST", str);
 			return null;
 		}
 
