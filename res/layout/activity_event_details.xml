@@ -211,8 +211,7 @@
 				<ExpandableListView
 				    android:id="@+id/guests"
 					android:layout_width="match_parent"
-					android:layout_height="match_parent"
-					android:background="@color/gray" />
+					android:layout_height="match_parent" />
 				
 				<RelativeLayout 
 				    android:layout_width="match_parent"

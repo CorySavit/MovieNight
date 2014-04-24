@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -297,6 +298,17 @@ public class EventDetailsActivity extends Activity {
 				ExpandableListView guestTabView = (ExpandableListView) findViewById(R.id.guests);
 				guestTabView.setAdapter(new GuestAdapter(EventDetailsActivity.this, guestMap, statusLabels));
 				guestTabView.expandGroup(0);
+				guestTabView.setOnChildClickListener(new OnChildClickListener() {
+
+					@Override
+					public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+						Intent intent = new Intent(getApplicationContext(), Profile.class);
+						intent.putExtra(Profile.USER_ID, ((User) v.getTag()).id);
+						startActivity(intent);
+						return true;
+					}
+					
+				});
 				
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
@@ -507,13 +519,14 @@ public class EventDetailsActivity extends Activity {
 	        ImageAware photo = new ImageViewAware((ImageView) view.findViewById(R.id.photo), false);
 	        imageLoader.displayImage(guest.photo, photo, imageOptions);
 	        
+	        view.setTag(guest);
+	        
 	        return view;
 		}
 
 		@Override
 		public boolean isChildSelectable(int groupPosition, int childPosition) {
-			// TODO Auto-generated method stub
-			return false;
+			return true;
 		}
 		
 	}

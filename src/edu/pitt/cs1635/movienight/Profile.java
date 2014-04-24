@@ -74,7 +74,7 @@ public class Profile extends Activity {
 		this.menu = menu;
 		getMenuInflater().inflate(R.menu.profile, menu);
 		
-		if (!intent.hasExtra(USER_ID)) {
+		if (userId == session.getId()) {
 			// profile for the current user
 			menu.findItem(R.id.action_logout).setVisible(true);
 			menu.findItem(R.id.action_edit_profile).setVisible(true);
@@ -157,7 +157,7 @@ public class Profile extends Activity {
 			nameView.setText(name);
 			imageLoader.displayImage(photo, photoAware, imageOptions);
 			
-			if (session.isLoggedIn() && intent.hasExtra(USER_ID)) {
+			if (session.isLoggedIn() && userId != session.getId()) {
 				// if user is logged in and not on their own profile page
 				showFriendMenuItem(!friend);
 			}
