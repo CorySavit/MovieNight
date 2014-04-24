@@ -12,8 +12,8 @@
     
     <RelativeLayout 
         android:id="@+id/rating_tag_wrap"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible" >
@@ -26,13 +26,12 @@
         
         <TextView
 			android:id="@+id/mn_rating"
-			android:layout_width="20dp"
-			android:layout_height="wrap_content"
-			android:gravity="center_horizontal"
+			android:layout_width="25dp"
+			android:layout_height="25dp"
+			android:gravity="center"
 			android:layout_alignParentRight="true"
 			android:textColor="#fff"
-			android:textStyle="bold"
-			android:textSize="12sp" />
+			android:textSize="10sp" />
         
     </RelativeLayout>
  

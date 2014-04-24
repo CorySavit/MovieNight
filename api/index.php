@@ -23,11 +23,11 @@ if ($request[0] == "movies") {
         //$lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
 
         // get movies playing near current location
-        $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime, mn_rating
+        $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime, round(mn_rating/mn_rating_count*100) as mn_rating
           from showtimes as s
           join movies as m on (s.movie_id = m.id)
           left join (
-            select movie_id, sum(rating) as mn_rating
+            select movie_id, sum(rating) as mn_rating, count(rating) as mn_rating_count
             from ratings
             group by movie_id
           ) as r on r.movie_id = s.movie_id
