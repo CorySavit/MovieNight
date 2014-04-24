@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
 				startActivityForResult(mapIntent, SET_LOCATION);
+				overridePendingTransition(R.anim.slide_up, android.R.anim.fade_out);
 			}
 			
 		});

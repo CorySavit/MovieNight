@@ -129,7 +129,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 				resultIntent.putExtra(SessionManager.LNG, marker.getPosition().longitude);
 				setResult(Activity.RESULT_OK, resultIntent);
 				finish();
-				
+				overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
 				
 			}
 	    	
@@ -278,15 +278,5 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
                 .draggable(true).visible(true));
 
     }
-	/*@Override
-	public void onMapLongClick(LatLng point) {
-		
-		
-		Intent resultIntent = new Intent();
-		resultIntent.putExtra(SessionManager.LAT, point.latitude);
-		resultIntent.putExtra(SessionManager.LNG, point.longitude);
-		setResult(Activity.RESULT_OK, resultIntent);
-		finish();
-		
-	}*/
+
 }
