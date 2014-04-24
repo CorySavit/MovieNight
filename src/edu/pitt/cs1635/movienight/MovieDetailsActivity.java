@@ -32,6 +32,8 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -183,6 +185,41 @@ public class MovieDetailsActivity extends Activity {
 
 		new GetMovieInfo().execute();
 
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+		if (session.isLoggedIn()) {
+			menu.findItem(R.id.action_my_events).setVisible(true);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		switch (item.getItemId()) {
+		case R.id.action_profile:
+			if (!session.isLoggedIn()){
+				session.showLoginSignupDialog();
+			} else {
+				Intent profileView = new Intent(this, Profile.class);
+				startActivity(profileView);
+				return true;
+			}
+			return true;
+		
+		case R.id.action_my_events:
+			startActivity(new Intent(this, MyEventsActivity.class));
+			return true;
+			
+		case R.id.action_search:
+			startActivity(new Intent(this, SearchActivity.class));
+			return true;
+		}
+		
+		return super.onOptionsItemSelected(item);
 	}
 	
 	private String formatDate(int month, int day, int year) {

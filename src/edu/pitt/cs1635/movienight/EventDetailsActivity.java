@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -174,18 +175,36 @@ public class EventDetailsActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.event_details, menu);
+		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+		if (session.isLoggedIn()) {
+			menu.findItem(R.id.action_my_events).setVisible(true);
+		}
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		
+		switch (item.getItemId()) {
+		case R.id.action_profile:
+			if (!session.isLoggedIn()){
+				session.showLoginSignupDialog();
+			} else {
+				Intent profileView = new Intent(this, Profile.class);
+				startActivity(profileView);
+				return true;
+			}
+			return true;
+		
+		case R.id.action_my_events:
+			startActivity(new Intent(this, MyEventsActivity.class));
+			return true;
+			
+		case R.id.action_search:
+			startActivity(new Intent(this, SearchActivity.class));
 			return true;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 	

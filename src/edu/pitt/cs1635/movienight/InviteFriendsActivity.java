@@ -26,6 +26,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -59,6 +60,8 @@ public class InviteFriendsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+	    getActionBar().hide();
 		setContentView(R.layout.activity_invite_friends);
 		
 		session = new SessionManager(this);
@@ -301,12 +304,6 @@ public class InviteFriendsActivity extends Activity {
 			view.setBackgroundColor(0x00000000);
 			checked.setVisibility(View.INVISIBLE);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.invite_friends, menu);
-		return true;
 	}
 
 }
