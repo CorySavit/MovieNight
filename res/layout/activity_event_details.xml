@@ -223,18 +223,18 @@
 						android:layout_height="wrap_content"
 						android:layout_above="@+id/new_message"
 						android:layout_alignParentTop="true"
-						android:padding="1dp" />
+						android:padding="1dp"
+						android:stackFromBottom="true"
+						android:transcriptMode="alwaysScroll" />
 					
 					<EditText 
 					    android:id="@+id/new_message"
 					    android:layout_width="match_parent"
-					    android:layout_height="30dp"
+					    android:layout_height="wrap_content"
 					    android:background="@color/gray"
-					    android:textColor="@color/white"
 					    android:layout_alignParentBottom="true"
-					    android:hint="Enter New Message"
-					    android:paddingLeft="5dp"
-					    android:paddingRight="5dp"
+					    android:hint="@string/type_message"
+					    android:padding="@dimen/global_padding"
 					    android:singleLine="true"
 					    android:textSize="18sp" />
 					

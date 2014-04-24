@@ -20,10 +20,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -40,7 +38,6 @@ import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -54,7 +51,7 @@ public class EventDetailsActivity extends Activity {
 	int eventID;
 	private Event event;
 	private Movie movie;
-	private ListAdapter messageAdapter;
+	private BaseAdapter messageAdapter;
 	ArrayList<Message> messages;
 	private AlertDialog.Builder statusBuilder;
 	private TextView statusAdminView;
@@ -156,12 +153,12 @@ public class EventDetailsActivity extends Activity {
 			}
 
 		});
+		
 		newMessageEdit = (EditText) findViewById(R.id.new_message);
 		newMessageEdit.setOnEditorActionListener(new OnEditorActionListener() {
 		
 			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					new PostMessage().execute();
 		        }
@@ -363,20 +360,27 @@ public class EventDetailsActivity extends Activity {
 
 	}
 	
-private class PostMessage extends AsyncTask<Void, Void, Void> {
+	private class PostMessage extends AsyncTask<Void, Void, Void> {
+		
+		private String message;
 		
 		protected Void doInBackground(Void... arg0) {
-			// user has already RSVP; they are changing it
-			String outMessage = newMessageEdit.getText().toString();
+			
+			message = newMessageEdit.getText().toString();
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
-			params.add(new BasicNameValuePair("message", outMessage));
+			params.add(new BasicNameValuePair("message", message));
             API.getInstance().post("events/"+eventID+"/messages", params);
             
 			return null;
 		}
 		
 		protected void onPostExecute(Void result){
+			// update listview
+            messages.add(new Message(message, session.getName(), "just now"));
+            messageAdapter.notifyDataSetChanged();
+            
+            // clear edittext
 			newMessageEdit.setText("");
 		}
 

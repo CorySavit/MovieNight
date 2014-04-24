@@ -352,7 +352,7 @@ if ($request[0] == "movies") {
             from messages as m 
             join users as u on m.user_id = u.id
             where m.event_id = ".$request[1]."
-            order by m.time desc;")->fetchAll(PDO::FETCH_ASSOC);
+            order by m.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
           echo json_encode($messages);
           break;

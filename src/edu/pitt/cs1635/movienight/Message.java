@@ -21,11 +21,15 @@ public class Message implements Serializable {
 		// @todo sanity check for mock data
 		if (data == null) {return;}
 		
-		
 		author = JSON.getString(data, AUTHOR);
 		message = JSON.getString(data, MESSAGE);
 		time = JSON.getString(data, TIME);
-		
+	}
+	
+	public Message(String message, String author, String time) {
+		this.message = message;
+		this.author = author;
+		this.time = time;
 	}
 	
 	public String toString() {
