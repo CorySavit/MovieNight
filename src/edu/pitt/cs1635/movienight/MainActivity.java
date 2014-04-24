@@ -32,6 +32,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.apache.http.NameValuePair;
@@ -351,14 +352,17 @@ public class MainActivity extends Activity {
 	        
 	        // movienight rating
 	        TextView ratingView = (TextView) view.findViewById(R.id.mn_rating);
-	        ratingView.setText(Integer.toString(movie.mnRating));
-	        ImageView ratingTag = (ImageView) view.findViewById(R.id.rating_tag);
-	        if (movie.mnRating < 0) {
-	        	ratingTag.setImageResource(R.drawable.negative_rating_tag);
-	        } else if (movie.mnRating > 0) {
-	        	ratingTag.setImageResource(R.drawable.positive_rating_tag);
-	        } else {
-	        	ratingTag.setImageResource(R.drawable.neutral_rating_tag);
+	        if (movie.mnRating != null) {
+	        	ratingView.setText(Integer.toString(movie.mnRating));
+		        ImageView ratingTag = (ImageView) view.findViewById(R.id.rating_tag);
+		        if (movie.mnRating < 0) {
+		        	ratingTag.setImageResource(R.drawable.negative_rating_tag);
+		        } else if (movie.mnRating > 0) {
+		        	ratingTag.setImageResource(R.drawable.positive_rating_tag);
+		        } else {
+		        	ratingTag.setImageResource(R.drawable.neutral_rating_tag);
+		        }
+		        ((RelativeLayout) view.findViewById(R.id.rating_tag_wrap)).setVisibility(View.VISIBLE);
 	        }
 	        
 	        // set this view's tag to the entire data object

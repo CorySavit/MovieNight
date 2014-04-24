@@ -18,7 +18,7 @@ public class User extends Person implements Serializable {
 
 	// object variables
 	String email;
-	int status;
+	Integer status;
 
 	public User(JSONObject data) {
 		super(data);

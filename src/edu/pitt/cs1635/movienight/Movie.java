@@ -34,17 +34,17 @@ public class Movie implements Serializable {
 	static final String ROTTEN_RATING = "rotten_rating";
 	static final String TMDB_RATING = "tmdb_rating";
 
-	int id;
-	int tmdbid;
+	Integer id;
+	Integer tmdbid;
 	String title;
 	String description;
 	String mpaaRating;
 	String poster;
 	String runtime;
-	int mnRating;
-	int rottenCritic;
-	int rottenAudience;
-	double tmdbRating;
+	Integer mnRating;
+	Integer rottenCritic;
+	Integer rottenAudience;
+	Double tmdbRating;
 	List<String> genres;
 	List<Event> events;
 	List<Theater> theaters;

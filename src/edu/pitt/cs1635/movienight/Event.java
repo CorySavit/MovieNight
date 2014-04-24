@@ -24,10 +24,10 @@ public class Event implements Serializable {
 	static final int STATUS_ADMIN = Guest.STATUS_ADMIN;
 
 	// object variables
-	int id;
+	Integer id;
 	Showtime showtime;
 	User admin;
-	int status;
+	Integer status;
 	List<User> guests;
 
 	public Event(JSONObject data) {

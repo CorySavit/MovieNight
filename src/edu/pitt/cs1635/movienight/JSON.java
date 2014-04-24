@@ -40,7 +40,7 @@ public class JSON {
 	 * getInt
 	 */
 	
-	public static int getInt(JSONObject data, String key) {
+	public static Integer getInt(JSONObject data, String key) {
 		try {
 			if (data.has(key) && !data.isNull(key)) {
 				return data.getInt(key);
@@ -48,14 +48,14 @@ public class JSON {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return null;
 	}
 	
 	/*
 	 * getDouble
 	 */
 	
-	public static double getDouble(JSONObject data, String key) {
+	public static Double getDouble(JSONObject data, String key) {
 		try {
 			if (data.has(key) && !data.isNull(key)) {
 				return data.getDouble(key);
@@ -63,7 +63,7 @@ public class JSON {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		return null;
 	}
 	
 	

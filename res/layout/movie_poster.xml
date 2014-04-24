@@ -11,10 +11,12 @@
         android:layout_height="match_parent" />
     
     <RelativeLayout 
+        android:id="@+id/rating_tag_wrap"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true" >
+        android:layout_alignParentRight="true"
+        android:visibility="invisible" >
         
         <ImageView
             android:id="@+id/rating_tag"
