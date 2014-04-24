@@ -295,6 +295,27 @@ public class SessionManager {
 
 		return user;
 	}
+	
+	public void setLocation(double lat, double lng) {
+		setLocation(lat, lng, null);
+	}
+	
+	public void setLocation(double lat, double lng, String location) {
+		setLocation((float) lat, (float) lng, location);
+	}
+	
+	public void setLocation(float lat, float lng) {
+		setLocation(lat, lng, null);
+	}
+	
+	public void setLocation(float lat, float lng, String location) {
+		editor.putFloat(LAT, lat);
+        editor.putFloat(LNG, lng);
+        if (location != null) {
+        	editor.putString(LOCATION, location);
+        }
+        editor.commit();
+	}
 
 	public Boolean isLoggedIn(){
 		return pref.contains(KEY_ID);
@@ -318,6 +339,14 @@ public class SessionManager {
 
 	public String getEmail() {
 		return pref.getString(KEY_EMAIL, "");
+	}
+	
+	public double getLat() {
+		return pref.getFloat(LAT, 0);
+	}
+	
+	public double getLng() {
+		return pref.getFloat(LNG, 0);
 	}
 
 }

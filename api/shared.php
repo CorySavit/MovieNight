@@ -72,13 +72,13 @@ function get_genres($id) {
     where movie_id = ".$id.";")->fetchAll(PDO::FETCH_COLUMN);
 }
 
-function get_showtimes($id, $date = null) {
+function get_showtimes($id, $date = null, $lat = STATIC_LAT, $lng = STATIC_LAT) {
   global $db;
   $date = is_null($date) ? date("Y-m-d") : $date;
 
   $theaters = $db->query("select s.id, time, flag, theater_id, name, address
       from showtimes as s join theaters as t on theater_id = t.id
-      where movie_id = ".$id." and date(time) = date(".$db->quote($date).")
+      where movie_id = ".$id." and date(time) = date(".$db->quote($date).") and theater_id in (".getNearTheatersQuery($lat, $lng).")
       order by time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
   $result = array();
@@ -95,6 +95,20 @@ function get_showtimes($id, $date = null) {
     }
   }
   return array_values($result);
+}
+
+function getNearTheatersQuery($lat = STATIC_LAT, $lng = STATIC_LNG, $radius = RADIUS_MILES) {
+  return "SELECT id
+    FROM theaters
+    WHERE (
+        3959 * acos(
+          cos(radians(".$lat."))
+          * cos(radians(lat))
+          * cos(radians(lng) - radians(".$lng."))
+          + sin(radians(".$lat."))
+          * sin(radians(lat))
+        )
+    ) <= ".$radius;
 }
 
 // format a JSON response

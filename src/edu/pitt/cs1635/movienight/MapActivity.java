@@ -22,11 +22,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -35,15 +33,12 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.TextView.OnEditorActionListener;
@@ -59,6 +54,7 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	 private LocationManager locationManager;
 	 private static final long MIN_TIME = 400;
 	 private static final float MIN_DISTANCE = 1000;
+	 private SessionManager session;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +62,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	    getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
 	    getActionBar().hide();
 	    setContentView(R.layout.activity_map);
+	    
+	    session = new SessionManager(this);
 	    
 
 	    if (mMap == null) {
@@ -123,6 +121,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 
 			@Override
 			public void onClick(View v) {
+				
+				session.setLocation(marker.getPosition().latitude, marker.getPosition().longitude);
 				
 				Intent resultIntent = new Intent();
 				resultIntent.putExtra(SessionManager.LAT, marker.getPosition().latitude);

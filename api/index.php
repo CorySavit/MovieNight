@@ -16,9 +16,6 @@ if ($request[0] == "movies") {
     switch ($request_type) {
       case 'GET': # /movies
 
-        // @todo this is just useing static lat/lng at the moment
-        //$lat = STATIC_LAT;
-        //$lng = STATIC_LNG;
         $lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
         $lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
 
@@ -32,17 +29,7 @@ if ($request[0] == "movies") {
             group by movie_id
           ) as r on r.movie_id = s.movie_id
           WHERE DATE(time) = DATE(".$db->quote($date).") AND theater_id IN (
-            SELECT id
-            FROM theaters
-            WHERE (
-                3959 * acos(
-                  cos(radians(".$lat."))
-                  * cos(radians(lat))
-                  * cos(radians(lng) - radians(".$lng."))
-                  + sin(radians(".$lat."))
-                  * sin(radians(lat))
-                )
-            ) <= 31
+            ".getNearTheatersQuery($lat, $lng, 5)."
           ) GROUP BY s.movie_id
           order by mn_rating desc;")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -59,6 +46,9 @@ if ($request[0] == "movies") {
 
   } else if (sizeof($request) == 2 && $request_type == 'GET') { # /movies/{id}
     // assume second parameter is id
+
+    $lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
+    $lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
 
     // get movie information
     $movie = $db->query("select id, tmdb_id, rotten_id, title, description, mpaa_rating, poster, runtime, mn_rating, mn_rating_count
@@ -85,7 +75,7 @@ if ($request[0] == "movies") {
     get_guests($movie['events'], true);
 
     // get showtimes
-    $movie['theaters'] = get_showtimes($movie['id'], $date);
+    $movie['theaters'] = get_showtimes($movie['id'], $date, $lat, $lng);
 
     // get cast from TMDB
     $tmdb = new TMDB($movie['tmdb_id']);
@@ -132,7 +122,10 @@ if ($request[0] == "movies") {
   } else if ($request[2] == 'showtimes') { # /movies/{id}/showtimes
 
     $my_date = array_key_exists('date', $_GET) ? $_GET['date'] : $date;
-    echo json_encode(get_showtimes($request[1], $my_date));
+    $lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
+    $lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
+
+    echo json_encode(get_showtimes($request[1], $my_date, $lat, $lng));
 
   } else {
     echo INVALID_REQUEST;

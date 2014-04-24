@@ -270,7 +270,10 @@ public class MovieDetailsActivity extends Activity {
 		protected Void doInBackground(Void... arg0) {
 
 			// make call to API
-			String str = API.getInstance().get("movies/" + movie.id);
+			List<NameValuePair> params = new ArrayList<NameValuePair>();
+			params.add(new BasicNameValuePair("lat", Double.toString(session.getLat())));
+			params.add(new BasicNameValuePair("lng", Double.toString(session.getLng())));
+			String str = API.getInstance().get("movies/" + movie.id, params);
 
 			if (str != null) {
 				try {
@@ -396,6 +399,8 @@ public class MovieDetailsActivity extends Activity {
 			// make call to API
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("date", date[0]));
+			params.add(new BasicNameValuePair("lat", Double.toString(session.getLat())));
+			params.add(new BasicNameValuePair("lng", Double.toString(session.getLng())));
 			String str = API.getInstance().get("movies/" + movie.id + "/showtimes", params);
 
 			if (str != null) {

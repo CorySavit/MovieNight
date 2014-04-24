@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -48,7 +47,6 @@ public class MainActivity extends Activity {
 	SessionManager session;
 	private ProgressDialog pDialog;
 	private GridView posterGrid;
-	private List<Movie> movieList;
 	private String locationString;
 	private Double latitude;
 	private Double longitude;
@@ -74,9 +72,6 @@ public class MainActivity extends Activity {
 		// create global configuration and initialize ImageLoader with this configuration
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext()).build();
         ImageLoader.getInstance().init(config);
-		
-        // create data structure
-		movieList = new ArrayList<Movie>();
 		
 		// find grid view
 		posterGrid = (GridView) this.findViewById(R.id.posterGrid);
@@ -133,8 +128,10 @@ public class MainActivity extends Activity {
 			
 			// if we can't get address, try to get last saved address
 			locationString = (locationString == null) ? settings.getString(SessionManager.LOCATION, getString(R.string.unknown_location)) : locationString;
-			latitude = (Double) ((latitude == null) ? settings.getFloat(SessionManager.LAT, 0) : latitude);
-			longitude = (Double) ((longitude == null) ? settings.getFloat(SessionManager.LNG, 0) : longitude);
+			latitude = (latitude == null) ? settings.getFloat(SessionManager.LAT, 0) : latitude;
+			longitude = (longitude == null) ? settings.getFloat(SessionManager.LNG, 0) : longitude;
+			
+			session.setLocation(latitude, longitude);
 			locationTextView.setText(locationString);
 		}
 		
@@ -186,11 +183,7 @@ public class MainActivity extends Activity {
 		super.onStop();
 		// save location when the app stops
 		if (latitude != null && longitude != null) {
-			SharedPreferences.Editor editor = settings.edit();
-			editor.putString(SessionManager.LOCATION, locationString);
-			editor.putFloat(SessionManager.LAT, new Float(latitude));
-			editor.putFloat(SessionManager.LNG, new Float(longitude));
-			editor.commit();
+			session.setLocation(latitude, longitude, locationString);
 		}
 	}
 	
@@ -234,10 +227,14 @@ public class MainActivity extends Activity {
 	 * Note that execute should be passed two parameters: a lat and lng respectively
 	 */
 	private class GetMovies extends AsyncTask<Double, Void, Void> {
+		
+		private List<Movie> movieList;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
+			
+			movieList = new ArrayList<Movie>();
 			
 			// show progress dialog
 			pDialog.show();
