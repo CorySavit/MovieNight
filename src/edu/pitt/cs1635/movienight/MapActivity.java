@@ -137,6 +137,14 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 
 	}
 	
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		
+		super.onPause();
+		overridePendingTransition(android.R.anim.fade_in, R.anim.slide_down);
+	}
+
 	private String downloadUrl(String strUrl) throws IOException{
 		String data = "";
 		InputStream iStream = null;
@@ -244,7 +252,16 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	public void onLocationChanged(Location location) {
 	    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 	    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+	    
+	    if (marker != null) {
+            marker.remove();
+        }
+        marker = mMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .draggable(true)
+                .visible(true));
 	    mMap.animateCamera(cameraUpdate);
+	    marker.showInfoWindow();
 	    locationManager.removeUpdates(this);
 
 	}

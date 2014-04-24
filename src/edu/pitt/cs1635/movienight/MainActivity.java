@@ -388,14 +388,16 @@ public class MainActivity extends Activity {
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("user_id", Integer.toString(session.getId())));
 			String pastMovies = API.getInstance().get("events/past", params);
+			Log.d("String:", pastMovies);
 			if (pastMovies != null) {
 				try {
 					JSONArray result = new JSONArray(pastMovies);
-					if(result.get(0) instanceof JSONObject){
-						JSONObject temp = result.getJSONObject(0);
-						return temp;
+					if(!result.isNull(0)){
+						if(result.get(0) instanceof JSONObject){
+							JSONObject temp = result.getJSONObject(0);
+							return temp;
+						}
 					}
-					
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
