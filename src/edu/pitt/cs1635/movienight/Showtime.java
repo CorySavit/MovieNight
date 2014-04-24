@@ -32,11 +32,10 @@ public class Showtime implements Serializable {
 	Integer flag;
 	String ticketURL;
 
-	private static SimpleDateFormat inputFormat;
+	private static SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
 
 	public Showtime(JSONObject data) {
 		// parse time
-		inputFormat = new SimpleDateFormat("yyyy-MM-dd kk:mm", Locale.US);
 		time = parseDate(JSON.getString(data, TIME));
 		
 		id = JSON.getInt(data, ID);

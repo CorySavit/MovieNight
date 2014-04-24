@@ -192,12 +192,21 @@ public class MainActivity extends Activity {
 			editor.commit();
 		}
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
+		if (session.isLoggedIn()) {
+			menu.findItem(R.id.action_my_events).setVisible(true);
+		}
+		return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		
 		switch (item.getItemId()) {
 		case R.id.action_profile:
-			
 			if (!session.isLoggedIn()){
 				session.showLoginSignupDialog();
 			} else {
@@ -205,23 +214,18 @@ public class MainActivity extends Activity {
 				startActivity(profileView);
 				return true;
 			}
-			break;
+			return true;
+		
+		case R.id.action_my_events:
+			startActivity(new Intent(this, MyEventsActivity.class));
+			return true;
 			
 		case R.id.action_search:
-			
-			Intent intent = new Intent(this, SearchActivity.class);
-			startActivity(intent);
+			startActivity(new Intent(this, SearchActivity.class));
 			return true;
 		}
 		
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.action_bar_menu, menu);
-		return true;
 	}
 	
 	/*

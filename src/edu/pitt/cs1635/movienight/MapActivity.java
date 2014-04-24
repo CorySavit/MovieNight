@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -54,6 +55,8 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+	    getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+	    getActionBar().hide();
 	    setContentView(R.layout.activity_map);
 	    
 
@@ -210,31 +213,6 @@ public class MapActivity extends FragmentActivity implements LocationListener, O
 				}
 			}
 		}
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_settings:
-			Intent profileView = new Intent(this, Profile.class);
-			startActivity(profileView);
-			return true;
-		case R.id.action_home:
-			finish();
-			//Intent homeView = new Intent(this, MainActivity.class);
-			//startActivity(homeView);
-			return true;
-
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.map, menu);
-		return true;
 	}
 
 	@Override
