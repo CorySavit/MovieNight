@@ -14,7 +14,9 @@
         android:hint="@string/enterLocation"
         android:inputType="textPostalAddress"
         android:singleLine="true"
-        android:textColor="@color/black"
+        android:background="@android:drawable/dark_header"
+        android:textColor="@color/white"
+        android:padding="@dimen/global_padding"
         android:textSize="18sp" />
 
     <fragment
@@ -30,7 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/blue_button"
-        android:text="Use This Location" />
+        android:text="@string/select_location"
+        style="@style/BlueButton"
+        android:textSize="16sp" />
 
 </RelativeLayout>
