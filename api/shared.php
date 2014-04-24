@@ -78,7 +78,7 @@ function get_showtimes($id, $date = null, $lat = STATIC_LAT, $lng = STATIC_LAT) 
 
   $theaters = $db->query("select s.id, time, flag, theater_id, name, address
       from showtimes as s join theaters as t on theater_id = t.id
-      where movie_id = ".$id." and date(time) = date(".$db->quote($date).") and theater_id in (".getNearTheatersQuery($lat, $lng).")
+      where movie_id = ".$id." and date(time) = date(".$db->quote($date).") and time >= now() and theater_id in (".getNearTheatersQuery($lat, $lng).")
       order by time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
   $result = array();
