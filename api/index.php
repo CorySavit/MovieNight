@@ -10,17 +10,17 @@ $request_type = $_SERVER['REQUEST_METHOD'];
 
 if ($request[0] == "movies") {
 
-  $date = '2014-04-15';
+  $date = date("Y-m-d");
 
   if (sizeof($request) == 1) {
     switch ($request_type) {
       case 'GET': # /movies
 
         // @todo this is just useing static lat/lng at the moment
-        $lat = STATIC_LAT;
-        $lng = STATIC_LNG;
-        //$lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
-        //$lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
+        //$lat = STATIC_LAT;
+        //$lng = STATIC_LNG;
+        $lat = array_key_exists('lat', $_GET) ? $_GET['lat'] : STATIC_LAT;
+        $lng = array_key_exists('lng', $_GET) ? $_GET['lng'] : STATIC_LNG;
 
         // get movies playing near current location
         $movies = $db->query("select m.id, m.title, m.poster, m.mpaa_rating, m.runtime, round(mn_rating/mn_rating_count*100) as mn_rating
@@ -43,11 +43,10 @@ if ($request[0] == "movies") {
                   * sin(radians(lat))
                 )
             ) <= 31
-          ) GROUP BY s.movie_id;")->fetchAll(PDO::FETCH_ASSOC);
+          ) GROUP BY s.movie_id
+          order by mn_rating desc;")->fetchAll(PDO::FETCH_ASSOC);
 
-        // @todo incorporate actual ratings
         foreach ($movies as &$movie) {
-          //$movie['mn_rating'] = rand(-1,1) * rand(1,10);
           $movie['genres'] = get_genres($movie['id']);
         }
 
@@ -75,19 +74,17 @@ if ($request[0] == "movies") {
     $movie['genres'] = get_genres($request[1]);
 
     // get featured events
-    // @todo add "and time > CURRENT_TIME"
     $movie['events'] = $db->query("select e.id, s.time, s.flag, t.name as theater_name
       from events as e
       join showtimes as s on showtime_id = s.id
       join theaters as t on s.theater_id = t.id
-      where movie_id = ".$movie['id']." and public = 1
+      where movie_id = ".$movie['id']." and public = 1 and time > CURRENT_TIME
       order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
     // add guests who are attending
     get_guests($movie['events'], true);
 
     // get showtimes
-    // @todo remove static date
     $movie['theaters'] = get_showtimes($movie['id'], $date);
 
     // get cast from TMDB
@@ -134,7 +131,6 @@ if ($request[0] == "movies") {
 
   } else if ($request[2] == 'showtimes') { # /movies/{id}/showtimes
 
-    // @todo change static date to date("Y-m-d")
     $my_date = array_key_exists('date', $_GET) ? $_GET['date'] : $date;
     echo json_encode(get_showtimes($request[1], $my_date));
 
@@ -171,13 +167,12 @@ if ($request[0] == "movies") {
 
         if (array_key_exists('user_id', $_GET)) {
           // get all of user's events
-          // @todo add "and time >= CURRENT_TIME" or maybe on a day level
           $events = $db->query("select e.id, m.title, s.time, s.flag, u2e.status
             from users2events as u2e
             join events as e on event_id = e.id
             join showtimes as s on e.showtime_id = s.id
             join movies as m on movie_id = m.id
-            where user_id = ".$_GET['user_id']."
+            where user_id = ".$_GET['user_id']." and date(time) >= date(CURRENT_TIME)
             order by s.time asc;")->fetchAll(PDO::FETCH_ASSOC);
 
           // get guests who are attending
@@ -221,7 +216,6 @@ if ($request[0] == "movies") {
 
         if (array_key_exists('user_id', $_GET)) {
           // get all of user's events
-          // @todo add "and time >= CURRENT_TIME" or maybe on a day level
           $events = $db->query("select e.id as event_id, m.id as movie_id, m.title, s.time, s.flag, u2e.status
             from users2events as u2e
             join events as e on event_id = e.id

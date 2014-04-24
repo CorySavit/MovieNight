@@ -356,15 +356,22 @@ public class MovieDetailsActivity extends Activity {
 
 				// set percentage
 				TextView percent = (TextView) rating.findViewById(R.id.percent);
+				percent.setText("N/A");
 				switch (ratings[i]) {
 				case R.string.rotten_critic:
-					percent.setText(movie.rottenCritic + "%");
+					if (movie.rottenAudience != null) {
+						percent.setText(movie.rottenCritic + "%");
+					}
 					break;
 				case R.string.rotten_audience:
-					percent.setText(movie.rottenAudience + "%");
+					if (movie.rottenAudience != null) {
+						percent.setText(movie.rottenAudience + "%");
+					}
 					break;
 				case R.string.tmdb:
-					percent.setText((long) Math.round(movie.tmdbRating * 10) + "%");
+					if (movie.tmdbRating != null) {
+						percent.setText((long) Math.round(movie.tmdbRating * 10) + "%");
+					}
 					break;
 				}
 

@@ -12,8 +12,8 @@ define("INVALID_REQUEST", "Invalid Request");
 // @todo eventually these won't be hardcoded
 define("STATIC_LAT", '40.462712');
 define("STATIC_LNG", '-79.965347');
-define("RADIUS_METERS", 50000);
-define("RADIUS_MILES", 31);
+define("RADIUS_METERS", 8046);
+define("RADIUS_MILES", 5);
 
 /**
  * Get either a Gravatar URL or complete image tag for a specified email address.

@@ -6,127 +6,137 @@ $db = new medoo(DB_NAME);
 
 // today's date for the time being
 $date = date("Y-m-d");
+$date = date('Y-m-d', strtotime($date. ' + 1 days'));
+for ($i = 0; $i < 5; $i++) {
+  $result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate='.$date.'&lat='.STATIC_LAT.'&lng='.STATIC_LNG.'&radius='.RADIUS_MILES.'&api_key=' . ONCONNECT_KEY));
+  importTMSData($result);
+  $date = date('Y-m-d', strtotime($date. ' + 1 days'));
+}
 
-//$result = json_decode(file_get_contents('http://data.tmsapi.com/v1/movies/showings?startDate='.date("Y-m-d").'&lat='.STATIC_LAT.'&lng='.STATIC_LNG.'&radius='.RADIUS_MILES.'&api_key=' . ONCONNECT_KEY));
-$result = json_decode(file_get_contents('../mock/movies'));
 
-foreach ($result as $data) {
+//$result = json_decode(file_get_contents('../mock/movies'));
 
-  // see if movie already exists in database
-  $movie = $db->get('movies', array(
-    'id',
-    'rotten_id',
-    'start_date',
-    'end_date'
-  ), array('tms_id' => $data->rootId));
+function importTMSData($result) {
+  global $db;
 
-  if (empty($movie)) {
-    // movie does not already exist in database
+  foreach ($result as $data) {
 
-    $tmdb = new TMDB($data->title, $data->releaseYear);
-    $rotten = new RottenTomatoes($data->title, array(
-      'imdb_id' => $tmdb->getIMDBId(),
-      'year' => $data->releaseYear
-    ));
+    // see if movie already exists in database
+    $movie = $db->get('movies', array(
+      'id',
+      'rotten_id',
+      'start_date',
+      'end_date'
+    ), array('tms_id' => $data->rootId));
 
-    // try to get runtime from tmdb first
-    $myRuntime = $tmdb->getRuntime();
-    if (is_null($myRuntime)) {
-      // parse runtime "PT02H14M" --> "2 hr 14 min"
-      preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
-      $myRuntime = intval($runtime[1]) * 60 + intval($runtime[2]);
-    }
+    if (empty($movie)) {
+      // movie does not already exist in database
 
-    myLog("\ninsert movie \"".$data->title."\" into database");
-    $movie_id = $db->insert('movies', array(
-      'tms_id' => $data->rootId,
-      'tmdb_id' => $tmdb->getTMDBId(),
-      'imdb_id' => $tmdb->getIMDBId(),
-      'rotten_id' => $rotten->getID(),
-      'title' => $data->title,
-      'description' => is_null($tmdb->getOverview()) ? $data->description : $tmdb->getOverview(),
-      'mpaa_rating' => $data->ratings[0]->code,
-      'poster' => $tmdb->getPosterURL(),
-      'backdrop' => $tmdb->getBackdropURL(),
-      'runtime' => $myRuntime,
-      'start_date' => $data->releaseDate,
-      'end_date' => $date
-    ));
-
-    // add genres
-    $genres = is_null($tmdb->getGenres()) ? $data->genres : $tmdb->getGenres();
-    foreach ($genres as $genre) {
-
-      if (gettype($genre) === "array") {
-        // see if tmdb entry is already in database
-        // @todo should probably search where 'name' as well
-        $genre['tmdb_id'] = $genre['id'];
-        unset($genre['id']);
-        $genre_id = $db->get('genres', 'id', array('tmdb_id' => $genre['tmdb_id']));
-      } else {
-        // search for existing name in database
-        $genre = array('name' => $genre);
-        $genre_id = $db->get('genres', 'id', array('name' => $genre['name']));
-      }
-
-      if (empty($genre_id)) {
-        // insert new genre if it doesn't exist
-        myLog("insert genre \"".$genre['name']."\" into database");
-        $genre_id = $db->insert('genres', $genre);
-      }
-
-      // create genre relationship
-      myLog("add genre \"".$genre['name']."\" to movie");
-      $db->insert('movies2genres', array(
-        'movie_id' => $movie_id,
-        'genre_id' => $genre_id
+      $tmdb = new TMDB($data->title, $data->releaseYear);
+      $rotten = new RottenTomatoes($data->title, array(
+        'imdb_id' => $tmdb->getIMDBId(),
+        'year' => $data->releaseYear
       ));
 
-    }
+      // try to get runtime from tmdb first
+      $myRuntime = $tmdb->getRuntime();
+      if (is_null($myRuntime)) {
+        // parse runtime "PT02H14M" --> "2 hr 14 min"
+        preg_match('/^PT(\d\d)H(\d\d)M$/', $data->runTime, $runtime);
+        $myRuntime = intval($runtime[1]) * 60 + intval($runtime[2]);
+      }
 
-    // @todo add cast
-
-
-  } else {
-    // movie already exists in database
-    $movie_id = $movie['id'];
-    myLog("\nmovie \"".$movie_id."\" already exists in database.");
-
-    // check if we need to expand date interval
-    // note that the start (release) date never changes
-    if ($date > $movie['end_date']) {
-
-      // update end date
-      myLog("update movie_".$movie['id']." end_date to ".$date);
-      $db->update('movies', array(
+      myLog("\ninsert movie \"".$data->title."\" into database");
+      $movie_id = $db->insert('movies', array(
+        'tms_id' => $data->rootId,
+        'tmdb_id' => $tmdb->getTMDBId(),
+        'imdb_id' => $tmdb->getIMDBId(),
+        'rotten_id' => $rotten->getID(),
+        'title' => $data->title,
+        'description' => is_null($tmdb->getOverview()) ? $data->description : $tmdb->getOverview(),
+        'mpaa_rating' => $data->ratings[0]->code,
+        'poster' => $tmdb->getPosterURL(),
+        'backdrop' => $tmdb->getBackdropURL(),
+        'runtime' => $myRuntime,
+        'start_date' => $data->releaseDate,
         'end_date' => $date
-      ), array('id' => $movie['id']));
+      ));
+
+      // add genres
+      $genres = is_null($tmdb->getGenres()) ? $data->genres : $tmdb->getGenres();
+      foreach ($genres as $genre) {
+
+        if (gettype($genre) === "array") {
+          // see if tmdb entry is already in database
+          // @todo should probably search where 'name' as well
+          $genre['tmdb_id'] = $genre['id'];
+          unset($genre['id']);
+          $genre_id = $db->get('genres', 'id', array('tmdb_id' => $genre['tmdb_id']));
+        } else {
+          // search for existing name in database
+          $genre = array('name' => $genre);
+          $genre_id = $db->get('genres', 'id', array('name' => $genre['name']));
+        }
+
+        if (empty($genre_id)) {
+          // insert new genre if it doesn't exist
+          myLog("insert genre \"".$genre['name']."\" into database");
+          $genre_id = $db->insert('genres', $genre);
+        }
+
+        // create genre relationship
+        myLog("add genre \"".$genre['name']."\" to movie");
+        $db->insert('movies2genres', array(
+          'movie_id' => $movie_id,
+          'genre_id' => $genre_id
+        ));
+
+      }
+
+      // @todo add cast
+
+
+    } else {
+      // movie already exists in database
+      $movie_id = $movie['id'];
+      myLog("\nmovie \"".$movie_id."\" already exists in database.");
+
+      // check if we need to expand date interval
+      // note that the start (release) date never changes
+      if ($date > $movie['end_date']) {
+
+        // update end date
+        myLog("update movie_".$movie['id']." end_date to ".$date);
+        $db->update('movies', array(
+          'end_date' => $date
+        ), array('id' => $movie['id']));
+
+      }
+
+      // @todo update things like rating again -- or move that into separate script?
 
     }
 
-    // @todo update things like rating again -- or move that into separate script?
+    // grab the close theaters from our database (only do this once for each movie)
+    // uses Haversine formula
+    // see https://developers.google.com/maps/articles/phpsqlsearch_v3#findnearsql
+    $theaters = $db->query("SELECT
+        id, google_id, name, (
+          3959 * acos(
+            cos(radians(".STATIC_LAT."))
+            * cos(radians(lat))
+            * cos(radians(lng) - radians(".STATIC_LNG."))
+            + sin(radians(".STATIC_LAT."))
+            * sin(radians(lat))
+          )
+      ) AS distance
+      FROM theaters
+      HAVING distance <= 31;")->fetchAll();
+
+    // add showtimes (even if the movie is already in the database)
+    addShowtimes($data->showtimes, $movie_id);
 
   }
-
-  // grab the close theaters from our database (only do this once for each movie)
-  // uses Haversine formula
-  // see https://developers.google.com/maps/articles/phpsqlsearch_v3#findnearsql
-  $theaters = $db->query("SELECT
-      id, google_id, name, (
-        3959 * acos(
-          cos(radians(".STATIC_LAT."))
-          * cos(radians(lat))
-          * cos(radians(lng) - radians(".STATIC_LNG."))
-          + sin(radians(".STATIC_LAT."))
-          * sin(radians(lat))
-        )
-    ) AS distance
-    FROM theaters
-    HAVING distance <= 31;")->fetchAll();
-
-  // add showtimes (even if the movie is already in the database)
-  addShowtimes($data->showtimes, $movie_id);
-
 }
 
 function addShowtimes($showtimes, $movie_id) {
